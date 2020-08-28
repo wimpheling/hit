@@ -55,7 +55,7 @@ That means every sub-object exists and has a position in a parent collection, th
 Every `object` (except, not yet implemented, embedded sub-objects) is indexed. That implies :
 
 - every object must have an `_id` field, with a value of type `string`
-- every object can be located using these three indices :
+- every object (except the root object) can be located using these three indices :
   - parent_id
   - parent_property
   - parent_position
@@ -66,9 +66,11 @@ The indexation allows `indexed_model` to provide `reference` and `reference_arra
 
 - you cannot delete an `object` as long as there are references to it in the document.
 
+The index also allows you to find all the fields that reference an object.
+
 ## Typed
 
-Every `object` in a document must have a `model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `indexed_model` must be initialized with a `kernel` that contains the definitions.
+Every `object` in a document must have a `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `indexed_model` must be initialized with a `kernel` that contains the definitions.
 
 The models :
 
@@ -76,6 +78,41 @@ The models :
 - restrict the accepted values using `field types` (TODO: link) and - optionally - `validators` (TODO : link)
 
 # Documentation
+
+## Creating an `indexed_model` instance
+
+To initiate an indexed_model, you need a **kernel** with model definitions. One of the core kernels, officially supported by me, is the recursively designed `indexed_model_model`, which allows you to modelize models for `indexed_model`.
+
+![I heard you liked models](./img/xzibit.jpg)
+
+To make it more simple, let's start with the basic, although completely useless `file_model`, that represents a directory/file structure, with links.
+
+We will use ( TODO : link ) `IndexedModel::new_with_values` to create the model.
+
+```rust
+use file_model::create_kernel;
+use indexed_model::{ IndexedModel, IndexedModelKernel,  ObjectValue};
+
+// create the kernel
+let kernel = create_kernel();
+
+// create a string id for the object
+let id = "my_id".into();
+
+// initiate the name value for our root object
+let mut values = HashMap::new();
+values.insert("name".into(), ObjectValue::String(name.to_string()));
+
+// we can now create the indexed_model instance
+let my_model = IndexedModel::new_with_values(
+  id,
+  kernel,
+  values,
+  // you must specify the main model name
+  "file_model/project"
+);
+
+```
 
 ## Property types
 
@@ -90,7 +127,9 @@ The models :
 - **reference**
 - **reference_array**
 
-## Model definitions
+## Kernel
+
+### Model definitions
 
 A `model` has the following properties:
 
@@ -113,3 +152,7 @@ A `model` has the following properties:
   https://nick.groenen.me/posts/rust-error-handling/
 - publish to crates.io
 - implement ACID
+
+### Kernel Plugins
+
+TODO: write this chapter
