@@ -64,6 +64,7 @@ impl IndexEntry {
         self.references.retain(|x| x != parent);
     }
 
+    // TODO : should have no return type
     pub(in crate::index) fn set(
         &mut self,
         property: &str,

@@ -64,6 +64,7 @@ impl Index {
         index.insert_raw(id, values, None)?;
         Ok(index)
     }
+
     pub fn get_main_object_id(&self) -> &Id {
         return &self.id;
     }
@@ -93,6 +94,7 @@ impl Index {
         value: ObjectValue,
     ) -> Result<(), String> {
         //remove reference for old value
+        // TODO : should be put in the ObjectValue::Reference case of the below match ?
         unindex_reference_from_property(self, id, property)?;
 
         match value.clone() {
@@ -244,5 +246,85 @@ impl Index {
 
     fn dispatch_value(entry: IndexEntryRef, property: &str, value: ObjectValue) {
         entry.borrow_mut().dispatch_value(property, value);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::index::Index;
+    use crate::plugins::Plugins;
+    use crate::ObjectValue;
+    use crate::Reference;
+    use std::collections::HashMap;
+    #[test]
+    fn it_should_create_a_new_index_with_values() {
+        let mut values = HashMap::new();
+        values.insert("test".into(), ObjectValue::Bool(true));
+        values.insert("testString".into(), ObjectValue::String("value".into()));
+        assert!(Index::new_with_values("id", values, Plugins::new()).is_ok());
+    }
+
+    #[test]
+    fn it_should_fail_creating_a_new_index_with_reference_values() {
+        let mut values = HashMap::new();
+        values.insert(
+            "reference".into(),
+            ObjectValue::Reference(Reference { id: "a".into() }),
+        );
+        assert_eq!(
+            Index::new_with_values("id", values, Plugins::new()).err(),
+            Some("References not allowed when creating new object".to_string())
+        );
+    }
+
+    #[test]
+    fn it_should_fail_creating_a_new_index_with_reference_array_values() {
+        let mut values = HashMap::new();
+        values.insert(
+            "reference".into(),
+            ObjectValue::VecReference(vec![Reference { id: "a".into() }]),
+        );
+        assert_eq!(
+            Index::new_with_values("id", values, Plugins::new()).err(),
+            Some("References not allowed when creating new object".to_string())
+        );
+    }
+    #[test]
+    fn it_should_fail_creating_a_new_index_with_subobject_values() {
+        let mut values = HashMap::new();
+        values.insert(
+            "reference".into(),
+            ObjectValue::SubObject(Reference { id: "a".into() }),
+        );
+        assert!(Index::new_with_values("id", values, Plugins::new()).is_err());
+    }
+    #[test]
+    fn it_should_fail_creating_a_new_index_with_subobject_array_values() {
+        let mut values = HashMap::new();
+        values.insert(
+            "reference".into(),
+            ObjectValue::VecSubObjects(vec![Reference { id: "a".into() }]),
+        );
+        assert!(Index::new_with_values("id", values, Plugins::new()).is_err());
+    }
+
+    #[test]
+    fn it_should_get_existing_data() {
+        let mut values = HashMap::new();
+        values.insert("test".into(), ObjectValue::Bool(true));
+        let index = Index::new_with_values("id", values, Plugins::new())
+            .ok()
+            .unwrap();
+
+        let item = index.get("id").unwrap();
+        let item = item.borrow();
+
+        let prop = item.get("test");
+        match prop {
+            ObjectValue::Bool(value) => {
+                assert_eq!(value, &true);
+            }
+            _ => panic!("Should be a boolean"),
+        }
     }
 }

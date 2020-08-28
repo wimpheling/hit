@@ -1,6 +1,5 @@
 use crate::index::IndexEntryProperty;
 
-
 use crate::object_data::ObjectValues;
 
 pub trait InitPlugin<ExtraData, Entry> {
@@ -12,10 +11,12 @@ pub trait InitPlugin<ExtraData, Entry> {
         parent: Option<IndexEntryProperty>,
     );
 }
+
 pub trait DeletePlugin<Entry> {
     fn on_before_delete_entry(&mut self, entry: &Entry) -> Result<(), String>;
     fn on_after_delete_entry(&mut self, entry: &Entry) -> Result<(), String>;
 }
+
 pub trait Plugin<ExtraData, Entry> {
     fn on_before_add_entry(
         &mut self,
