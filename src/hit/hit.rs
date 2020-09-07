@@ -1,9 +1,9 @@
 use crate::events::FieldListenerRef;
+use crate::hit::helpers::can_move_object;
+use crate::hit::hit_entry::HitEntry;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::index::IndexEntryRef;
-use crate::model::index::helpers::can_move_object;
-use crate::model::index::indexed_model_entry::IndexedModelEntry;
 use crate::model::validators::ValidatorContext;
 use crate::model::Model;
 use crate::object_data::Id;
@@ -17,12 +17,12 @@ use std::collections::HashMap;
 use std::iter::Iterator;
 use std::rc::Rc;
 
-pub type IndexedModelPlugins = Plugins<Rc<Model>, IndexedModelEntry>;
-pub type IndexedModelKernel = dyn Kernel<Rc<Model>, IndexedModelEntry>;
+pub type HitPlugins = Plugins<Rc<Model>, HitEntry>;
+pub type HitKernel = dyn Kernel<Rc<Model>, HitEntry>;
 
 pub(in crate) struct ModelIndex {
     pub map: HashMap<String, Rc<Model>>,
-    pub plugins: Vec<Rc<RefCell<dyn DeletePlugin<IndexedModelEntry>>>>,
+    pub plugins: Vec<Rc<RefCell<dyn DeletePlugin<HitEntry>>>>,
 }
 
 impl ModelIndex {
@@ -34,21 +34,21 @@ impl ModelIndex {
     }
 }
 
-pub struct IndexedModel {
+pub struct Hit {
     pub(in crate) index: Index,
     pub(in crate) model_index: Rc<RefCell<ModelIndex>>,
-    pub(in crate) plugins: IndexedModelPlugins,
-    pub kernel: Rc<IndexedModelKernel>,
+    pub(in crate) plugins: HitPlugins,
+    pub kernel: Rc<HitKernel>,
 }
 
-impl IndexedModel {
-    pub fn new(id: &str, kernel: Rc<IndexedModelKernel>) -> IndexedModel {
+impl Hit {
+    pub fn new(id: &str, kernel: Rc<HitKernel>) -> Hit {
         let mut model_index = ModelIndex::new();
         model_index.plugins = kernel.get_plugins().delete_plugins;
         let model_index = Rc::new(RefCell::new(model_index));
         let mut plugins = Plugins::new();
         plugins.delete_plugins.push(model_index.clone());
-        IndexedModel {
+        Hit {
             model_index: model_index,
             index: Index::new(id, plugins),
             plugins: kernel.get_plugins(),
@@ -57,10 +57,10 @@ impl IndexedModel {
     }
     pub fn new_with_values(
         id: &str,
-        kernel: Rc<IndexedModelKernel>,
+        kernel: Rc<HitKernel>,
         values: ObjectValues,
         model_type: &str,
-    ) -> Result<IndexedModel, String> {
+    ) -> Result<Hit, String> {
         let mut model_index = ModelIndex::new();
         model_index.plugins = kernel.get_plugins().delete_plugins;
         let model = kernel
@@ -75,7 +75,7 @@ impl IndexedModel {
         let model_index = Rc::new(RefCell::new(model_index));
         let mut plugins = Plugins::new();
         plugins.delete_plugins.push(model_index.clone());
-        Ok(IndexedModel {
+        Ok(Hit {
             index: Index::new_with_values(id, values, plugins)?,
             model_index: model_index,
             plugins: kernel.get_plugins(),
@@ -155,11 +155,11 @@ impl IndexedModel {
         }
     }
 
-    pub fn get(&self, id: &str) -> Option<IndexedModelEntry> {
+    pub fn get(&self, id: &str) -> Option<HitEntry> {
         let index_entry = self.index.get(id)?;
         let model = self.model_index.borrow();
         let model = model.map.get(id)?;
-        Some(IndexedModelEntry {
+        Some(HitEntry {
             entry: index_entry,
             model: model.clone(),
         })
@@ -240,7 +240,7 @@ impl IndexedModel {
         Ok(())
     }
 
-    pub fn get_plugins(&self) -> &IndexedModelPlugins {
+    pub fn get_plugins(&self) -> &HitPlugins {
         return &self.plugins;
     }
     pub fn get_main_object_id(&self) -> &Id {
@@ -286,15 +286,15 @@ impl IndexedModel {
         }
     }
 }
-impl Iterator for IndexedModel {
-    type Item = IndexedModelEntry;
-    fn next(&mut self) -> Option<IndexedModelEntry> {
+impl Iterator for Hit {
+    type Item = HitEntry;
+    fn next(&mut self) -> Option<HitEntry> {
         // Let's loop until we find something that should not be filtered.
         loop {
             match self.model_index.borrow().map.iter().next() {
                 Some((id, model)) => {
                     let entry = self.index.get(&id)?;
-                    return Some(IndexedModelEntry {
+                    return Some(HitEntry {
                         entry: entry.clone(),
                         model: model.clone(),
                     });
@@ -309,24 +309,20 @@ impl DeletePlugin<IndexEntryRef> for ModelIndex {
     fn on_after_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), String> {
         let model = self.map.get(entry.borrow().get_id()).ok_or("Err")?;
         for plugin in self.plugins.iter() {
-            plugin
-                .borrow_mut()
-                .on_after_delete_entry(&IndexedModelEntry {
-                    entry: entry.clone(),
-                    model: model.clone(),
-                })?;
+            plugin.borrow_mut().on_after_delete_entry(&HitEntry {
+                entry: entry.clone(),
+                model: model.clone(),
+            })?;
         }
         Ok(())
     }
     fn on_before_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), String> {
         let model = self.map.get(entry.borrow().get_id()).ok_or("Err")?;
         for plugin in self.plugins.iter() {
-            plugin
-                .borrow_mut()
-                .on_before_delete_entry(&IndexedModelEntry {
-                    entry: entry.clone(),
-                    model: model.clone(),
-                })?;
+            plugin.borrow_mut().on_before_delete_entry(&HitEntry {
+                entry: entry.clone(),
+                model: model.clone(),
+            })?;
         }
         Ok(())
     }

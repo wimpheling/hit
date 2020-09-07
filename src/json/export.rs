@@ -1,6 +1,6 @@
+use crate::hit::{Hit, HitEntry};
 use crate::index::IndexEntryProperty;
 use crate::json::utils::*;
-use crate::model::{IndexedModel, IndexedModelEntry};
 use crate::object_data::{ObjectValue, Reference};
 use serde_json::{json, Map, Value};
 use std::collections::HashMap;
@@ -110,7 +110,7 @@ fn export_parent(parent: Option<IndexEntryProperty>) -> Value {
     }
 }
 
-fn export_object(object: IndexedModelEntry) -> Result<Value, String> {
+fn export_object(object: HitEntry) -> Result<Value, String> {
     let model = &object.get_model();
     let mut data = HashMap::new();
     for (key, _field) in model.fields.iter() {
@@ -132,11 +132,11 @@ fn export_object(object: IndexedModelEntry) -> Result<Value, String> {
     }));
 }
 
-pub fn export(index: &IndexedModel) -> Result<Value, String> {
+pub fn export(index: &Hit) -> Result<Value, String> {
     let mut data = vec![];
     for (id, entry) in index.index.iter() {
         let model = { index.get_model(id).ok_or("Model not found")? };
-        let exported_object = export_object(IndexedModelEntry {
+        let exported_object = export_object(HitEntry {
             entry: entry.clone(),
             model: model.clone(),
         })?;

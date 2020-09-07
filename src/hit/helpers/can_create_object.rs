@@ -1,12 +1,12 @@
-use crate::IndexedModel;
-use crate::IndexedModelKernel;
+use crate::Hit;
+use crate::HitKernel;
 use crate::Model;
 use crate::ModelError;
 use std::collections::HashMap;
 use std::rc::Rc;
 
 fn get_allowed_fields(
-    kernel: Rc<IndexedModelKernel>,
+    kernel: Rc<HitKernel>,
     model: &Model,
     target_model_name: &str,
 ) -> Result<Option<Vec<String>>, ModelError> {
@@ -30,9 +30,7 @@ fn get_allowed_fields(
 pub type ObjectPermissions = HashMap<String, HashMap<String, Vec<String>>>;
 
 // Indexes all the models where a given model can be added (used for suggestions)
-pub fn get_all_permissions(
-    kernel: Rc<IndexedModelKernel>,
-) -> Result<ObjectPermissions, ModelError> {
+pub fn get_all_permissions(kernel: Rc<HitKernel>) -> Result<ObjectPermissions, ModelError> {
     let mut output: ObjectPermissions = HashMap::new();
     let list_of_models_clone = kernel.clone().get_models();
 
@@ -56,7 +54,7 @@ pub fn get_all_permissions(
 // TODO : use index by type when they are implemented
 pub fn get_all_targets(
     model_name: &str,
-    index: &IndexedModel,
+    index: &Hit,
     permissions: &ObjectPermissions,
 ) -> Result<Vec<String>, String> {
     match permissions.get(model_name) {

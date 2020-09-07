@@ -1,4 +1,4 @@
-use crate::model::IndexedModelKernel;
+use crate::hit::HitKernel;
 use crate::model::Model;
 use crate::model::ModelFieldRef;
 use crate::object_data::Reference;
@@ -56,7 +56,7 @@ pub fn get_object_property_as_string(
     let property = get_object_property(object, property)?;
     return get_value_as_string(property);
 }
-pub fn get_model(kernel: Rc<IndexedModelKernel>, data: &JSONObject) -> Result<Rc<Model>, String> {
+pub fn get_model(kernel: Rc<HitKernel>, data: &JSONObject) -> Result<Rc<Model>, String> {
     let model_name = get_object_property_as_string(data, String::from("model"))?;
     let model = kernel.get_model(&model_name);
     match model {

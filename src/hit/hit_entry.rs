@@ -5,12 +5,12 @@ use crate::object_data::ObjectValue;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub struct IndexedModelEntry {
+pub struct HitEntry {
     pub(in crate) entry: Rc<RefCell<IndexEntry>>,
     pub(in crate) model: Rc<Model>,
 }
 
-impl IndexedModelEntry {
+impl HitEntry {
     pub fn get(&self, property: &str) -> ObjectValue {
         let entry = self.entry.borrow();
         return entry.get(property).clone();

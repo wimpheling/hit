@@ -1,5 +1,5 @@
+use crate::hit::HitEntry;
 use crate::index::IndexEntryProperty;
-use crate::model::IndexedModelEntry;
 use crate::model::Model;
 use crate::object_data::ObjectValues;
 use crate::plugins::DeletePlugin;
@@ -32,7 +32,7 @@ impl ModelTypeIndexer {
     }
 }
 
-impl InitPlugin<Rc<Model>, IndexedModelEntry> for ModelTypeIndexer {
+impl InitPlugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
     fn on_init_add_entry(
         &mut self,
         model: Rc<Model>,
@@ -43,12 +43,12 @@ impl InitPlugin<Rc<Model>, IndexedModelEntry> for ModelTypeIndexer {
         self.add_to_index(model, id);
     }
 }
-impl DeletePlugin<IndexedModelEntry> for ModelTypeIndexer {
-    fn on_before_delete_entry(&mut self, _entry: &IndexedModelEntry) -> Result<(), String> {
+impl DeletePlugin<HitEntry> for ModelTypeIndexer {
+    fn on_before_delete_entry(&mut self, _entry: &HitEntry) -> Result<(), String> {
         Ok(())
     }
 
-    fn on_after_delete_entry(&mut self, entry: &IndexedModelEntry) -> Result<(), String> {
+    fn on_after_delete_entry(&mut self, entry: &HitEntry) -> Result<(), String> {
         let model = entry.get_model();
         let model_type = model.get_name();
         let id = entry.get_id();
@@ -60,7 +60,7 @@ impl DeletePlugin<IndexedModelEntry> for ModelTypeIndexer {
     }
 }
 
-impl Plugin<Rc<Model>, IndexedModelEntry> for ModelTypeIndexer {
+impl Plugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
     fn on_before_add_entry(
         &mut self,
         _model: Rc<Model>,

@@ -10,8 +10,8 @@ mod field_type_subobject;
 mod field_type_subobject_array;
 
 use crate::errors::ModelError;
+use crate::hit::HitEntry;
 use crate::model::validators::{ValidatorContext, Validators};
-use crate::model::IndexedModelEntry;
 use crate::model::Model;
 use crate::object_data::Reference;
 pub use field_type_bool::FieldTypeBool;
@@ -37,7 +37,7 @@ type ReturnModelError = Result<(), Vec<ModelError>>;
 fn check_reference_exists<'a>(
     value: &Reference,
     context: &'a ValidatorContext<'a>,
-) -> Result<IndexedModelEntry, Vec<ModelError>> {
+) -> Result<HitEntry, Vec<ModelError>> {
     //check reference
     let entry = context.index.get(&value.id);
     match entry {

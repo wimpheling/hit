@@ -1,6 +1,6 @@
+use crate::hit::{Hit, HitKernel, IndexModelImporter};
 use crate::index::IndexEntryProperty;
 use crate::json::utils::*;
-use crate::model::{IndexModelImporter, IndexedModel, IndexedModelKernel};
 use crate::object_data::{DateTimeUtc, ObjectValue, ObjectValues};
 use chrono::{DateTime, Utc};
 use serde_json::Value;
@@ -70,7 +70,7 @@ fn get_parent(value: &JSONObject) -> Result<Option<IndexEntryProperty>, String> 
 
 fn import_data<'index>(
     data: &JSONObject,
-    kernel: Rc<IndexedModelKernel>,
+    kernel: Rc<HitKernel>,
     new_index: &'index mut IndexModelImporter,
 ) -> Result<(), String> {
     let id = get_object_property_as_string(data, String::from("id"))?;
@@ -108,14 +108,11 @@ fn get_json_value(value: &String) -> Result<Value, String> {
         Ok(value) => Ok(value),
     }
 }
-pub fn import_from_string<'a>(
-    value: &String,
-    kernel: Rc<IndexedModelKernel>,
-) -> Result<IndexedModel, String> {
+pub fn import_from_string<'a>(value: &String, kernel: Rc<HitKernel>) -> Result<Hit, String> {
     let value = get_json_value(value)?;
     import(&value, kernel)
 }
-pub fn import<'a>(value: &Value, kernel: Rc<IndexedModelKernel>) -> Result<IndexedModel, String> {
+pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, String> {
     let value = get_value_as_object(&value)?;
     let id = get_object_property_as_string(value, String::from("id"))?;
     let mut new_index = IndexModelImporter::new(&id, kernel.clone());

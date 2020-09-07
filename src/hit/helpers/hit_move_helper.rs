@@ -1,12 +1,12 @@
 use crate::field_types::FieldTypeSubobjectArray;
 use crate::index::can_move_object as index_can_move_object;
 use crate::model::Model;
+use crate::Hit;
 use crate::IndexEntryProperty;
-use crate::IndexedModel;
 use std::rc::Rc;
 
 fn _can_move_object(
-    index: &IndexedModel,
+    index: &Hit,
     id: &str,
     target_model: Rc<Model>,
     property: &str,
@@ -32,7 +32,7 @@ fn _can_move_object(
     Ok(false)
 }
 pub fn can_move_object(
-    index: &IndexedModel,
+    index: &Hit,
     id: &str,
     target_id: &str,
     target_model: &str,

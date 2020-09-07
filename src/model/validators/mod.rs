@@ -1,5 +1,5 @@
 use crate::errors::ModelError;
-use crate::model::IndexedModel;
+use crate::Hit;
 use std::cell::RefCell;
 use std::rc::Rc;
 pub type Validators<T> = Vec<Rc<RefCell<dyn Validator<T>>>>;
@@ -15,7 +15,7 @@ pub static ERROR_MAX_LENGTH: &str = "Max length was reached.";
 pub struct ValidatorContext<'a> {
     pub id: &'a str,
     pub property: &'a str,
-    pub index: Rc<&'a IndexedModel>,
+    pub index: Rc<&'a Hit>,
 }
 
 impl Validator<String> for MaxLength {

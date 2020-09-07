@@ -4,6 +4,7 @@ extern crate mopa;
 
 mod errors;
 mod events;
+mod hit;
 mod index;
 mod json;
 mod kernel;
@@ -25,6 +26,8 @@ pub use model::*;
 pub use object_data::Id;
 pub use object_data::ObjectValue;
 pub use object_data::Reference;
+
+pub use hit::{Hit, HitKernel};
 
 pub use events::FieldListener;
 pub use events::FieldListenerRef;

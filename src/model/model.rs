@@ -42,7 +42,7 @@ impl Model {
         return self.interfaces.contains(interface);
     }
 
-    pub(in crate::model) fn get_fields(&self) -> &Fields {
+    pub(in crate) fn get_fields(&self) -> &Fields {
         return &self.fields;
     }
 }
