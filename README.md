@@ -1,21 +1,20 @@
-# indexed_model
+# hit
 
-This is a Rust library to handle data structured in tree-like documents with these features:
+`hit` is a Rust library to handle data structured in tree-like documents with these features:
 
-This library was intended to manage, in memory, deeply nested documents with strictly typed data structures and multiple inner links. That could be the representation of a word processor document, a directory and its files and subfolers with symbolic links...
+- **H**ierarchical
+- **I**ndexed
+- **T**yped
+
+This library was intended to manage, in memory, deeply nested documents with strictly typed data structures and multiple inner links. That could be the representation of a word processor document, a directory and its files and subfolders with symbolic links...
 
 # Get started
 
 # Philosophy
 
-`indexed_model` is
+`hit` is
 
-- hierarchical
-- indexed
-- relational
-- typed
-
-<!-- > We will sometimes use JSON representations of the `indexed_model` documents. This is chosen for readability as it is a concise and well-known format, but JSON is not the native format of `indexed_model`. A JSON serializer/deserializer is available, but the output we show here is not exactly the same as the JSON serializer output.
+<!-- > We will sometimes use JSON representations of the `hit` documents. This is chosen for readability as it is a concise and well-known format, but JSON is not the native format of `hit`. A JSON serializer/deserializer is available, but the output we show here is not exactly the same as the JSON serializer output.
  -->
 
 ## Hierarchical
@@ -60,38 +59,35 @@ Every `object` (except, not yet implemented, embedded sub-objects) is indexed. T
   - parent_property
   - parent_position
 
-## Relational
+The indexation allows `hit` to provide `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, and enforce consistency rules : you cannot delete an `object` as long as there are references to it in the document.
 
-The indexation allows `indexed_model` to provide `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, in the sense that :
-
-- you cannot delete an `object` as long as there are references to it in the document.
-
-The index also allows you to find all the fields that reference an object.
+The index also allows you to easily find all the fields that reference an object.
 
 ## Typed
 
-Every `object` in a document must have a `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `indexed_model` must be initialized with a `kernel` that contains the definitions.
+Every `object` in a document must have a `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `hit` must be initialized with a `kernel` that contains the definitions.
 
 The models :
 
 - list the names of the accepted fields of an object
 - restrict the accepted values using `field types` (TODO: link) and - optionally - `validators` (TODO : link)
 
-# Documentation
+# Guide : How to create and use a `hit` instance
 
-## Creating an `indexed_model` instance
+## Creating a `hit` instance
 
-To initiate an indexed_model, you need a **kernel** with model definitions. One of the core kernels, officially supported by me, is the recursively designed `indexed_model_model`, which allows you to modelize models for `indexed_model`.
+To initiate a hit data instance, you need a **kernel** with model definitions. One of the core kernels, officially supported by me, is the recursively designed `hit_model`, which allows you to modelize models for `hit`.
 
 ![I heard you liked models](./img/xzibit.jpg)
 
 To make it more simple, let's start with the basic, although completely useless `file_model`, that represents a directory/file structure, with links.
 
-We will use ( TODO : link ) `IndexedModel::new_with_values` to create the model.
+We will use ( TODO : link ) `Hit::new_with_values` to create the model. If you do not have initial values, you can instead use the (TODO : link ) `Hit::new` function.
 
 ```rust
 use file_model::create_kernel;
-use indexed_model::{ IndexedModel, IndexedModelKernel,  ObjectValue};
+use hit::{ Hit, ObjectValue };
+use std::collections::HashMap;
 
 // create the kernel
 let kernel = create_kernel();
@@ -103,39 +99,76 @@ let id = "my_id".into();
 let mut values = HashMap::new();
 values.insert("name".into(), ObjectValue::String(name.to_string()));
 
-// we can now create the indexed_model instance
-let my_model = IndexedModel::new_with_values(
+// we can now create the hit instance
+let my_model = Hit::new_with_values(
   id,
   kernel,
   values,
   // you must specify the main model name
   "file_model/project"
 );
-
 ```
 
 ## Property types
 
-`indexed_model` allows the following property types as values:
+`hit` allows the following property types as values:
+
+Simple values :
 
 - **string**
 - **number**
 - **boolean**
 - **date**
+
+Complex values :
+
 - **sub_object**
 - **sub_object_array**
 - **reference**
 - **reference_array**
 
+The following chapters will explain how to use these value types.
+
+## Setting a simple value
+
+## Adding an object
+
+## Removing an object
+
+## Referencing an object
+
+## Removing an object reference
+
+# Guide : validation
+
+`hit` provides validation for your data. There are two level of validation:
+
+## Mandatory validation
+
+There are some basic data integrity rules that `hit` models will not let you break. When you set a value or do an operation, if what you're doing violates these rules, the operation will return an error. `hit` is designed to have only a minimal amount of these errors. These errors are :
+
+- Reference integrity. If you try to reference an object id that doesn't exist, or delete an object that is referenced in another field, your operation will not happen.
+- Data types. If you're setting a field to an `ObjectValue` that is not accepted by its `FieldType`, your operation will be rejected.
+- Object model names. If you're trying to insert an object with an invalid model name, your operation will be rejected.
+- Object field names. If you're trying to set a property that doesn't exist on the model of an object, or to create an object with invalid property names.
+
+**(TODO) : be able to add mandatory validation to a model.**
+
+## Non-blocking validation
+
+The main validation model
+
+# Guide : How to create a model
+
 ## Kernel
 
-### Model definitions
+## Model definitions
 
 A `model` has the following properties:
 
 - name
 - definition
-  This is a key/value dictionary. The definition is a struct that implements the `ModelField` trait. You can write your own Model Fields, but `indexed_model` comes with standard ones:
+  This is a key/value dictionary. The definition is a struct that implements the `ModelField` trait. You can write your own Model Fields, but `hit` comes with standard ones:
 
   - String
   - Integer
