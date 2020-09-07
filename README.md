@@ -162,6 +162,14 @@ The main validation model
 
 ## Kernel
 
+### Kernel macro
+
+TODO : create the macro ^^
+
+### Kernel Plugins
+
+TODO: write this chapter
+
 ## Model definitions
 
 A `model` has the following properties:
@@ -178,14 +186,14 @@ A `model` has the following properties:
 
 - / add serious tests
 - / write guide
-- write doc
+- write rust doc
 - clarify API
 - complete event/plugin system
 - Have consistent errors
   https://nick.groenen.me/posts/rust-error-handling/
 - publish to crates.io
+
+# TODO After stabilization
+
+- do we need insert quietly ?
 - implement ACID
-
-### Kernel Plugins
-
-TODO: write this chapter

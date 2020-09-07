@@ -30,7 +30,6 @@ pub fn index_object_references(
                 index_reference(index, reference, key, id)?;
             }
             ObjectValue::VecReference(references) => {
-                //
                 for reference in references.iter() {
                     index_reference(index, reference, key, id)?;
                 }
