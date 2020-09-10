@@ -1,6 +1,7 @@
 use crate::index::{IndexEntryProperty, IndexEntryRef};
 use crate::object_data::ObjectValue;
 use crate::object_data::Reference;
+use crate::HitError;
 
 pub fn get_parent_property_value(
     parent_entry: &IndexEntryRef,
@@ -16,7 +17,7 @@ pub fn mutate_insert_in_ref_array(
     data: Vec<Reference>,
     id: &str,
     before_id: Option<String>,
-) -> Result<Vec<Reference>, String> {
+) -> Result<Vec<Reference>, HitError> {
     let mut data = data.clone();
     let new_ref = Reference { id: id.into() };
     match before_id {
@@ -24,7 +25,7 @@ pub fn mutate_insert_in_ref_array(
             let position = data
                 .iter()
                 .position(|r| r.id == before_id)
-                .ok_or("Invalid before id".to_string())?;
+                .ok_or(HitError::InvalidBeforeId(before_id.to_string()))?;
             data.insert(position, new_ref);
         }
         None => data.push(new_ref),

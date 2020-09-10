@@ -1,8 +1,8 @@
 use crate::events::{FieldListenerRef, Listeners};
-
 use crate::object_data::Id;
 use crate::object_data::ObjectValue;
 use crate::object_data::ObjectValues;
+use crate::HitError;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::default::Default;
@@ -69,7 +69,7 @@ impl IndexEntry {
         &mut self,
         property: &str,
         value: ObjectValue,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         self.data.insert(property.to_string(), value.clone());
         self.dispatch_value(property, value);
         Ok(())
@@ -84,7 +84,7 @@ impl IndexEntry {
         self.property_change_listeners.insert(property, listener);
     }
 
-    pub fn remove_listener(&mut self, property: &str, listener_id: &str) -> Result<(), &str> {
+    pub fn remove_listener(&mut self, property: &str, listener_id: &str) -> Result<(), HitError> {
         self.property_change_listeners.remove(property, listener_id)
     }
 }

@@ -42,7 +42,7 @@ fn check_reference_exists<'a>(
     let entry = context.index.get(&value.id);
     match entry {
         None => {
-            return Err(vec![HitError::InvalidReference()]);
+            return Err(vec![HitError::InvalidReference(value.id.to_string())]);
         }
         Some(entry) => Ok(entry),
     }
@@ -57,7 +57,8 @@ fn check_reference_is_authorized(authorized_models: &Vec<String>, model: &Model)
             return Ok(());
         }
     }
-    return Err(vec![HitError::InvalidReference()]);
+    //TODO error handling
+    return Err(vec![HitError::InvalidReference("".to_string())]);
 }
 pub fn run_validators<T>(
     validators: &Validators<T>,

@@ -1,3 +1,4 @@
+use crate::HitError;
 use crate::ObjectValue;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -25,10 +26,10 @@ impl Listeners {
         listeners.push(value);
     }
 
-    pub fn remove(&mut self, property: &str, listener_id: &str) -> Result<(), &str> {
+    pub fn remove(&mut self, property: &str, listener_id: &str) -> Result<(), HitError> {
         let listeners = self
             .get_property_listeners_mut(property)
-            .ok_or("Listener not found")?;
+            .ok_or(HitError::ListenerNotFound(property.to_string()))?;
         listeners.retain(|listener2| listener2.borrow().get_unique_id() != listener_id);
         Ok(())
     }

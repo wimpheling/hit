@@ -2,16 +2,16 @@ use crate::index::reference_index_helpers::unindex_reference_from_property;
 use crate::index::subobject_helpers::remove_subobject_from_parent_array;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
-
-use crate::object_data::{ObjectValue};
+use crate::object_data::ObjectValue;
+use crate::HitError;
 use std::collections::HashMap;
 
 fn find_references(
     index: &Index,
     id: &str,
     output: &mut HashMap<String, Vec<IndexEntryProperty>>,
-) -> Result<(), String> {
-    let entry = index.get(id).ok_or("Invalid id".to_string())?;
+) -> Result<(), HitError> {
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     //Error if entry has references
     let references = entry.borrow().references.clone();
     if references.len() > 0 {
@@ -24,11 +24,11 @@ fn find_references(
 pub fn find_references_recursive(
     index: &Index,
     id: &str,
-) -> Result<HashMap<String, Vec<IndexEntryProperty>>, String> {
+) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
     let mut output = HashMap::new();
     find_references(index, id, &mut output)?;
 
-    let entry = index.get(id).ok_or("Not found")?;
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     for (_, value) in entry.borrow().data.iter() {
         match value {
             ObjectValue::VecSubObjects(value) => {
@@ -45,9 +45,9 @@ pub fn find_references_recursive(
     Ok(output)
 }
 
-pub fn remove_object(index: &mut Index, id: &str) -> Result<(), String> {
+pub fn remove_object(index: &mut Index, id: &str) -> Result<(), HitError> {
     remove_object_children(index, id)?;
-    let entry = index.get(id).ok_or("Index not found")?;
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     for plugin in index.plugins.delete_plugins.iter() {
         plugin.borrow_mut().on_before_delete_entry(&entry)?;
     }
@@ -64,16 +64,16 @@ pub fn remove_object(index: &mut Index, id: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn unindex_references_from_properties(index: &mut Index, id: &str) -> Result<(), String> {
-    let entry = index.get(id).ok_or("id invalid")?;
+fn unindex_references_from_properties(index: &mut Index, id: &str) -> Result<(), HitError> {
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     for (key, _) in entry.borrow().data.iter() {
         unindex_reference_from_property(index, id, key)?;
     }
     Ok(())
 }
 
-fn remove_object_children(index: &mut Index, id: &str) -> Result<(), String> {
-    let entry = index.get(id).ok_or("Not found")?;
+fn remove_object_children(index: &mut Index, id: &str) -> Result<(), HitError> {
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     for (_, value) in entry.borrow().data.iter() {
         match value {
             ObjectValue::VecSubObjects(value) => {

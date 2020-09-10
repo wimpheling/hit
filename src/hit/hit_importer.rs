@@ -2,9 +2,9 @@ use crate::hit::hit::ModelIndex;
 use crate::hit::{Hit, HitKernel, HitPlugins};
 use crate::index::IndexEntryProperty;
 use crate::index::IndexImporter;
-
 use crate::object_data::ObjectValues;
 use crate::plugins::Plugins;
+use crate::HitError;
 use std::cell::RefCell;
 
 use std::rc::Rc;
@@ -37,8 +37,8 @@ impl IndexModelImporter {
         id: &str,
         values: ObjectValues,
         parent: Option<IndexEntryProperty>,
-    ) -> Result<(), String> {
-        let model = self.kernel.get_model(model_type).map_err(|_| "Err")?;
+    ) -> Result<(), HitError> {
+        let model = self.kernel.get_model(model_type)?;
         self.model_index
             .borrow_mut()
             .map

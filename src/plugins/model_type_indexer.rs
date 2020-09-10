@@ -5,6 +5,7 @@ use crate::object_data::ObjectValues;
 use crate::plugins::DeletePlugin;
 use crate::plugins::InitPlugin;
 use crate::plugins::Plugin;
+use crate::HitError;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -44,11 +45,11 @@ impl InitPlugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
     }
 }
 impl DeletePlugin<HitEntry> for ModelTypeIndexer {
-    fn on_before_delete_entry(&mut self, _entry: &HitEntry) -> Result<(), String> {
+    fn on_before_delete_entry(&mut self, _entry: &HitEntry) -> Result<(), HitError> {
         Ok(())
     }
 
-    fn on_after_delete_entry(&mut self, entry: &HitEntry) -> Result<(), String> {
+    fn on_after_delete_entry(&mut self, entry: &HitEntry) -> Result<(), HitError> {
         let model = entry.get_model();
         let model_type = model.get_name();
         let id = entry.get_id();

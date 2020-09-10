@@ -1,6 +1,7 @@
 use crate::index::index::IndexPlugins;
 use crate::index::{Index, IndexEntryProperty};
 use crate::object_data::{ObjectValue, ObjectValues};
+use crate::HitError;
 use std::collections::HashMap;
 
 pub struct IndexImporter {
@@ -21,7 +22,7 @@ impl IndexImporter {
         id: &str,
         values: ObjectValues,
         parent: Option<IndexEntryProperty>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         self.index.insert_raw(id, values.clone(), parent)?;
         self.collect_references(values, id)?;
         Ok(())
@@ -37,7 +38,7 @@ impl IndexImporter {
         Ok(self.index)
     }
 
-    fn collect_references(&mut self, values: ObjectValues, id: &str) -> Result<(), String> {
+    fn collect_references(&mut self, values: ObjectValues, id: &str) -> Result<(), HitError> {
         for (key, value) in values.iter() {
             match value {
                 ObjectValue::Reference(reference) => {

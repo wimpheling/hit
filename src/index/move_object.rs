@@ -3,22 +3,25 @@ use crate::index::subobject_helpers::{
     insert_subobject_in_array, remove_subobject_from_parent_array,
 };
 use crate::index::{Index, IndexEntryProperty};
+use crate::HitError;
 
 fn set_object_parent(
     index: &mut Index,
     id: &str,
     new_parent: IndexEntryProperty,
-) -> Result<(), String> {
+) -> Result<(), HitError> {
     index
         .get_mut(id)
-        .ok_or("Invalid index")?
+        .ok_or(HitError::IDNotFound(id.to_string()))?
         .borrow_mut()
         .set_parent(Some(new_parent));
     Ok(())
 }
 
-fn check_target_is_not_a_child(index: &Index, id: &str, target_id: &str) -> Result<bool, String> {
-    let parent = index.get(target_id).ok_or("Invalid id")?;
+fn check_target_is_not_a_child(index: &Index, id: &str, target_id: &str) -> Result<bool, HitError> {
+    let parent = index
+        .get(target_id)
+        .ok_or(HitError::IDNotFound(target_id.to_string()))?;
     let parent_parent = parent.borrow().get_parent();
     match parent_parent {
         None => Ok(true),
@@ -37,25 +40,25 @@ fn _can_move_object(
     id: &str,
     target_parent: IndexEntryProperty,
     _before_id: Option<String>,
-) -> Result<(), String> {
+) -> Result<(), HitError> {
     //AN OBJECT CANNOT BE ITS OWN PARENT !
     if target_parent.id == id {
-        return Err("An object cannot be its own parent".to_string());
+        return Err(HitError::CannotBeOwnParent(id.to_string()));
     }
 
     match index
         .get(id)
-        .ok_or("Invalid main id")?
+        .ok_or(HitError::IDNotFound(id.to_string()))?
         .borrow()
         .get_parent()
     {
         Some(_) => {}
-        None => return Err("You cannot move the root object".to_string()),
+        None => return Err(HitError::CannotMoveRootObject()),
     }
 
     //AN OBJECT CANNOT MOVE INSIDE ITSELF
     if !check_target_is_not_a_child(index, id, &target_parent.id)? {
-        return Err("Cannot move an object to a child of his".to_string());
+        return Err(HitError::CannotBeOwnChild());
     }
     Ok(())
 }
@@ -77,7 +80,7 @@ pub fn move_object(
     id: &str,
     target_parent: IndexEntryProperty,
     before_id: Option<String>,
-) -> Result<(), String> {
+) -> Result<(), HitError> {
     if Some(id.to_string()) == before_id {
         return Ok(());
     }
@@ -86,10 +89,10 @@ pub fn move_object(
 
     let original_parent = index
         .get(id)
-        .ok_or("Invalid index")?
+        .ok_or(HitError::IDNotFound(id.to_string()))?
         .borrow()
         .get_parent()
-        .ok_or("Entry has no parent (main object)")?;
+        .ok_or(HitError::CannotMoveRootObject())?;
     remove_subobject_from_parent_array(index, id)?;
 
     set_object_parent(index, id, target_parent.clone())?;

@@ -92,7 +92,9 @@ fn import_data<'index>(
         }
     }
 
-    new_index.add_item(model.get_name(), &id, new_data.clone(), parent.clone())?;
+    new_index
+        .add_item(model.get_name(), &id, new_data.clone(), parent.clone())
+        .map_err(|_| "Error in adding item")?;
 
     for plugin in new_index.get_plugins().init_plugins.iter() {
         plugin

@@ -5,10 +5,10 @@ use crate::index::list_helpers::{
 use crate::index::{Index, IndexEntryProperty, IndexEntryRef};
 use crate::object_data::ObjectValue;
 use crate::object_data::Reference;
+use crate::HitError;
 
-pub fn remove_subobject_from_parent_array(index: &mut Index, id: &str) -> Result<(), String> {
-    let (entry, parent) = get_parent_index_entry(index, &id)?
-        .ok_or("No parent (this is the main object)".to_string())?;
+pub fn remove_subobject_from_parent_array(index: &mut Index, id: &str) -> Result<(), HitError> {
+    let (entry, parent) = get_parent_index_entry(index, &id)?.ok_or(HitError::NoParent())?;
     remove_from_subobject_array(index, &entry, parent, &id)
 }
 /* TODO: remove ?
@@ -46,7 +46,7 @@ pub fn insert_subobject_in_array(
     parent: IndexEntryProperty,
     id: &str,
     before_id: Option<String>,
-) -> Result<(), String> {
+) -> Result<(), HitError> {
     let (parent_index_entry, parent) = get_parent_index_entry_from_parent(index, parent)?;
     let reference_array = get_parent_property_value(&parent_index_entry, &parent);
     let new_reference_array = mutate_insert_in_subobject_array(reference_array, id, before_id)?;
@@ -60,7 +60,7 @@ pub fn insert_subobject_in_array(
 fn mutate_remove_from_subobject_array(
     data: ObjectValue,
     id: &str,
-) -> Result<Option<Vec<Reference>>, String> {
+) -> Result<Option<Vec<Reference>>, HitError> {
     match data {
         ObjectValue::VecSubObjects(data) => {
             let mut data = data.clone();
@@ -70,7 +70,7 @@ fn mutate_remove_from_subobject_array(
             }
             Ok(Some(data))
         }
-        _ => Err("Invalid object found 2".into()),
+        _ => Err(HitError::CannotRemoveObjectFromThisDataType()),
     }
 }
 
@@ -79,7 +79,7 @@ fn remove_from_subobject_array(
     parent_index_entry: &IndexEntryRef,
     parent: IndexEntryProperty,
     id: &str,
-) -> Result<(), String> {
+) -> Result<(), HitError> {
     let array_of_refs = get_parent_property_value(parent_index_entry, &parent);
     // let refs_as_vec = get_object_value_as_vec_reference(array_of_refs.clone())?;
     let new_value = mutate_remove_from_subobject_array(array_of_refs, id)?;
@@ -103,10 +103,10 @@ fn mutate_insert_in_subobject_array(
     data: ObjectValue,
     id: &str,
     before_id: Option<String>,
-) -> Result<Vec<Reference>, String> {
+) -> Result<Vec<Reference>, HitError> {
     match data {
         ObjectValue::VecSubObjects(data) => mutate_insert_in_ref_array(data, id, before_id),
         ObjectValue::Null => Ok(vec![Reference { id: id.into() }]),
-        _ => Err("Invalid object found".into()),
+        _ => Err(HitError::CannotInsertObjectInThisDataType()),
     }
 }

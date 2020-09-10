@@ -10,6 +10,7 @@ use crate::object_data::Id;
 use crate::object_data::{ObjectValue, ObjectValues, Reference};
 use crate::plugins::DeletePlugin;
 use crate::plugins::Plugins;
+use crate::HitError;
 use crate::Kernel;
 
 use std::cell::RefCell;
@@ -60,12 +61,10 @@ impl Hit {
         kernel: Rc<HitKernel>,
         values: ObjectValues,
         model_type: &str,
-    ) -> Result<Hit, String> {
+    ) -> Result<Hit, HitError> {
         let mut model_index = ModelIndex::new();
         model_index.plugins = kernel.get_plugins().delete_plugins;
-        let model = kernel
-            .get_model(model_type)
-            .map_err(|_| "Model not found")?;
+        let model = kernel.get_model(model_type)?;
 
         //TODO : validate values
         //  - check all fields are in the model
@@ -87,15 +86,17 @@ impl Hit {
         return self.model_index.borrow().map.contains_key(key);
     }
 
-    fn validate_reference(&self, id: &str, target: IndexEntryProperty) -> Result<bool, String> {
+    fn validate_reference(&self, id: &str, target: IndexEntryProperty) -> Result<bool, HitError> {
         let target_model = self.model_index.borrow();
         let target_model = target_model
             .map
             .get(&target.id)
-            .ok_or("Target Model not found")?;
+            .ok_or(HitError::NoModelForId(target.id.to_string()))?;
+
         let target_model_field = target_model
             .get_field(&target.property)
-            .ok_or("Invalid field")?;
+            .ok_or(HitError::PropertyNotFound((&target.property).to_string()))?;
+
         let target_model_field_borrowed = target_model_field.borrow();
         Ok(target_model_field_borrowed.accepts(
             &ObjectValue::Reference(Reference { id: id.to_string() }),
@@ -106,27 +107,35 @@ impl Hit {
             },
         ))
     }
-    pub fn insert_reference(&mut self, id: &str, target: IndexEntryProperty) -> Result<(), String> {
+    pub fn insert_reference(
+        &mut self,
+        id: &str,
+        target: IndexEntryProperty,
+    ) -> Result<(), HitError> {
         let is_valid = self.validate_reference(id, target.clone())?;
         if is_valid {
             self.index.insert_reference(id, target)
         } else {
-            Err("Object not accepted".to_string())
+            Err(HitError::InvalidReference(id.to_string()))
         }
     }
 
-    pub fn remove_reference(&mut self, id: &str, parent: IndexEntryProperty) -> Result<(), String> {
+    pub fn remove_reference(
+        &mut self,
+        id: &str,
+        parent: IndexEntryProperty,
+    ) -> Result<(), HitError> {
         self.index.remove_reference(id, parent)
     }
 
     pub fn find_references_recursive(
         &self,
         id: &str,
-    ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, String> {
+    ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
         self.index.find_references_recursive(id)
     }
 
-    pub fn remove_object(&mut self, id: &str) -> Result<(), String> {
+    pub fn remove_object(&mut self, id: &str) -> Result<(), HitError> {
         self.index.remove_object(id)
     }
 
@@ -136,7 +145,7 @@ impl Hit {
         target_id: &str,
         target_model: &str,
         property: &str,
-    ) -> Result<bool, String> {
+    ) -> Result<bool, HitError> {
         can_move_object(&self, id, target_id, target_model, property)
     }
 
@@ -145,9 +154,11 @@ impl Hit {
         id: &str,
         property: IndexEntryProperty,
         before_id: Option<String>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         //check destination is allowed
-        let target_model = self.get_model(&property.id).ok_or("Model not found ")?;
+        let target_model = self
+            .get_model(&property.id)
+            .ok_or(HitError::NoModelForId((&property).id.to_string()))?;
         let ok = self.can_move_object(
             id,
             &property.id,
@@ -157,7 +168,7 @@ impl Hit {
         if ok {
             self.index.move_object(id, property, before_id)
         } else {
-            Err("Can't move object".to_string())
+            Err(HitError::ModelNotAllowed())
         }
     }
 
@@ -182,9 +193,12 @@ impl Hit {
         self.index.get_value(id, property)
     }
 
-    pub fn set(&mut self, id: &str, property: &str, value: ObjectValue) -> Result<(), String> {
-        let entry = self.get(id).ok_or("Invalid id")?;
-        let model_field = entry.model.get_field(property).ok_or("Invalid field")?;
+    pub fn set(&mut self, id: &str, property: &str, value: ObjectValue) -> Result<(), HitError> {
+        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+        let model_field = entry
+            .model
+            .get_field(property)
+            .ok_or(HitError::PropertyNotFound(property.to_string()))?;
         //does the field accept the object value
         if !model_field.borrow().accepts(
             &value,
@@ -194,7 +208,7 @@ impl Hit {
                 index: Rc::new(self),
             },
         ) {
-            return Err("Invalid value type".to_string());
+            return Err(HitError::InvalidDataType());
         }
 
         self.index.set_value(id, property, value.clone())?;
@@ -211,7 +225,8 @@ impl Hit {
                     index: Rc::new(self),
                 },
             )
-            .map_err(|_| "Err".to_string())?;
+            //TODO: replace with validation errors
+            .map_err(|_| HitError::ValidationError())?;
         Ok(())
     }
     pub fn insert(
@@ -221,11 +236,11 @@ impl Hit {
         values: HashMap<String, ObjectValue>,
         parent: IndexEntryProperty,
         before_id: Option<String>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         let model = self
             .kernel
             .get_model(&model_type.to_string())
-            .map_err(|_| format!("Error getting model {}", model_type))?;
+            .map_err(|_| HitError::ModelDoesNotExist(model_type.to_string()))?;
         for plugin in self.get_plugins().plugins.iter() {
             plugin.borrow_mut().on_before_add_entry(
                 model.clone(),
@@ -264,11 +279,16 @@ impl Hit {
         id: &str,
         field: &str,
         listener: FieldListenerRef,
-    ) -> Result<String, String> {
+    ) -> Result<String, HitError> {
         //check field exists
         let model = self.model_index.borrow();
-        let model = model.map.get(id).ok_or("Model not found")?;
-        model.get_field(field).ok_or("Field not found")?;
+        let model = model
+            .map
+            .get(id)
+            .ok_or(HitError::NoModelForId(id.to_string()))?;
+        model
+            .get_field(field)
+            .ok_or(HitError::PropertyNotFound(field.to_string()))?;
 
         match self.index.get(id) {
             Some(entry) => {
@@ -281,7 +301,7 @@ impl Hit {
                 };
                 Ok(listener_id)
             }
-            None => Err("Data not found".to_string()),
+            None => Err(HitError::IDNotFound(id.to_string())),
         }
     }
     pub fn unsubscribe_field(
@@ -289,13 +309,13 @@ impl Hit {
         id: &str,
         field: &str,
         listener_id: &str,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         match self.index.get(id) {
             Some(entry) => {
                 entry.borrow_mut().remove_listener(field, listener_id)?;
                 Ok(())
             }
-            None => Err("Object not found".to_string()),
+            None => Err(HitError::IDNotFound(id.to_string())),
         }
     }
 }
@@ -319,8 +339,13 @@ impl Iterator for Hit {
 }
 
 impl DeletePlugin<IndexEntryRef> for ModelIndex {
-    fn on_after_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), String> {
-        let model = self.map.get(entry.borrow().get_id()).ok_or("Err")?;
+    fn on_after_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), HitError> {
+        let entry_borrowed = entry.borrow();
+        let id = entry_borrowed.get_id();
+        let model = self
+            .map
+            .get(id)
+            .ok_or(HitError::NoModelForId(id.to_string()))?;
         for plugin in self.plugins.iter() {
             plugin.borrow_mut().on_after_delete_entry(&HitEntry {
                 entry: entry.clone(),
@@ -329,8 +354,13 @@ impl DeletePlugin<IndexEntryRef> for ModelIndex {
         }
         Ok(())
     }
-    fn on_before_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), String> {
-        let model = self.map.get(entry.borrow().get_id()).ok_or("Err")?;
+    fn on_before_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), HitError> {
+        let entry_borrowed = entry.borrow();
+        let id = entry_borrowed.get_id();
+        let model = self
+            .map
+            .get(id)
+            .ok_or(HitError::NoModelForId(id.to_string()))?;
         for plugin in self.plugins.iter() {
             plugin.borrow_mut().on_before_delete_entry(&HitEntry {
                 entry: entry.clone(),

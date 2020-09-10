@@ -14,6 +14,7 @@ use crate::object_data::ObjectValue;
 use crate::object_data::ObjectValues;
 use crate::object_data::Reference;
 use crate::plugins::Plugins;
+use crate::HitError;
 use std::collections::btree_map::Iter;
 use std::collections::{BTreeMap, HashMap};
 pub struct Index {
@@ -37,7 +38,7 @@ impl Index {
         id: &str,
         values: ObjectValues,
         plugins: IndexPlugins,
-    ) -> Result<Index, String> {
+    ) -> Result<Index, HitError> {
         let mut index = Index {
             index: BTreeMap::new(),
             id: id.to_string(),
@@ -47,16 +48,16 @@ impl Index {
         for (_, value) in values.iter() {
             match value {
                 ObjectValue::Reference(_) => {
-                    return Err("References not allowed when creating new object".to_string())
+                    return Err(HitError::CanOnlySetScalarValuesInInsertedObject())
                 }
                 ObjectValue::VecReference(_) => {
-                    return Err("References not allowed when creating new object".to_string())
+                    return Err(HitError::CanOnlySetScalarValuesInInsertedObject())
                 }
                 ObjectValue::SubObject(_) => {
-                    return Err("Subobjects not allowed when creating new object".to_string())
+                    return Err(HitError::CanOnlySetScalarValuesInInsertedObject())
                 }
                 ObjectValue::VecSubObjects(_) => {
-                    return Err("Subobjects not allowed when creating new object".to_string())
+                    return Err(HitError::CanOnlySetScalarValuesInInsertedObject())
                 }
                 _ => {}
             }
@@ -92,7 +93,7 @@ impl Index {
         id: &str,
         property: &str,
         value: ObjectValue,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         //remove reference for old value
         // TODO : should be put in the ObjectValue::Reference case of the below match ?
         unindex_reference_from_property(self, id, property)?;
@@ -106,10 +107,10 @@ impl Index {
                 index_reference(self, &value, property, id)?;
             }
             ObjectValue::String(_) => {}
-            _ => return Err("Invalid value type".to_string()),
+            _ => return Err(HitError::CanOnlySetScalarValues()),
         }
 
-        let entry = self.get(id).ok_or("Invalid id")?;
+        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
         entry.borrow_mut().set(property, value)?;
         Ok(())
     }
@@ -124,10 +125,11 @@ impl Index {
         values: HashMap<String, ObjectValue>,
         parent: IndexEntryProperty,
         before_id: Option<String>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         self.insert_quietly(id, values, parent, before_id)?;
         //dispatch value to parent property
-        let (entry, parent) = get_parent_index_entry(self, &id)?.ok_or("Must have a parent")?;
+        let (entry, parent) =
+            get_parent_index_entry(self, &id)?.ok_or(HitError::InvalidParentID(id.to_string()))?;
         Index::dispatch_value_property(entry, &parent.property);
         Ok(())
     }
@@ -140,10 +142,10 @@ impl Index {
         id: &str,
         values: HashMap<String, ObjectValue>,
         parent: Option<IndexEntryProperty>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         //check id doesnt exist
         if self.index.contains_key(id) {
-            return Err("Id already exists in this document.".to_string());
+            return Err(HitError::DuplicateID(id.to_string()));
         }
         self.index.insert(
             id.to_string(),
@@ -158,7 +160,7 @@ impl Index {
         values: HashMap<String, ObjectValue>,
         parent: IndexEntryProperty,
         before_id: Option<String>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         // insert
         self.insert_raw(id, values.clone(), Some(parent.clone()))?;
 
@@ -171,7 +173,11 @@ impl Index {
         Ok(())
     }
 
-    pub fn insert_reference(&mut self, id: &str, target: IndexEntryProperty) -> Result<(), String> {
+    pub fn insert_reference(
+        &mut self,
+        id: &str,
+        target: IndexEntryProperty,
+    ) -> Result<(), HitError> {
         //update reference index
         index_reference(
             self,
@@ -181,7 +187,10 @@ impl Index {
         )?;
 
         //generate mutated vector
-        let target_entry = { self.get_mut(&target.id).ok_or("Id not found")? };
+        let target_entry = {
+            self.get_mut(&target.id)
+                .ok_or(HitError::IDNotFound(target.id.to_string()))?
+        };
         let data = get_parent_property_value(&target_entry, &target);
         let data = mutate_insert_in_reference_array(data, id, None)?;
         let value = ObjectValue::VecReference(data);
@@ -197,12 +206,18 @@ impl Index {
 
         Ok(())
     }
-    pub fn remove_reference(&mut self, id: &str, parent: IndexEntryProperty) -> Result<(), String> {
+    pub fn remove_reference(
+        &mut self,
+        id: &str,
+        parent: IndexEntryProperty,
+    ) -> Result<(), HitError> {
         let value = remove_reference_from_parent_array_from_property(self, parent.clone(), id)?;
 
         unindex_reference(self, parent.clone(), id)?;
         //dispatch event
-        let entry = self.get(&parent.clone().id).ok_or("Error")?;
+        let entry = self
+            .get(&parent.clone().id)
+            .ok_or(HitError::IDNotFound(parent.clone().id.to_string()))?;
         Index::dispatch_value(entry, &parent.property, value);
         Ok(())
     }
@@ -210,18 +225,18 @@ impl Index {
     pub(in crate) fn find_references_recursive(
         &self,
         id: &str,
-    ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, String> {
+    ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
         find_references_recursive(&self, id)
     }
 
-    pub fn remove_object(&mut self, id: &str) -> Result<(), String> {
+    pub fn remove_object(&mut self, id: &str) -> Result<(), HitError> {
         let references = find_references_recursive(&self, id)?;
         if references.len() > 0 {
-            return Err("There are referenes to this object or subobject".to_string());
+            return Err(HitError::CannotDeleteObjectWithReferences(id.to_string()));
         }
 
         let (parent_entry, parent) =
-            get_parent_index_entry(self, &id)?.ok_or("Object has no parent".to_string())?;
+            get_parent_index_entry(self, &id)?.ok_or(HitError::CannotDeleteRootObject())?;
 
         remove_object(self, id)?;
 
@@ -235,7 +250,7 @@ impl Index {
         id: &str,
         property: IndexEntryProperty,
         before_id: Option<String>,
-    ) -> Result<(), String> {
+    ) -> Result<(), HitError> {
         move_object(self, id, property, before_id)
     }
 

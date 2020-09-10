@@ -1,6 +1,6 @@
 use crate::index::IndexEntryProperty;
-
 use crate::object_data::ObjectValues;
+use crate::HitError;
 
 pub trait InitPlugin<ExtraData, Entry> {
     fn on_init_add_entry(
@@ -13,8 +13,8 @@ pub trait InitPlugin<ExtraData, Entry> {
 }
 
 pub trait DeletePlugin<Entry> {
-    fn on_before_delete_entry(&mut self, entry: &Entry) -> Result<(), String>;
-    fn on_after_delete_entry(&mut self, entry: &Entry) -> Result<(), String>;
+    fn on_before_delete_entry(&mut self, entry: &Entry) -> Result<(), HitError>;
+    fn on_after_delete_entry(&mut self, entry: &Entry) -> Result<(), HitError>;
 }
 
 pub trait Plugin<ExtraData, Entry> {
