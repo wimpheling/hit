@@ -1,8 +1,8 @@
-use crate::errors::ModelError;
 use crate::model::field_types::{check_if_required, run_validators};
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::ObjectValue;
+use crate::HitError;
 
 pub struct FieldTypeInteger {
     pub required: bool,
@@ -31,11 +31,11 @@ impl ModelField for FieldTypeInteger {
         &self,
         value: &ObjectValue,
         context: &ValidatorContext,
-    ) -> Result<(), Vec<ModelError>> {
+    ) -> Result<(), Vec<HitError>> {
         match value {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::I32(value) => {
-                let mut errors: Vec<ModelError> = vec![];
+                let mut errors: Vec<HitError> = vec![];
                 run_validators(&self.validators, value, &mut errors, context);
 
                 if errors.len() > 0 {
@@ -43,7 +43,7 @@ impl ModelField for FieldTypeInteger {
                 }
                 return Ok(());
             }
-            _ => Err(vec![ModelError::InvalidDataType()]),
+            _ => Err(vec![HitError::InvalidDataType()]),
         }
     }
 }

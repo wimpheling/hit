@@ -1,11 +1,11 @@
 use crate::model::field_types::{
-    check_reference_exists, check_reference_is_authorized, run_validators, ReturnModelError,
+    check_reference_exists, check_reference_is_authorized, run_validators, ReturnHitError,
 };
 
-use crate::errors::ModelError;
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
+use crate::HitError;
 use std::default::Default;
 
 #[derive(Default)]
@@ -19,7 +19,7 @@ fn validate_reference(
     sub_value: &Reference,
     context: &ValidatorContext,
     authorized_models: &Vec<String>,
-) -> ReturnModelError {
+) -> ReturnHitError {
     let entry = check_reference_exists(sub_value, context)?;
     return check_reference_is_authorized(authorized_models, &entry.get_model());
 }
@@ -42,11 +42,11 @@ impl ModelField for FieldTypeSubobjectArray {
     fn get_name(&self) -> String {
         return String::from(&self.name);
     }
-    fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnModelError {
+    fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnHitError {
         match value {
             ObjectValue::Null => Ok(()),
             ObjectValue::VecSubObjects(value) => {
-                let mut errors: Vec<ModelError> = vec![];
+                let mut errors: Vec<HitError> = vec![];
                 //verify validity of reference
                 for sub_value in value {
                     match validate_reference(&sub_value, context, &self.authorized_models) {
@@ -67,7 +67,7 @@ impl ModelField for FieldTypeSubobjectArray {
                 }
                 return Ok(());
             }
-            _ => Err(vec![ModelError::InvalidDataType()]),
+            _ => Err(vec![HitError::InvalidDataType()]),
         }
     }
 }

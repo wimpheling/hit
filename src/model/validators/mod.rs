@@ -1,10 +1,10 @@
-use crate::errors::ModelError;
 use crate::Hit;
+use crate::HitError;
 use std::cell::RefCell;
 use std::rc::Rc;
 pub type Validators<T> = Vec<Rc<RefCell<dyn Validator<T>>>>;
 pub trait Validator<T> {
-    fn validate(&self, value: &T, context: &ValidatorContext) -> Result<(), Vec<ModelError>>;
+    fn validate(&self, value: &T, context: &ValidatorContext) -> Result<(), Vec<HitError>>;
 }
 
 pub struct MaxLength {
@@ -19,9 +19,9 @@ pub struct ValidatorContext<'a> {
 }
 
 impl Validator<String> for MaxLength {
-    fn validate(&self, value: &String, _context: &ValidatorContext) -> Result<(), Vec<ModelError>> {
+    fn validate(&self, value: &String, _context: &ValidatorContext) -> Result<(), Vec<HitError>> {
         if value.len() as u8 > self.length {
-            return Err(vec![ModelError::DomainError {
+            return Err(vec![HitError::DomainError {
                 key: String::from(ERROR_MAX_LENGTH),
                 message: None,
             }]);

@@ -1,7 +1,7 @@
 use crate::Hit;
+use crate::HitError;
 use crate::HitKernel;
 use crate::Model;
-use crate::ModelError;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -9,7 +9,7 @@ fn get_allowed_fields(
     kernel: Rc<HitKernel>,
     model: &Model,
     target_model_name: &str,
-) -> Result<Option<Vec<String>>, ModelError> {
+) -> Result<Option<Vec<String>>, HitError> {
     let mut allowed_fields = vec![];
     let target_model = kernel.get_model(target_model_name)?;
     let fields = target_model.get_fields();
@@ -30,7 +30,7 @@ fn get_allowed_fields(
 pub type ObjectPermissions = HashMap<String, HashMap<String, Vec<String>>>;
 
 // Indexes all the models where a given model can be added (used for suggestions)
-pub fn get_all_permissions(kernel: Rc<HitKernel>) -> Result<ObjectPermissions, ModelError> {
+pub fn get_all_permissions(kernel: Rc<HitKernel>) -> Result<ObjectPermissions, HitError> {
     let mut output: ObjectPermissions = HashMap::new();
     let list_of_models_clone = kernel.clone().get_models();
 

@@ -1,12 +1,12 @@
 use crate::model::field_types::{
     check_if_required, check_reference_exists, check_reference_is_authorized, run_validators,
-    ReturnModelError,
+    ReturnHitError,
 };
 
-use crate::errors::ModelError;
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
+use crate::HitError;
 
 pub struct FieldTypeSubobject {
     pub required: bool,
@@ -34,11 +34,11 @@ impl ModelField for FieldTypeSubobject {
     fn get_name(&self) -> String {
         return String::from(&self.name);
     }
-    fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnModelError {
+    fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnHitError {
         match value {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::Reference(value) => {
-                let mut errors: Vec<ModelError> = vec![];
+                let mut errors: Vec<HitError> = vec![];
                 //verify validity of reference
                 let entry = check_reference_exists(value, context)?;
                 check_reference_is_authorized(&self.authorized_models, &entry.get_model())?;
@@ -50,7 +50,7 @@ impl ModelField for FieldTypeSubobject {
                 }
                 return Ok(());
             }
-            _ => Err(vec![ModelError::InvalidDataType()]),
+            _ => Err(vec![HitError::InvalidDataType()]),
         }
     }
 }

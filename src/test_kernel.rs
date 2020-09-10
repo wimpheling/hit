@@ -3,8 +3,8 @@ use crate::kernel::Kernel;
 use crate::model::field_types::FieldTypeString;
 use crate::model::validators::MaxLength;
 use crate::model::Model;
-use crate::model::ModelError;
 use crate::plugins::Plugins;
+use crate::HitError;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -13,11 +13,11 @@ pub struct TestKernel {
 }
 
 impl Kernel<Rc<Model>, HitEntry> for TestKernel {
-    fn get_model(&self, name: &str) -> Result<Rc<Model>, ModelError> {
+    fn get_model(&self, name: &str) -> Result<Rc<Model>, HitError> {
         if name == "test/test" {
             return Ok(self.model.clone());
         } else {
-            return Err(ModelError::ModelDoesNotExist(String::from(name)));
+            return Err(HitError::ModelDoesNotExist(String::from(name)));
         }
     }
 

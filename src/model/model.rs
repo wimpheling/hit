@@ -1,4 +1,3 @@
-pub use crate::errors::ModelError;
 use crate::model::{Fields, ModelFieldRef};
 use std::collections::BTreeMap;
 

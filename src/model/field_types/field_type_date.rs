@@ -1,8 +1,8 @@
-use crate::errors::ModelError;
 use crate::model::field_types::{check_if_required, run_validators};
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::ObjectValue;
+use crate::HitError;
 use chrono::{DateTime, Utc};
 
 pub struct FieldTypeDate {
@@ -32,11 +32,11 @@ impl ModelField for FieldTypeDate {
         &self,
         value: &ObjectValue,
         context: &ValidatorContext,
-    ) -> Result<(), Vec<ModelError>> {
+    ) -> Result<(), Vec<HitError>> {
         match value {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::Date(value) => {
-                let mut errors: Vec<ModelError> = vec![];
+                let mut errors: Vec<HitError> = vec![];
                 let date = value.get_date();
                 run_validators(&self.validators, &date, &mut errors, context);
 
@@ -45,7 +45,7 @@ impl ModelField for FieldTypeDate {
                 }
                 return Ok(());
             }
-            _ => Err(vec![ModelError::InvalidDataType()]),
+            _ => Err(vec![HitError::InvalidDataType()]),
         }
     }
 }
