@@ -21,9 +21,10 @@ pub struct ValidatorContext<'a> {
 impl Validator<String> for MaxLength {
     fn validate(&self, value: &String, _context: &ValidatorContext) -> Result<(), Vec<HitError>> {
         if value.len() as u8 > self.length {
+            // TODO : this should not be a HitError, but a validation error
             return Err(vec![HitError::DomainError {
                 key: String::from(ERROR_MAX_LENGTH),
-                message: None,
+                message: ERROR_MAX_LENGTH.to_string(),
             }]);
         }
         return Ok(());
