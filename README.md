@@ -8,15 +8,6 @@
 
 This library was intended to manage, in memory, deeply nested documents with strictly typed data structures and multiple inner links. That could be the representation of a word processor document, a directory and its files and subfolders with symbolic links...
 
-# Get started
-
-# Philosophy
-
-`hit` is
-
-<!-- > We will sometimes use JSON representations of the `hit` documents. This is chosen for readability as it is a concise and well-known format, but JSON is not the native format of `hit`. A JSON serializer/deserializer is available, but the output we show here is not exactly the same as the JSON serializer output.
- -->
-
 ## Hierarchical
 
 Every document is structured like a document tree, in a similar way to MongoDB documents. That means a document always start with a root `object`, that is, a list of keys and values.
@@ -45,8 +36,7 @@ Here is an example
 }
 ``` -->
 
-That means every sub-object exists and has a position in a parent collection, that can be defined by it's subobject ID, it's property name, and its index in that collection.
-
+The values can be either be simple (string, numeric, date) values, or their can contain **other sub objects**. Every sub-object (except the root one) can thus be located as being in a **property** of another **object**.
 (TODO : link to property types)
 
 ## Indexed
@@ -59,18 +49,25 @@ Every `object` (except, not yet implemented, embedded sub-objects) is indexed. T
   - parent_property
   - parent_position
 
-The indexation allows `hit` to provide `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, and enforce consistency rules : you cannot delete an `object` as long as there are references to it in the document.
+The indexation allows `hit` to provide (TODO LINK) `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, and enforce consistency rules : you cannot delete an `object` as long as there are references to it in the document.
 
-The index also allows you to easily find all the fields that reference an object.
+The index also allows you to easily find all the references to an object. (TOO : does it ?)
 
 ## Typed
 
-Every `object` in a document must have a `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `hit` must be initialized with a `kernel` that contains the definitions.
+Every `object` in a document must have a (TODO: Link) `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `hit` must be initialized with a `kernel` that contains the definitions.
 
 The models :
 
 - list the names of the accepted fields of an object
 - restrict the accepted values using `field types` (TODO: link) and - optionally - `validators` (TODO : link)
+
+# Get started
+
+`hit` is
+
+<!-- > We will sometimes use JSON representations of the `hit` documents. This is chosen for readability as it is a concise and well-known format, but JSON is not the native format of `hit`. A JSON serializer/deserializer is available, but the output we show here is not exactly the same as the JSON serializer output.
+ -->
 
 # Guide : How to create and use a `hit` instance
 
@@ -156,19 +153,9 @@ There are some basic data integrity rules that `hit` models will not let you bre
 
 ## Non-blocking validation
 
-The main validation model
+The main validation model is _non-blocking_ : that means you can assign invalid values to properties of your objects.
 
-# Guide : How to create a model
-
-## Kernel
-
-### Kernel macro
-
-TODO : create the macro ^^
-
-### Kernel Plugins
-
-TODO: write this chapter
+# Models
 
 ## Model definitions
 
@@ -181,6 +168,28 @@ A `model` has the following properties:
   - String
   - Integer
   - TODO
+
+## Validators
+
+### Field validators
+
+### Object validators
+
+### Standard library
+
+## Creating custom field types
+
+## Model macro
+
+## Kernel
+
+### Kernel macro
+
+TODO : create the macro ^^
+
+### Kernel Plugins
+
+TODO: write this chapter
 
 # TODO
 

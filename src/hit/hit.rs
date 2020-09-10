@@ -82,9 +82,11 @@ impl Hit {
             kernel: kernel,
         })
     }
+
     pub fn contains_key(&self, key: &str) -> bool {
         return self.model_index.borrow().map.contains_key(key);
     }
+
     fn validate_reference(&self, id: &str, target: IndexEntryProperty) -> Result<bool, String> {
         let target_model = self.model_index.borrow();
         let target_model = target_model
@@ -144,8 +146,19 @@ impl Hit {
         property: IndexEntryProperty,
         before_id: Option<String>,
     ) -> Result<(), String> {
-        //TODO : check destination is kosher
-        self.index.move_object(id, property, before_id)
+        //check destination is allowed
+        let target_model = self.get_model(&property.id).ok_or("Model not found ")?;
+        let ok = self.can_move_object(
+            id,
+            &property.id,
+            target_model.get_name(),
+            &property.property,
+        )?;
+        if ok {
+            self.index.move_object(id, property, before_id)
+        } else {
+            Err("Can't move object".to_string())
+        }
     }
 
     pub fn get_model(&self, id: &str) -> Option<Rc<Model>> {
