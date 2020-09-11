@@ -25,9 +25,9 @@ fn validate_reference(
 }
 
 impl ModelField for FieldTypeSubobjectArray {
-    fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
+    fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
-            ObjectValue::VecSubObjects(_) => true,
+            // ObjectValue::VecSubObjects(_) => true,
             _ => false,
         }
     }
@@ -69,5 +69,11 @@ impl ModelField for FieldTypeSubobjectArray {
             }
             _ => Err(vec![HitError::InvalidDataType()]),
         }
+    }
+    fn is_vec_reference(&self) -> bool {
+        false
+    }
+    fn is_vec_subobject(&self) -> bool {
+        true
     }
 }

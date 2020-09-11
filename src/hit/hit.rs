@@ -88,14 +88,7 @@ impl Hit {
             .ok_or(HitError::PropertyNotFound((&target.property).to_string()))?;
 
         let target_model_field_borrowed = target_model_field.borrow();
-        if target_model_field_borrowed.accepts(
-            &ObjectValue::VecReference(vec![Reference { id: id.to_string() }]),
-            &ValidatorContext {
-                id: id,
-                property: &target.property,
-                index: Rc::new(self),
-            },
-        ) {
+        if target_model_field_borrowed.is_vec_reference() {
             Ok(true)
         } else {
             Err(HitError::InvalidDataType())
@@ -197,7 +190,7 @@ impl Hit {
             .get_field(property)
             .ok_or(HitError::PropertyNotFound(property.to_string()))?;
         //does the field accept the object value
-        if !model_field.borrow().accepts(
+        if !model_field.borrow().accepts_for_set(
             &value,
             &ValidatorContext {
                 id: id,

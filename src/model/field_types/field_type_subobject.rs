@@ -16,10 +16,10 @@ pub struct FieldTypeSubobject {
 }
 
 impl ModelField for FieldTypeSubobject {
-    fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
+    fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
-            ObjectValue::Null => !self.required,
-            ObjectValue::SubObject(_) => true,
+            // ObjectValue::Null => !self.required,
+            // ObjectValue::SubObject(_) => true,
             _ => false,
         }
     }
@@ -52,5 +52,11 @@ impl ModelField for FieldTypeSubobject {
             }
             _ => Err(vec![HitError::InvalidDataType()]),
         }
+    }
+    fn is_vec_reference(&self) -> bool {
+        false
+    }
+    fn is_vec_subobject(&self) -> bool {
+        false
     }
 }

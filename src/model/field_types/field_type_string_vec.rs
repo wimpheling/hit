@@ -18,7 +18,7 @@ impl ModelField for FieldTypeStringVec {
     fn get_name(&self) -> String {
         return String::from(&self.name);
     }
-    fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
+    fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
             ObjectValue::String(_) => true,
             _ => false,
@@ -47,5 +47,11 @@ impl ModelField for FieldTypeStringVec {
             }
             _ => Err(vec![HitError::InvalidDataType()]),
         }
+    }
+    fn is_vec_reference(&self) -> bool {
+        false
+    }
+    fn is_vec_subobject(&self) -> bool {
+        false
     }
 }

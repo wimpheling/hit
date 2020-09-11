@@ -16,9 +16,9 @@ pub struct FieldTypeReferenceArray {
 }
 
 impl ModelField for FieldTypeReferenceArray {
-    fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
+    fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
-            ObjectValue::VecReference(_) => true,
+            // ObjectValue::VecReference(_) => true,
             _ => false,
         }
     }
@@ -47,5 +47,11 @@ impl ModelField for FieldTypeReferenceArray {
             }
             _ => Err(vec![HitError::InvalidDataType()]),
         }
+    }
+    fn is_vec_reference(&self) -> bool {
+        true
+    }
+    fn is_vec_subobject(&self) -> bool {
+        false
     }
 }

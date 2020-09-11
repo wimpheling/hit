@@ -36,7 +36,7 @@ impl ModelField for FieldTypeBool {
         }
     }
 
-    fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
+    fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
             ObjectValue::Null => !self.required,
             ObjectValue::Bool(_) => true,
@@ -46,5 +46,11 @@ impl ModelField for FieldTypeBool {
 
     fn accepts_model(&self, _model: &Model) -> bool {
         return false;
+    }
+    fn is_vec_reference(&self) -> bool {
+        false
+    }
+    fn is_vec_subobject(&self) -> bool {
+        false
     }
 }

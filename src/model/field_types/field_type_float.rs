@@ -15,7 +15,7 @@ impl ModelField for FieldTypeFloat {
         return String::from(&self.name);
     }
 
-    fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
+    fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
             ObjectValue::Null => !self.required,
             ObjectValue::F32(_) => true,
@@ -45,5 +45,11 @@ impl ModelField for FieldTypeFloat {
             }
             _ => Err(vec![HitError::InvalidDataType()]),
         }
+    }
+    fn is_vec_reference(&self) -> bool {
+        false
+    }
+    fn is_vec_subobject(&self) -> bool {
+        false
     }
 }

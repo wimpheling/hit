@@ -47,12 +47,14 @@ impl DateTimeUtc {
         return self.get_date().to_rfc2822();
     }
 }
+
 impl Display for DateTimeUtc {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.datetime)?;
         return Ok(());
     }
 }
+
 impl Display for ObjectValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
