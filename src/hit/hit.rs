@@ -65,7 +65,7 @@ impl Hit {
         let mut plugins = Plugins::new();
         plugins.delete_plugins.push(model_index.clone());
         Ok(Hit {
-            index: Index::new_with_values(id, values, plugins)?,
+            index: Index::new(id, values, plugins)?,
             model_index: model_index,
             plugins: kernel.get_plugins(),
             kernel: kernel,
@@ -370,6 +370,13 @@ mod tests {
     use std::rc::Rc;
     #[test]
     fn it_should_create_a_new_hit_instance() {
+        let kernel = Rc::new(create_test_kernel());
+        let hit = Hit::new("id", "test/test", kernel).unwrap();
+        assert!(hit.get("id").is_some());
+        assert_eq!(hit.get_main_object_id(), "id");
+    }
+    #[test]
+    fn it_should_create_a_new_hit_instance_with_values() {
         let kernel = Rc::new(create_test_kernel());
         let hit = Hit::new("id", "test/test", kernel).unwrap();
         assert!(hit.get("id").is_some());

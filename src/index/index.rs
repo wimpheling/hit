@@ -17,6 +17,7 @@ use crate::plugins::Plugins;
 use crate::HitError;
 use std::collections::btree_map::Iter;
 use std::collections::{BTreeMap, HashMap};
+
 pub struct Index {
     pub(in crate::index) index: BTreeMap<Id, IndexEntryRef>,
     id: Id,
@@ -26,7 +27,7 @@ pub struct Index {
 pub type IndexPlugins = Plugins<!, IndexEntryRef>;
 
 impl Index {
-    pub fn new(id: &str, plugins: IndexPlugins) -> Index {
+    pub fn new_for_import(id: &str, plugins: IndexPlugins) -> Index {
         Index {
             index: BTreeMap::new(),
             id: id.to_string(),
@@ -34,11 +35,7 @@ impl Index {
         }
     }
 
-    pub fn new_with_values(
-        id: &str,
-        values: ObjectValues,
-        plugins: IndexPlugins,
-    ) -> Result<Index, HitError> {
+    pub fn new(id: &str, values: ObjectValues, plugins: IndexPlugins) -> Result<Index, HitError> {
         let mut index = Index {
             index: BTreeMap::new(),
             id: id.to_string(),
@@ -277,7 +274,7 @@ mod tests {
         let mut values = HashMap::new();
         values.insert("test".into(), ObjectValue::Bool(true));
         values.insert("testString".into(), ObjectValue::String("value".into()));
-        assert!(Index::new_with_values("id", values, Plugins::new()).is_ok());
+        assert!(Index::new("id", values, Plugins::new()).is_ok());
     }
 
     #[test]
@@ -288,7 +285,7 @@ mod tests {
             ObjectValue::Reference(Reference { id: "a".into() }),
         );
         assert!(matches!(
-            Index::new_with_values("id", values, Plugins::new()).err(),
+            Index::new("id", values, Plugins::new()).err(),
             Some(HitError::CanOnlySetScalarValuesInInsertedObject())
         ));
     }
@@ -301,7 +298,7 @@ mod tests {
             ObjectValue::VecReference(vec![Reference { id: "a".into() }]),
         );
         assert!(matches!(
-            Index::new_with_values("id", values, Plugins::new()).err(),
+            Index::new("id", values, Plugins::new()).err(),
             Some(HitError::CanOnlySetScalarValuesInInsertedObject())
         ));
     }
@@ -312,7 +309,7 @@ mod tests {
             "reference".into(),
             ObjectValue::SubObject(Reference { id: "a".into() }),
         );
-        assert!(Index::new_with_values("id", values, Plugins::new()).is_err());
+        assert!(Index::new("id", values, Plugins::new()).is_err());
     }
     #[test]
     fn it_should_fail_creating_a_new_index_with_subobject_array_values() {
@@ -321,16 +318,14 @@ mod tests {
             "reference".into(),
             ObjectValue::VecSubObjects(vec![Reference { id: "a".into() }]),
         );
-        assert!(Index::new_with_values("id", values, Plugins::new()).is_err());
+        assert!(Index::new("id", values, Plugins::new()).is_err());
     }
 
     #[test]
     fn it_should_get_existing_data() {
         let mut values = HashMap::new();
         values.insert("test".into(), ObjectValue::Bool(true));
-        let index = Index::new_with_values("id", values, Plugins::new())
-            .ok()
-            .unwrap();
+        let index = Index::new("id", values, Plugins::new()).ok().unwrap();
 
         let item = index.get("id").unwrap();
         let item = item.borrow();

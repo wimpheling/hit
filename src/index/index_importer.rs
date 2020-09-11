@@ -13,7 +13,7 @@ impl IndexImporter {
     pub fn new(id: &str, plugins: IndexPlugins) -> Self {
         IndexImporter {
             collected_refs: HashMap::new(),
-            index: Index::new(id, plugins),
+            index: Index::new_for_import(id, plugins),
         }
     }
 
