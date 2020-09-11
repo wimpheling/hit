@@ -45,7 +45,7 @@ fn json_to_object_value(value: &Value) -> Result<ObjectValue, JSONImportError> {
                 return Err(JSONImportError::InvalidSubObjectType());
             }
         }
-        // TODO: why shouldn't this be an array ?
+        // TODO: why shouldn't this be an array ? Find a better naming
         Value::Array(_value) => Err(JSONImportError::ShouldNotBeAnArray()),
     }
 }
