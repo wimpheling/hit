@@ -14,6 +14,8 @@ mod object_data;
 mod plugins;
 #[cfg(test)]
 mod test_kernel;
+#[cfg(test)]
+mod tests;
 
 // TODO
 // mod utils;

@@ -207,3 +207,8 @@ TODO: write this chapter
 - do we need insert quietly ?
 - implement ACID
 - Should Kernel be typed/dynamic ? May be useful for extending though
+
+- Allow interfaces in authorized models
+- enums for string type
+- unique in parent/parent.parent
+  dependencies =>
