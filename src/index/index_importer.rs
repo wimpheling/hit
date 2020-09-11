@@ -28,9 +28,12 @@ impl IndexImporter {
         Ok(())
     }
 
-    pub fn finish_import(self) -> Result<Index, String> {
+    pub fn finish_import(self) -> Result<Index, HitError> {
         for (id, vector) in self.collected_refs.iter() {
-            let entry = self.index.get(id).ok_or("Error")?;
+            let entry = self
+                .index
+                .get(id)
+                .ok_or(HitError::IDNotFound(id.to_string()))?;
             for parent in vector.iter() {
                 entry.borrow_mut().references.push(parent.clone());
             }

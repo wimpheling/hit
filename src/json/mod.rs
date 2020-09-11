@@ -1,14 +1,32 @@
 pub mod export;
 pub mod import;
 mod utils;
+use crate::HitError;
+
+#[derive(Debug)]
+pub enum JSONImportError {
+    HitError(HitError),
+    //    StringError(String),
+    InvalidTypeShouldBeAnObject(),
+    InvalidTypeShouldBeAnArray(),
+    InvalidTypeShouldBeAString(),
+    InvalidTypeShouldBeANumber(),
+    InvalidSubObjectType(),
+    ShouldNotBeAnArray(),
+    InvalidJSON(),
+    InvalidDateFormat(),
+}
 
 #[cfg(test)]
 mod tests {
     use crate::json::import::import;
+    use crate::json::JSONImportError;
     use crate::object_data::ObjectValue;
     use crate::test_kernel::create_test_kernel;
+    use crate::HitError;
     use serde_json::json;
     use std::rc::Rc;
+
     #[test]
     pub fn no_duplicate_ids() {
         let json_data = json!({
@@ -41,7 +59,10 @@ mod tests {
         let result = import(&json_data, Rc::new(kernel));
         match result {
             Ok(_index) => assert!(false),
-            Err(error) => assert_eq!(error, "Id already exists in this document."),
+            Err(error) => assert!(matches!(
+                error,
+                JSONImportError::HitError(HitError::DuplicateID(id))
+            )),
         }
     }
 

@@ -268,6 +268,7 @@ impl Index {
 mod tests {
     use crate::index::Index;
     use crate::plugins::Plugins;
+    use crate::HitError;
     use crate::ObjectValue;
     use crate::Reference;
     use std::collections::HashMap;
@@ -286,10 +287,10 @@ mod tests {
             "reference".into(),
             ObjectValue::Reference(Reference { id: "a".into() }),
         );
-        assert_eq!(
+        assert!(matches!(
             Index::new_with_values("id", values, Plugins::new()).err(),
-            Some("References not allowed when creating new object".to_string())
-        );
+            Some(HitError::CanOnlySetScalarValuesInInsertedObject())
+        ));
     }
 
     #[test]
@@ -299,10 +300,10 @@ mod tests {
             "reference".into(),
             ObjectValue::VecReference(vec![Reference { id: "a".into() }]),
         );
-        assert_eq!(
+        assert!(matches!(
             Index::new_with_values("id", values, Plugins::new()).err(),
-            Some("References not allowed when creating new object".to_string())
-        );
+            Some(HitError::CanOnlySetScalarValuesInInsertedObject())
+        ));
     }
     #[test]
     fn it_should_fail_creating_a_new_index_with_subobject_values() {

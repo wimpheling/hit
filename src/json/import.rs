@@ -1,18 +1,19 @@
 use crate::hit::{Hit, HitKernel, IndexModelImporter};
 use crate::index::IndexEntryProperty;
 use crate::json::utils::*;
+use crate::json::JSONImportError;
 use crate::object_data::{DateTimeUtc, ObjectValue, ObjectValues};
 use chrono::{DateTime, Utc};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-fn json_to_object_value(value: &Value) -> Result<ObjectValue, String> {
+fn json_to_object_value(value: &Value) -> Result<ObjectValue, JSONImportError> {
     match value {
         Value::Null => Ok(ObjectValue::Null),
         Value::Number(value) => match value.as_f64() {
             Some(value) => Ok(ObjectValue::F32(value as f32)),
-            None => Err(String::from("Invalid number value")),
+            None => Err(JSONImportError::InvalidTypeShouldBeANumber()),
         },
         Value::String(value) => Ok(ObjectValue::String(String::from(value))),
         Value::Bool(value) => Ok(ObjectValue::Bool(*value)),
@@ -38,19 +39,17 @@ fn json_to_object_value(value: &Value) -> Result<ObjectValue, String> {
                     Ok(sub_value) => Ok(ObjectValue::Date(DateTimeUtc::new(
                         sub_value.with_timezone(&Utc),
                     ))),
-                    Err(_error) => Err(format!("Invalid date format")),
+                    Err(_error) => Err(JSONImportError::InvalidDateFormat()),
                 }
             } else {
-                return Err(String::from(format!(
-                    "Invalid type of subobject: {}",
-                    _type
-                )));
+                return Err(JSONImportError::InvalidSubObjectType());
             }
         }
-        Value::Array(_value) => Err(String::from("Property should not be an array.")),
+        // TODO: why shouldn't this be an array ?
+        Value::Array(_value) => Err(JSONImportError::ShouldNotBeAnArray()),
     }
 }
-fn get_parent(value: &JSONObject) -> Result<Option<IndexEntryProperty>, String> {
+fn get_parent(value: &JSONObject) -> Result<Option<IndexEntryProperty>, JSONImportError> {
     let parent = get_object_property(value, String::from("parent"))?;
     match parent {
         Value::Null => {
@@ -64,7 +63,7 @@ fn get_parent(value: &JSONObject) -> Result<Option<IndexEntryProperty>, String> 
                 property: property,
             }));
         }
-        _ => return Err(String::from("Invalid parent data type")),
+        _ => return Err(JSONImportError::InvalidTypeShouldBeAnObject()),
     }
 }
 
@@ -72,7 +71,7 @@ fn import_data<'index>(
     data: &JSONObject,
     kernel: Rc<HitKernel>,
     new_index: &'index mut IndexModelImporter,
-) -> Result<(), String> {
+) -> Result<(), JSONImportError> {
     let id = get_object_property_as_string(data, String::from("id"))?;
     let model = get_model(kernel, data)?;
     let parent = get_parent(data)?;
@@ -94,7 +93,7 @@ fn import_data<'index>(
 
     new_index
         .add_item(model.get_name(), &id, new_data.clone(), parent.clone())
-        .map_err(|_| "Error in adding item")?;
+        .map_err(|err| JSONImportError::HitError(err))?;
 
     for plugin in new_index.get_plugins().init_plugins.iter() {
         plugin
@@ -104,17 +103,20 @@ fn import_data<'index>(
     return Ok(());
 }
 
-fn get_json_value(value: &String) -> Result<Value, String> {
+fn get_json_value(value: &String) -> Result<Value, JSONImportError> {
     match serde_json::from_str(value) {
-        Err(_err) => Err(String::from("Error in parsing")),
+        Err(_err) => Err(JSONImportError::InvalidJSON()),
         Ok(value) => Ok(value),
     }
 }
-pub fn import_from_string<'a>(value: &String, kernel: Rc<HitKernel>) -> Result<Hit, String> {
+pub fn import_from_string<'a>(
+    value: &String,
+    kernel: Rc<HitKernel>,
+) -> Result<Hit, JSONImportError> {
     let value = get_json_value(value)?;
     import(&value, kernel)
 }
-pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, String> {
+pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, JSONImportError> {
     let value = get_value_as_object(&value)?;
     let id = get_object_property_as_string(value, String::from("id"))?;
     let mut new_index = IndexModelImporter::new(&id, kernel.clone());
@@ -125,6 +127,8 @@ pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, String> {
         let entry = get_value_as_object(entry)?;
         import_data(entry, clone, &mut new_index)?;
     }
-    let new_index = new_index.finish_import()?;
+    let new_index = new_index
+        .finish_import()
+        .map_err(|err| JSONImportError::HitError(err))?;
     Ok(new_index)
 }

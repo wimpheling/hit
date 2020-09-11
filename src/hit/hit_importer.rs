@@ -51,10 +51,10 @@ impl IndexModelImporter {
         &self.plugins
     }
 
-    pub fn finish_import(self) -> Result<Hit, String> {
-        let index = self.index.finish_import();
+    pub fn finish_import(self) -> Result<Hit, HitError> {
+        let index = self.index.finish_import()?;
         Ok(Hit {
-            index: index?,
+            index: index,
             model_index: self.model_index,
             plugins: self.plugins,
             kernel: self.kernel,
