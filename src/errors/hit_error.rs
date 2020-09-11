@@ -1,7 +1,7 @@
 use std::clone::Clone;
 use thiserror::Error;
 
-#[derive(Error, Clone, Debug)]
+#[derive(Error, Clone, Debug, PartialEq)]
 pub enum HitError {
     #[error("There is no model entry for id `{0}`")]
     NoModelForId(String),

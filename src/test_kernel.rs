@@ -1,6 +1,9 @@
 use crate::hit::HitEntry;
 use crate::kernel::Kernel;
+use crate::model::field_types::FieldTypeReference;
+use crate::model::field_types::FieldTypeReferenceArray;
 use crate::model::field_types::FieldTypeString;
+use crate::model::field_types::FieldTypeSubobjectArray;
 use crate::model::validators::MaxLength;
 use crate::model::Model;
 use crate::plugins::Plugins;
@@ -45,11 +48,10 @@ pub fn create_test_kernel() -> TestKernel {
     );
     model.fields.insert(
         String::from("sub_items"),
-        Rc::new(RefCell::new(FieldTypeString {
+        Rc::new(RefCell::new(FieldTypeSubobjectArray {
             name: String::from("sub_items"),
-            required: true,
-            validators: vec![Rc::new(RefCell::new(MaxLength { length: 8 }))],
-            _enum: None,
+            validators: vec![],
+            authorized_models: vec!["test/test".into()],
         })),
     );
     model.fields.insert(
@@ -59,6 +61,23 @@ pub fn create_test_kernel() -> TestKernel {
             required: true,
             validators: vec![],
             _enum: None,
+        })),
+    );
+    model.fields.insert(
+        String::from("reference"),
+        Rc::new(RefCell::new(FieldTypeReference {
+            name: String::from("reference"),
+            required: true,
+            validators: vec![],
+            authorized_models: vec!["test/test".into()],
+        })),
+    );
+    model.fields.insert(
+        String::from("references"),
+        Rc::new(RefCell::new(FieldTypeReferenceArray {
+            name: String::from("references"),
+            validators: vec![],
+            authorized_models: vec!["test/test".into()],
         })),
     );
     return TestKernel {

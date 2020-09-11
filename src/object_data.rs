@@ -8,17 +8,17 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 pub type Id = String;
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct Reference {
     pub id: Id,
 }
 
-#[derive(Clone, Serialize, Debug)]
+#[derive(Clone, Serialize, Debug, PartialEq)]
 pub struct DateTimeUtc {
     datetime: i64,
 }
 
-#[derive(Clone, Serialize, Debug)]
+#[derive(Clone, Serialize, Debug, PartialEq)]
 pub enum ObjectValue {
     Bool(bool),
     String(String),

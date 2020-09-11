@@ -18,7 +18,7 @@ pub struct FieldTypeReferenceArray {
 impl ModelField for FieldTypeReferenceArray {
     fn accepts(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
-            ObjectValue::Reference(_) => true,
+            ObjectValue::VecReference(_) => true,
             _ => false,
         }
     }

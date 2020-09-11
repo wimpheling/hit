@@ -25,14 +25,13 @@ pub use model::*;
 
 pub use object_data::Id;
 pub use object_data::ObjectValue;
+pub use object_data::ObjectValues;
 pub use object_data::Reference;
 
 pub use hit::{Hit, HitKernel};
 
 pub use events::FieldListener;
 pub use events::FieldListenerRef;
-
-
 
 pub use json::export::export;
 pub use json::import::import;
