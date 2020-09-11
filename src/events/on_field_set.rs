@@ -12,12 +12,10 @@ impl Listeners {
     }
 
     fn get_or_create_property_listeners(&mut self, property: &str) -> &mut Vec<FieldListenerRef> {
-        // TODO: vérifier que la property est présente dans le modèle de l'entry
         self.0.entry(property.to_string()).or_insert(vec![])
     }
 
     fn get_property_listeners_mut(&mut self, property: &str) -> Option<&mut Vec<FieldListenerRef>> {
-        // TODO: vérifier que la property est présente dans le modèle de l'entry
         self.0.get_mut(property)
     }
 

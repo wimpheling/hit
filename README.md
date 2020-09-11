@@ -206,3 +206,4 @@ TODO: write this chapter
 
 - do we need insert quietly ?
 - implement ACID
+- Should Kernel be typed/dynamic ? May be useful for extending though

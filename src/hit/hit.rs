@@ -43,18 +43,8 @@ pub struct Hit {
 }
 
 impl Hit {
-    pub fn new(id: &str, kernel: Rc<HitKernel>) -> Hit {
-        let mut model_index = ModelIndex::new();
-        model_index.plugins = kernel.get_plugins().delete_plugins;
-        let model_index = Rc::new(RefCell::new(model_index));
-        let mut plugins = Plugins::new();
-        plugins.delete_plugins.push(model_index.clone());
-        Hit {
-            model_index: model_index,
-            index: Index::new(id, plugins),
-            plugins: kernel.get_plugins(),
-            kernel: kernel,
-        }
+    pub fn new(id: &str, model_type: &str, kernel: Rc<HitKernel>) -> Result<Hit, HitError> {
+        Hit::new_with_values(id, kernel, HashMap::new(), model_type)
     }
     pub fn new_with_values(
         id: &str,
@@ -280,7 +270,6 @@ impl Hit {
         field: &str,
         listener: FieldListenerRef,
     ) -> Result<String, HitError> {
-        //check field exists
         let model = self.model_index.borrow();
         let model = model
             .map
@@ -368,5 +357,22 @@ impl DeletePlugin<IndexEntryRef> for ModelIndex {
             })?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::json::export::export;
+    use crate::test_kernel::create_test_kernel;
+    use crate::Hit;
+    use crate::IndexEntryProperty;
+    use std::collections::HashMap;
+    use std::rc::Rc;
+    #[test]
+    fn it_should_create_a_new_hit_instance() {
+        let kernel = Rc::new(create_test_kernel());
+        let hit = Hit::new("id", "test/test", kernel).unwrap();
+        assert!(hit.get("id").is_some());
+        assert_eq!(hit.get_main_object_id(), "id");
     }
 }
