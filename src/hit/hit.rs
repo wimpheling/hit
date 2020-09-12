@@ -6,6 +6,7 @@ use crate::index::IndexEntryProperty;
 use crate::index::IndexEntryRef;
 use crate::model::validators::ValidatorContext;
 use crate::model::Model;
+use crate::model::ModelFieldRef;
 use crate::object_data::Id;
 use crate::object_data::{ObjectValue, ObjectValues, Reference};
 use crate::plugins::DeletePlugin;
@@ -77,11 +78,7 @@ impl Hit {
     }
 
     fn validate_reference(&self, id: &str, target: IndexEntryProperty) -> Result<bool, HitError> {
-        let target_model = self.model_index.borrow();
-        let target_model = target_model
-            .map
-            .get(&target.id)
-            .ok_or(HitError::NoModelForId(target.id.to_string()))?;
+        let target_model = self.get_model_or_error(&target.id)?;
 
         let target_model_field = target_model
             .get_field(&target.property)
@@ -115,7 +112,17 @@ impl Hit {
         id: &str,
         parent: IndexEntryProperty,
     ) -> Result<(), HitError> {
-        self.index.remove_reference(id, parent)
+        // check in model that this property exists and is of a valid type
+        let target_model = self.get_model_or_error(&parent.id)?;
+        let target_property = target_model
+            .get_field(&parent.property)
+            .ok_or(HitError::PropertyNotFound((&parent.property).into()))?;
+        let target_property = target_property.borrow();
+        if target_property.is_vec_reference() {
+            self.index.remove_reference(id, parent)
+        } else {
+            Err(HitError::InvalidDataType())
+        }
     }
 
     pub fn find_references_recursive(
@@ -146,9 +153,7 @@ impl Hit {
         before_id: Option<String>,
     ) -> Result<(), HitError> {
         //check destination is allowed
-        let target_model = self
-            .get_model(&property.id)
-            .ok_or(HitError::NoModelForId((&property).id.to_string()))?;
+        let target_model = self.get_model_or_error(&property.id)?;
         let ok = self.can_move_object(
             id,
             &property.id,
@@ -168,6 +173,22 @@ impl Hit {
             None => None,
         }
     }
+
+    fn get_model_or_error(&self, id: &str) -> Result<Rc<Model>, HitError> {
+        self.get_model(id).ok_or(HitError::NoModelForId(id.into()))
+    }
+    /*
+    fn get_model_field_or_error(
+        &self,
+        id: &str,
+        property: &str,
+    ) -> Result<&ModelFieldRef, HitError> {
+        let model = self.get_model_or_error(id)?;
+        let a = model
+            .get_field(property)
+            .ok_or(HitError::PropertyNotFound(property.into()));
+        return a;
+    } */
 
     pub fn get(&self, id: &str) -> Option<HitEntry> {
         let index_entry = self.index.get(id)?;
@@ -270,11 +291,7 @@ impl Hit {
         field: &str,
         listener: FieldListenerRef,
     ) -> Result<String, HitError> {
-        let model = self.model_index.borrow();
-        let model = model
-            .map
-            .get(id)
-            .ok_or(HitError::NoModelForId(id.to_string()))?;
+        let model = self.get_model_or_error(id)?;
         model
             .get_field(field)
             .ok_or(HitError::PropertyNotFound(field.to_string()))?;

@@ -196,9 +196,10 @@ TODO: write this chapter
 - / add serious tests
 - / write guide
 - write rust doc
+- check/rewrite reference indexation
 - clarify API
 - complete event/plugin system
-- Have consistent errors
+- X Have consistent errors
   https://nick.groenen.me/posts/rust-error-handling/
 - publish to crates.io
 

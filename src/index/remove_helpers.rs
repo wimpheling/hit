@@ -25,6 +25,12 @@ pub fn find_references_recursive(
     index: &Index,
     id: &str,
 ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
+    // TODO URGENT : check if/how this works
+    // It seems reference indexation was started but does it work ?
+    // Why should it be recursive then ?
+    // And why do recursion instead of iterating through the index ???
+    // TODO : SHITTY CODE ALERT
+
     let mut output = HashMap::new();
     find_references(index, id, &mut output)?;
 
