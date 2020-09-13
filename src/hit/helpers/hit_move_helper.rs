@@ -10,7 +10,7 @@ fn _can_move_object(
     id: &str,
     target_model: Rc<Model>,
     property: &str,
-) -> Result<bool, HitError> {
+) -> Result<(), HitError> {
     let model = index
         .get_model(id)
         .ok_or(HitError::NoModelForId(id.to_string()))?;
@@ -23,15 +23,15 @@ fn _can_move_object(
         .ok_or(HitError::InvalidMoveDestination())?;
     for allowed_model in target_field.authorized_models.iter() {
         if allowed_model == model.get_name() {
-            return Ok(true);
+            return Ok(());
         }
         for interface in model.interfaces.iter() {
             if allowed_model == interface {
-                return Ok(true);
+                return Ok(());
             }
         }
     }
-    Ok(false)
+    Err(HitError::ModelNotAllowed())
 }
 pub fn can_move_object(
     index: &Hit,
@@ -39,8 +39,8 @@ pub fn can_move_object(
     target_id: &str,
     target_model: &str,
     property: &str,
-) -> Result<bool, HitError> {
-    if !index_can_move_object(
+) -> Result<(), HitError> {
+    index_can_move_object(
         &index.index,
         id,
         IndexEntryProperty {
@@ -48,9 +48,7 @@ pub fn can_move_object(
             property: property.to_string(),
         },
         None,
-    ) {
-        return Ok(false);
-    }
+    )?;
     let target_model = index.kernel.get_model(target_model)?;
     return _can_move_object(index, id, target_model, property);
 }

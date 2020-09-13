@@ -1,3 +1,5 @@
+// NOT USED FOR NOW
+
 use std::collections::HashMap;
 
 type PropertyMap<T> = HashMap<String, Vec<T>>;

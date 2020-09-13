@@ -68,11 +68,8 @@ pub fn can_move_object(
     id: &str,
     target_parent: IndexEntryProperty,
     before_id: Option<String>,
-) -> bool {
-    match _can_move_object(index, id, target_parent, before_id) {
-        Err(_) => false,
-        Ok(_) => true,
-    }
+) -> Result<(), HitError> {
+    _can_move_object(index, id, target_parent, before_id)
 }
 
 pub fn move_object(

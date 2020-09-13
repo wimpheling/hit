@@ -142,7 +142,7 @@ impl Hit {
         target_id: &str,
         target_model: &str,
         property: &str,
-    ) -> Result<bool, HitError> {
+    ) -> Result<(), HitError> {
         can_move_object(&self, id, target_id, target_model, property)
     }
 
@@ -154,17 +154,13 @@ impl Hit {
     ) -> Result<(), HitError> {
         //check destination is allowed
         let target_model = self.get_model_or_error(&property.id)?;
-        let ok = self.can_move_object(
+        self.can_move_object(
             id,
             &property.id,
             target_model.get_name(),
             &property.property,
         )?;
-        if ok {
-            self.index.move_object(id, property, before_id)
-        } else {
-            Err(HitError::ModelNotAllowed())
-        }
+        self.index.move_object(id, property, before_id)
     }
 
     pub fn get_model(&self, id: &str) -> Option<Rc<Model>> {
@@ -175,7 +171,7 @@ impl Hit {
     }
 
     fn get_model_or_error(&self, id: &str) -> Result<Rc<Model>, HitError> {
-        self.get_model(id).ok_or(HitError::NoModelForId(id.into()))
+        self.get_model(id).ok_or(HitError::IDNotFound(id.into()))
     }
     /*
     fn get_model_field_or_error(
@@ -240,6 +236,7 @@ impl Hit {
             .map_err(|_| HitError::ValidationError())?;
         Ok(())
     }
+
     pub fn insert(
         &mut self,
         model_type: &str,
