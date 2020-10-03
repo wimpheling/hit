@@ -12,7 +12,7 @@ fn find_references(
     output: &mut HashMap<String, Vec<IndexEntryProperty>>,
 ) -> Result<(), HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-    //Error if entry has references
+
     let references = entry.borrow().references.clone();
     if references.len() > 0 {
         output.insert(id.to_string(), references);
@@ -25,29 +25,8 @@ pub fn find_references_recursive(
     index: &Index,
     id: &str,
 ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
-    // TODO URGENT : check if/how this works
-    // It seems reference indexation was started but does it work ?
-    // Why should it be recursive then ?
-    // And why do recursion instead of iterating through the index ???
-    // TODO : SHITTY CODE ALERT
-
     let mut output = HashMap::new();
     find_references(index, id, &mut output)?;
-
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-    for (_, value) in entry.borrow().data.iter() {
-        match value {
-            ObjectValue::VecSubObjects(value) => {
-                for val in value {
-                    find_references(index, &val.id, &mut output)?;
-                }
-            }
-            ObjectValue::SubObject(value) => {
-                find_references(index, &value.id, &mut output)?;
-            }
-            _ => {}
-        }
-    }
     Ok(output)
 }
 

@@ -94,3 +94,34 @@ fn it_should_find_all_references() {
     );
     assert_eq!(references, mock_object);
 }
+
+#[test]
+fn it_should_find_all_references_after_removal() {
+    // TODO : more tests, redo the code etc
+    let mut hit = create_hit_with_references();
+    hit.remove_reference(
+        "id2".into(),
+        IndexEntryProperty {
+            id: "id4".into(),
+            property: "references".into(),
+        },
+    )
+    .expect("Error");
+    let references = hit.find_references_recursive("id2").expect("Error");
+
+    let mut mock_object = HashMap::new();
+    mock_object.insert(
+        "id2".into(),
+        vec![
+            IndexEntryProperty {
+                id: "id".into(),
+                property: "references".into(),
+            },
+            IndexEntryProperty {
+                id: "id3".into(),
+                property: "reference".into(),
+            },
+        ],
+    );
+    assert_eq!(references, mock_object);
+}
