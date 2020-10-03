@@ -30,7 +30,7 @@ pub use object_data::ObjectValue;
 pub use object_data::ObjectValues;
 pub use object_data::Reference;
 
-pub use hit::{Hit, HitKernel};
+pub use hit::{Hit, HitEntry, HitKernel};
 
 pub use events::FieldListener;
 pub use events::FieldListenerRef;

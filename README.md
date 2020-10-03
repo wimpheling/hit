@@ -51,7 +51,7 @@ Every `object` (except, not yet implemented, embedded sub-objects) is indexed. T
 
 The indexation allows `hit` to provide (TODO LINK) `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, and enforce consistency rules : you cannot delete an `object` as long as there are references to it in the document.
 
-The index also allows you to easily find all the references to an object. (TOO : does it ?)
+The index also allows you to easily find all the references to an object.
 
 ## Typed
 
@@ -64,7 +64,11 @@ The models :
 
 # Get started
 
-`hit` is
+`hit` is a rust library. You can add it to your project by adding this line to your `Cargo.toml` file :
+
+```
+TODO
+```
 
 <!-- > We will sometimes use JSON representations of the `hit` documents. This is chosen for readability as it is a concise and well-known format, but JSON is not the native format of `hit`. A JSON serializer/deserializer is available, but the output we show here is not exactly the same as the JSON serializer output.
  -->
@@ -73,16 +77,14 @@ The models :
 
 ## Creating a `hit` instance
 
-To initiate a hit data instance, you need a **kernel** with model definitions. One of the core kernels, officially supported by me, is the recursively designed `hit_model`, which allows you to modelize models for `hit`.
+To initiate a hit data instance, you need a (TODO: link) **kernel** with model definitions. One of the core kernels, officially supported by me, is the recursively designed (TODO: link) `hit_model`, which allows you to modelize models for `hit`.
 
-![I heard you liked models](./img/xzibit.jpg)
-
-To make it more simple, let's start with the basic, although completely useless `file_model`, that represents a directory/file structure, with links.
+To make it more simple, let's start with the basic, although completely useless (TODO: link) `hit_test_file_model`, that represents a directory/file structure, with links.
 
 We will use ( TODO : link ) `Hit::new_with_values` to create the model. If you do not have initial values, you can instead use the (TODO : link ) `Hit::new` function.
 
 ```rust
-use file_model::create_kernel;
+use hit_file_model::create_kernel;
 use hit::{ Hit, ObjectValue };
 use std::collections::HashMap;
 
@@ -102,7 +104,7 @@ let my_model = Hit::new_with_values(
   kernel,
   values,
   // you must specify the main model name
-  "file_model/project"
+  "file/filesystem"
 );
 ```
 
@@ -112,17 +114,40 @@ let my_model = Hit::new_with_values(
 
 Simple values :
 
+These values are set using the (TODO: link) `Hit::set` value.
+
 - **string**
+
+  a `string` field accepts rust `String` values.
+
 - **number**
+
+  a `number` field accepts rust `f32` values.
+
 - **boolean**
 - **date**
 
+  a `data` field accepts timestamps as rust `i64` values.
+
 Complex values :
 
+These fields can only be populated using specific methods from the `Hit` struct.
+
 - **sub_object**
+
+  a `sub_object` field accepts a single `hit` object as a value. The field will be the only parent of the object that populates it.
+
 - **sub_object_array**
+
+  a `sub_object_array` field accepts several `hit` objects as a value. It will likewise be the only possible parent of the objects that populate it.
+
 - **reference**
+
+  a `reference` field accepts references to another object within the same root `Hit` instance. It cannot be set to an invalid ID, and likewise an object cannot be removed from the root instance if there are references to it. See (TODO: link) _mandatory validation_.
+
 - **reference_array**
+
+  likewise, a `reference_array` field accepts several references.
 
 The following chapters will explain how to use these value types.
 
@@ -155,7 +180,13 @@ There are some basic data integrity rules that `hit` models will not let you bre
 
 The main validation model is _non-blocking_ : that means you can assign invalid values to properties of your objects.
 
-# Models
+# Guide: creating models
+
+`hit` relies on Models. Similar to SQL table definitions, _Models_ are instances of the `Model` struct. A `Hit` instance relies on a `Kernel` which is a collection of models (and of plugins too as we'll see later). As a `Hit` instance has a hierarchical, tree-like structure, it must have a root object, which, like all of its sub-objects, is structured by a `Model`.
+
+In our (TODO: link to github) `hit_test_file_model` example, the `file/filesystem` model is the root object, and contains files and folders sub-objects.
+
+In that part of the guide we will introduce how to create your own kernel, models, as well as plugins.
 
 ## Model definitions
 
@@ -163,11 +194,16 @@ A `model` has the following properties:
 
 - name
 - definition
-  This is a key/value dictionary. The definition is a struct that implements the `ModelField` trait. You can write your own Model Fields, but `hit` comes with standard ones:
+  This is a key/value dictionary. The definition is a struct that implements the `ModelField` trait. You can write your own Model Fields, but `hit` comes with standard ones, which match pretty obviously the types defined in the previous chapter :
 
-  - String
-  - Integer
-  - TODO
+  - (TODO: link) String
+  - (TODO: link) Integer
+  - (TODO: link) Float
+  - (TODO: link) Date
+  - (TODO: link) Subobject
+  - (TODO: link) Subobject Array
+  - (TODO: link) Reference
+  - (TODO: link) Reference Array
 
 ## Validators
 
@@ -191,19 +227,18 @@ TODO : create the macro ^^
 
 TODO: write this chapter
 
-# TODO
+# TODO : stabilization
 
 - / add serious tests
 - / write guide
 - write rust doc
 - complete event/plugin system
-  https://nick.groenen.me/posts/rust-error-handling/
 
-# TODO After stabilization
+# TODO : After stabilization
 
 - clarify API
 - do we need insert quietly ?
-- implement ACID
+- implement ACID transactions ?
 - Should Kernel be typed/dynamic ? May be useful for extending though
 
 - Allow interfaces in authorized models
