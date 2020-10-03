@@ -222,7 +222,7 @@ impl Index {
     pub(in crate) fn find_references_recursive(
         &self,
         id: &str,
-    ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
+    ) -> Result<Vec<IndexEntryProperty>, HitError> {
         find_references_recursive(&self, id)
     }
 

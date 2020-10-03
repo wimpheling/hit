@@ -6,28 +6,17 @@ use crate::object_data::ObjectValue;
 use crate::HitError;
 use std::collections::HashMap;
 
-fn find_references(
-    index: &Index,
-    id: &str,
-    output: &mut HashMap<String, Vec<IndexEntryProperty>>,
-) -> Result<(), HitError> {
+fn find_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-
-    let references = entry.borrow().references.clone();
-    if references.len() > 0 {
-        output.insert(id.to_string(), references);
-        return Ok(());
-    }
-    Ok(())
+    let entry = entry.borrow();
+    Ok(entry.references.clone())
 }
 
 pub fn find_references_recursive(
     index: &Index,
     id: &str,
-) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
-    let mut output = HashMap::new();
-    find_references(index, id, &mut output)?;
-    Ok(output)
+) -> Result<Vec<IndexEntryProperty>, HitError> {
+    Ok(find_references(index, id)?)
 }
 
 pub fn remove_object(index: &mut Index, id: &str) -> Result<(), HitError> {

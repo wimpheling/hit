@@ -1,6 +1,5 @@
 use crate::test_kernel::create_test_kernel;
 use crate::Hit;
-use crate::HitError;
 use crate::IndexEntryProperty;
 use crate::ObjectValue;
 use crate::Reference;
@@ -74,24 +73,20 @@ fn it_should_find_all_references() {
     let hit = create_hit_with_references();
     let references = hit.find_references_recursive("id2").expect("Error");
 
-    let mut mock_object = HashMap::new();
-    mock_object.insert(
-        "id2".into(),
-        vec![
-            IndexEntryProperty {
-                id: "id".into(),
-                property: "references".into(),
-            },
-            IndexEntryProperty {
-                id: "id4".into(),
-                property: "references".into(),
-            },
-            IndexEntryProperty {
-                id: "id3".into(),
-                property: "reference".into(),
-            },
-        ],
-    );
+    let mut mock_object = vec![
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "references".into(),
+        },
+        IndexEntryProperty {
+            id: "id4".into(),
+            property: "references".into(),
+        },
+        IndexEntryProperty {
+            id: "id3".into(),
+            property: "reference".into(),
+        },
+    ];
     assert_eq!(references, mock_object);
 }
 
@@ -109,19 +104,15 @@ fn it_should_find_all_references_after_removal() {
     .expect("Error");
     let references = hit.find_references_recursive("id2").expect("Error");
 
-    let mut mock_object = HashMap::new();
-    mock_object.insert(
-        "id2".into(),
-        vec![
-            IndexEntryProperty {
-                id: "id".into(),
-                property: "references".into(),
-            },
-            IndexEntryProperty {
-                id: "id3".into(),
-                property: "reference".into(),
-            },
-        ],
-    );
+    let mut mock_object = vec![
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "references".into(),
+        },
+        IndexEntryProperty {
+            id: "id3".into(),
+            property: "reference".into(),
+        },
+    ];
     assert_eq!(references, mock_object);
 }

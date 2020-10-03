@@ -125,10 +125,7 @@ impl Hit {
         }
     }
 
-    pub fn find_references_recursive(
-        &self,
-        id: &str,
-    ) -> Result<HashMap<String, Vec<IndexEntryProperty>>, HitError> {
+    pub fn find_references_recursive(&self, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
         self.index.find_references_recursive(id)
     }
 

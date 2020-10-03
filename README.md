@@ -196,15 +196,12 @@ TODO: write this chapter
 - / add serious tests
 - / write guide
 - write rust doc
-- check/rewrite reference indexation
-- clarify API
 - complete event/plugin system
-- X Have consistent errors
   https://nick.groenen.me/posts/rust-error-handling/
-- publish to crates.io
 
 # TODO After stabilization
 
+- clarify API
 - do we need insert quietly ?
 - implement ACID
 - Should Kernel be typed/dynamic ? May be useful for extending though
