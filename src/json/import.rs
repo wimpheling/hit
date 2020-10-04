@@ -1,4 +1,4 @@
-use crate::hit::{Hit, HitKernel, IndexModelImporter};
+use crate::hit_mod::{Hit, HitKernel, IndexModelImporter};
 use crate::index::IndexEntryProperty;
 use crate::json::utils::*;
 use crate::json::JSONImportError;

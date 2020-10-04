@@ -73,7 +73,7 @@ fn it_should_find_all_references() {
     let hit = create_hit_with_references();
     let references = hit.find_references_recursive("id2").expect("Error");
 
-    let mut mock_object = vec![
+    let mock_object = vec![
         IndexEntryProperty {
             id: "id".into(),
             property: "references".into(),
@@ -91,7 +91,7 @@ fn it_should_find_all_references() {
 }
 
 #[test]
-fn it_should_find_all_references_after_removal() {
+fn it_should_find_all_references_after_removal_from_array() {
     // TODO : more tests, redo the code etc
     let mut hit = create_hit_with_references();
     hit.remove_reference(
@@ -104,7 +104,7 @@ fn it_should_find_all_references_after_removal() {
     .expect("Error");
     let references = hit.find_references_recursive("id2").expect("Error");
 
-    let mut mock_object = vec![
+    let mock_object = vec![
         IndexEntryProperty {
             id: "id".into(),
             property: "references".into(),
@@ -112,6 +112,62 @@ fn it_should_find_all_references_after_removal() {
         IndexEntryProperty {
             id: "id3".into(),
             property: "reference".into(),
+        },
+    ];
+    assert_eq!(references, mock_object);
+}
+
+#[test]
+fn it_should_find_all_references_after_update() {
+    // TODO : more tests, redo the code etc
+    let mut hit = create_hit_with_references();
+    hit.set(
+        "id3",
+        "reference",
+        ObjectValue::Reference(Reference { id: "id4".into() }),
+    )
+    .expect("Error");
+    hit.set(
+        "id4",
+        "reference",
+        ObjectValue::Reference(Reference { id: "id2".into() }),
+    )
+    .expect("Error");
+    let references = hit.find_references_recursive("id2").expect("Error");
+
+    let mock_object = vec![
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "references".into(),
+        },
+        IndexEntryProperty {
+            id: "id4".into(),
+            property: "references".into(),
+        },
+        IndexEntryProperty {
+            id: "id4".into(),
+            property: "reference".into(),
+        },
+    ];
+    assert_eq!(references, mock_object);
+}
+
+#[test]
+fn it_should_find_all_references_after_set_to_null() {
+    // TODO : more tests, redo the code etc
+    let mut hit = create_hit_with_references();
+    hit.set("id3", "reference", ObjectValue::Null)
+        .expect("Error");
+    let references = hit.find_references_recursive("id2").expect("Error");
+
+    let mock_object = vec![
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "references".into(),
+        },
+        IndexEntryProperty {
+            id: "id4".into(),
+            property: "references".into(),
         },
     ];
     assert_eq!(references, mock_object);

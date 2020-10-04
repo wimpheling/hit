@@ -1,5 +1,5 @@
-use crate::hit::hit::ModelIndex;
-use crate::hit::{Hit, HitKernel, HitPlugins};
+use crate::hit_mod::hit::ModelIndex;
+use crate::hit_mod::{Hit, HitKernel, HitPlugins};
 use crate::index::IndexEntryProperty;
 use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;

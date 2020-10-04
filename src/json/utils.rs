@@ -1,4 +1,4 @@
-use crate::hit::HitKernel;
+use crate::hit_mod::HitKernel;
 use crate::json::JSONImportError;
 use crate::model::Model;
 use crate::model::ModelFieldRef;

@@ -1,4 +1,4 @@
-use crate::hit::HitEntry;
+use crate::hit_mod::HitEntry;
 use crate::index::IndexEntryProperty;
 use crate::model::Model;
 use crate::object_data::ObjectValues;

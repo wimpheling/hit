@@ -1,4 +1,4 @@
-use crate::hit::{Hit, HitEntry};
+use crate::hit_mod::{Hit, HitEntry};
 use crate::index::IndexEntryProperty;
 use crate::json::utils::*;
 use crate::object_data::{ObjectValue, Reference};

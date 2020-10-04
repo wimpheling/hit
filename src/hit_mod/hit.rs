@@ -1,6 +1,6 @@
 use crate::events::FieldListenerRef;
-use crate::hit::helpers::can_move_object;
-use crate::hit::hit_entry::HitEntry;
+use crate::hit_mod::helpers::can_move_object;
+use crate::hit_mod::hit_entry::HitEntry;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::index::IndexEntryRef;

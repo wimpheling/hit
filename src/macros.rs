@@ -13,7 +13,7 @@ macro_rules! modele {
             $(,)?
     ) => {
         {
-            let mut mdl: indexed_model::Model = indexed_model::Model::new(
+            let mut mdl: hit::Model = hit::Model::new(
                 String::from($model_name),
                 String::from($model_label),
             );

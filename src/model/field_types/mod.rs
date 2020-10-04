@@ -9,7 +9,7 @@ mod field_type_string_vec;
 mod field_type_subobject;
 mod field_type_subobject_array;
 
-use crate::hit::HitEntry;
+use crate::hit_mod::HitEntry;
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::Model;
 use crate::object_data::Reference;

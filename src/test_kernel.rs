@@ -1,12 +1,11 @@
-use crate::hit::HitEntry;
 use crate::kernel::Kernel;
 use crate::model::field_types::FieldTypeReference;
 use crate::model::field_types::FieldTypeReferenceArray;
 use crate::model::field_types::FieldTypeString;
 use crate::model::field_types::FieldTypeSubobjectArray;
-use crate::model::validators::MaxLength;
 use crate::model::Model;
 use crate::plugins::Plugins;
+use crate::HitEntry;
 use crate::HitError;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -67,7 +66,7 @@ pub fn create_test_kernel() -> TestKernel {
         String::from("reference"),
         Rc::new(RefCell::new(FieldTypeReference {
             name: String::from("reference"),
-            required: true,
+            required: false,
             validators: vec![],
             authorized_models: vec!["test/test".into()],
         })),
