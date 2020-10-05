@@ -227,6 +227,11 @@ impl Index {
     }
 
     pub fn remove_object(&mut self, id: &str) -> Result<(), HitError> {
+        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+        for plugin in self.plugins.delete_plugins.iter() {
+            plugin.borrow_mut().on_before_delete_entry(&entry)?;
+        }
+
         let references = find_references_recursive(&self, id)?;
         if references.len() > 0 {
             return Err(HitError::CannotDeleteObjectWithReferences(id.to_string()));

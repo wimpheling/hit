@@ -4,7 +4,6 @@ use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::object_data::ObjectValue;
 use crate::HitError;
-use std::collections::HashMap;
 
 fn find_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
@@ -22,9 +21,6 @@ pub fn find_references_recursive(
 pub fn remove_object(index: &mut Index, id: &str) -> Result<(), HitError> {
     remove_object_children(index, id)?;
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-    for plugin in index.plugins.delete_plugins.iter() {
-        plugin.borrow_mut().on_before_delete_entry(&entry)?;
-    }
     //remove references from properties
     unindex_references_from_properties(index, id)?;
     //remove object from id list in parent

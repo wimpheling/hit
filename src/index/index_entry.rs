@@ -56,15 +56,14 @@ impl IndexEntry {
     }
 
     pub fn get_id(&self) -> &Id {
-        return &self.id;
+        &self.id
     }
 
     // TODO : use it !
-    fn unindex_reference(&mut self, parent: &IndexEntryProperty, _id: &str) {
+    /* fn unindex_reference(&mut self, parent: &IndexEntryProperty, _id: &str) {
         self.references.retain(|x| x != parent);
-    }
+    } */
 
-    // TODO : should have no return type
     pub(in crate::index) fn set(
         &mut self,
         property: &str,

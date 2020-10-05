@@ -13,7 +13,7 @@ macro_rules! modele {
             $(,)?
     ) => {
         {
-            let mut mdl: hit::Model = hit::Model::new(
+            let mut mdl: $crate::Model = $crate::Model::new(
                 String::from($model_name),
                 String::from($model_label),
             );

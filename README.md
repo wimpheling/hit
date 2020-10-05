@@ -233,6 +233,7 @@ TODO: write this chapter
 - / write guide
 - write rust doc
 - complete event/plugin system
+- complete validation system
 
 # TODO : After stabilization
 

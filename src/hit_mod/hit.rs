@@ -6,9 +6,8 @@ use crate::index::IndexEntryProperty;
 use crate::index::IndexEntryRef;
 use crate::model::validators::ValidatorContext;
 use crate::model::Model;
-use crate::model::ModelFieldRef;
 use crate::object_data::Id;
-use crate::object_data::{ObjectValue, ObjectValues, Reference};
+use crate::object_data::{ObjectValue, ObjectValues};
 use crate::plugins::DeletePlugin;
 use crate::plugins::Plugins;
 use crate::HitError;
@@ -77,7 +76,7 @@ impl Hit {
         return self.model_index.borrow().map.contains_key(key);
     }
 
-    fn validate_reference(&self, id: &str, target: IndexEntryProperty) -> Result<bool, HitError> {
+    fn field_is_reference_array(&self, target: &IndexEntryProperty) -> Result<bool, HitError> {
         let target_model = self.get_model_or_error(&target.id)?;
 
         let target_model_field = target_model
@@ -97,8 +96,8 @@ impl Hit {
         id: &str,
         target: IndexEntryProperty,
     ) -> Result<(), HitError> {
-        let is_valid = self.validate_reference(id, target.clone())?;
         //TODO : validate that the model field accepts reference arrays
+        let is_valid = self.field_is_reference_array(&target)?;
 
         if is_valid {
             self.index.insert_reference(id, target)

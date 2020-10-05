@@ -44,6 +44,7 @@ impl InitPlugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
         self.add_to_index(model, id);
     }
 }
+
 impl DeletePlugin<HitEntry> for ModelTypeIndexer {
     fn on_before_delete_entry(&mut self, _entry: &HitEntry) -> Result<(), HitError> {
         Ok(())

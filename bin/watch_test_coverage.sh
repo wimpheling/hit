@@ -1,0 +1,1 @@
+cargo watch -x 'tarpaulin --ignore-tests --out Lcov' -i lcov.info

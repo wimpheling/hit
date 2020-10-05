@@ -67,7 +67,7 @@ pub fn create_test_kernel() -> TestKernel {
         Rc::new(RefCell::new(FieldTypeReference {
             name: String::from("reference"),
             required: false,
-            validators: vec![],
+            validators: vec![], 
             authorized_models: vec!["test/test".into()],
         })),
     );

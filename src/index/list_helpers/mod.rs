@@ -105,6 +105,7 @@ mod tests {
         match value {
             ObjectValue::VecReference(refs) => refs.iter().position(|r| r.id == id).unwrap(),
             ObjectValue::VecSubObjects(refs) => refs.iter().position(|r| r.id == id).unwrap(),
+            // TODO : should not panic
             _ => panic!("Invalid value"),
         }
     }
