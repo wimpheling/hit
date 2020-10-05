@@ -5,6 +5,8 @@ use crate::IndexEntryProperty;
 use crate::{Hit, HitError};
 use std::rc::Rc;
 
+// TODO : that's not generic, it should use the allow_model method
+// this prevents from creating custom subobject fields with custom rules :/
 fn _can_move_object(
     index: &Hit,
     id: &str,
@@ -31,7 +33,7 @@ fn _can_move_object(
             }
         }
     }
-    Err(HitError::ModelNotAllowed())
+    Err(HitError::ModelNotAllowed(model.get_name().clone()))
 }
 pub fn can_move_object(
     index: &Hit,

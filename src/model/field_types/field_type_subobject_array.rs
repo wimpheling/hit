@@ -21,7 +21,12 @@ fn validate_reference(
     authorized_models: &Vec<String>,
 ) -> ReturnHitError {
     let entry = check_reference_exists(sub_value, context)?;
-    return check_reference_is_authorized(authorized_models, &entry.get_model());
+    if !check_reference_is_authorized(authorized_models, &entry.get_model()) {
+        return Err(vec![HitError::ModelNotAllowed(
+            entry.get_model().get_name().clone(),
+        )]);
+    }
+    Ok(())
 }
 
 impl ModelField for FieldTypeSubobjectArray {
@@ -33,10 +38,7 @@ impl ModelField for FieldTypeSubobjectArray {
     }
 
     fn accepts_model(&self, model: &Model) -> bool {
-        match check_reference_is_authorized(&self.authorized_models, model) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        check_reference_is_authorized(&self.authorized_models, model)
     }
 
     fn get_name(&self) -> String {

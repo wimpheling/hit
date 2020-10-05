@@ -27,8 +27,8 @@ pub enum HitError {
     InvalidReferenceTypeInArray(),
     #[error("This field is required")]
     Required(),
-    #[error("This model is not allowed here")]
-    ModelNotAllowed(),
+    #[error("Model `{0}` is not allowed here")]
+    ModelNotAllowed(String),
     #[error("ID not found: `{0}`")]
     IDNotFound(String),
     #[error("Listener Not Found: `{0}`")]

@@ -25,10 +25,7 @@ impl ModelField for FieldTypeSubobject {
     }
 
     fn accepts_model(&self, model: &Model) -> bool {
-        match check_reference_is_authorized(&self.authorized_models, model) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        check_reference_is_authorized(&self.authorized_models, model)
     }
 
     fn get_name(&self) -> String {
@@ -41,7 +38,11 @@ impl ModelField for FieldTypeSubobject {
                 let mut errors: Vec<HitError> = vec![];
                 //verify validity of reference
                 let entry = check_reference_exists(value, context)?;
-                check_reference_is_authorized(&self.authorized_models, &entry.get_model())?;
+                if !check_reference_is_authorized(&self.authorized_models, &entry.get_model()) {
+                    return Err(vec![HitError::ModelNotAllowed(
+                        entry.get_model().get_name().clone(),
+                    )]);
+                }
                 //Run validators
                 run_validators(&self.validators, value, &mut errors, context);
 

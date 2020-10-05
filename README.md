@@ -232,7 +232,9 @@ TODO: write this chapter
 - / add serious tests
 - / write guide
 - write rust doc
-- complete event/plugin system
+- / complete event/plugin system
+- test move function
+- refactor move function with allows_model
 - complete validation system
 
 # TODO : After stabilization

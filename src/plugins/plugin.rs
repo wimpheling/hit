@@ -1,6 +1,6 @@
-use crate::index::IndexEntryProperty;
 use crate::object_data::ObjectValues;
 use crate::HitError;
+use crate::{index::IndexEntryProperty, ObjectValue};
 
 pub trait InitPlugin<ExtraData, Entry> {
     fn on_init_add_entry(
@@ -33,8 +33,18 @@ pub trait Plugin<ExtraData, Entry> {
         parent: IndexEntryProperty,
     );
 
-    fn on_before_set_value(&mut self);
-    fn on_after_set_value(&mut self);
+    fn on_before_set_value(
+        &mut self,
+        property: IndexEntryProperty,
+        value: &ObjectValue,
+        old_value: &Option<ObjectValue>,
+    );
+    fn on_after_set_value(
+        &mut self,
+        property: IndexEntryProperty,
+        value: &ObjectValue,
+        old_value: &Option<ObjectValue>,
+    );
     fn on_before_move_subobject(&mut self);
     fn on_after_move_subobject(&mut self);
 }

@@ -7,6 +7,7 @@ use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
 use crate::HitError;
 
+#[derive(Default)]
 pub struct FieldTypeReference {
     pub required: bool,
     pub name: String,
@@ -37,7 +38,11 @@ impl ModelField for FieldTypeReference {
                 let mut errors: Vec<HitError> = vec![];
                 //verify validity of reference
                 let entry = check_reference_exists(value, context)?;
-                check_reference_is_authorized(&self.authorized_models, &entry.get_model())?;
+                if !check_reference_is_authorized(&self.authorized_models, &entry.get_model()) {
+                    return Err(vec![HitError::ModelNotAllowed(
+                        entry.get_model().get_name().clone(),
+                    )]);
+                }
                 //Run validators
                 run_validators(&self.validators, value, &mut errors, context);
 

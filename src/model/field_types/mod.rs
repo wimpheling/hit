@@ -48,18 +48,21 @@ fn check_reference_exists<'a>(
     }
 }
 
-fn check_reference_is_authorized(authorized_models: &Vec<String>, model: &Model) -> ReturnHitError {
+fn check_reference_is_authorized(authorized_models: &Vec<String>, model: &Model) -> bool {
     for authorized_model in authorized_models {
+        println!("============");
+        println!("{}", model.get_name());
+        println!("{}", authorized_model);
         if model.get_name() == authorized_model {
-            return Ok(());
+            return true;
         }
         if model.implements_interface(authorized_model) {
-            return Ok(());
+            return true;
         }
     }
-    //TODO error handling
-    return Err(vec![HitError::InvalidReference("".to_string())]);
+    return false;
 }
+
 pub fn run_validators<T>(
     validators: &Validators<T>,
     value: &T,

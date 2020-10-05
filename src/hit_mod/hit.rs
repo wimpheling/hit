@@ -202,6 +202,20 @@ impl Hit {
             .model
             .get_field(property)
             .ok_or(HitError::PropertyNotFound(property.to_string()))?;
+
+        let old_value = self.get_value(id, property);
+
+        for plugin in self.plugins.plugins.iter() {
+            plugin.borrow_mut().on_before_set_value(
+                IndexEntryProperty {
+                    id: id.into(),
+                    property: property.into(),
+                },
+                &value,
+                &old_value,
+            );
+        }
+
         //does the field accept the object value
         if !model_field.borrow().accepts_for_set(
             &value,
@@ -216,8 +230,6 @@ impl Hit {
 
         self.index.set_value(id, property, value.clone())?;
 
-        //TODO: plugins
-
         model_field
             .borrow()
             .validate(
@@ -230,6 +242,17 @@ impl Hit {
             )
             //TODO: replace with validation errors
             .map_err(|_| HitError::ValidationError())?;
+
+        for plugin in self.plugins.plugins.iter() {
+            plugin.borrow_mut().on_after_set_value(
+                IndexEntryProperty {
+                    id: id.into(),
+                    property: property.into(),
+                },
+                &value,
+                &old_value,
+            );
+        }
         Ok(())
     }
 
@@ -241,29 +264,48 @@ impl Hit {
         parent: IndexEntryProperty,
         before_id: Option<String>,
     ) -> Result<(), HitError> {
-        let model = self
+        let new_object_model = self
             .kernel
             .get_model(&model_type.to_string())
             .map_err(|_| HitError::ModelDoesNotExist(model_type.to_string()))?;
+
+        // before_add_entry hook
         for plugin in self.get_plugins().plugins.iter() {
             plugin.borrow_mut().on_before_add_entry(
-                model.clone(),
+                new_object_model.clone(),
                 &id,
                 values.clone(),
                 parent.clone(),
             );
         }
 
+        let target_model = self.get_model_or_error(&parent.id)?;
+
+        // verify that the model field exists and is of the right type
+        let field = target_model
+            .get_field(&parent.property)
+            .ok_or(HitError::PropertyNotFound(parent.property.clone()))?;
+        let field = field.borrow();
+        if !field.is_vec_subobject() {
+            return Err(HitError::CannotInsertObjectInThisDataType());
+        }
+        // check if model is authorized
+        if !field.accepts_model(&new_object_model) {
+            return Err(HitError::ModelNotAllowed(model_type.into()));
+        }
+
+        // update the data
         self.index
             .insert(id, values.clone(), parent.clone(), before_id)?;
         self.model_index
             .borrow_mut()
             .map
-            .insert(id.to_string(), model.clone());
+            .insert(id.to_string(), new_object_model.clone());
 
+        // after_add_entry hook
         for plugin in self.get_plugins().plugins.iter() {
             plugin.borrow_mut().on_after_add_entry(
-                model.clone(),
+                new_object_model.clone(),
                 &id,
                 values.clone(),
                 parent.clone(),

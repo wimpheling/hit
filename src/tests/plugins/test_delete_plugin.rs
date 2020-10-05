@@ -96,7 +96,7 @@ fn it_should_call_the_before_delete_callback_only_before_an_error() {
             HashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
-                property: "sub_items".into(),
+                property: "subitems".into(),
             },
             None,
         )
@@ -134,7 +134,7 @@ fn it_should_call_both_callbacks_when_deleting() {
             HashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
-                property: "sub_items".into(),
+                property: "subitems".into(),
             },
             None,
         )

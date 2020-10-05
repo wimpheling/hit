@@ -1,4 +1,3 @@
-use crate::hit_mod::HitEntry;
 use crate::index::IndexEntryProperty;
 use crate::model::Model;
 use crate::object_data::ObjectValues;
@@ -6,6 +5,7 @@ use crate::plugins::DeletePlugin;
 use crate::plugins::InitPlugin;
 use crate::plugins::Plugin;
 use crate::HitError;
+use crate::{hit_mod::HitEntry, ObjectValue};
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -80,8 +80,20 @@ impl Plugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
     ) {
         self.add_to_index(model, id);
     }
-    fn on_after_set_value(&mut self) {}
-    fn on_before_set_value(&mut self) {}
+    fn on_after_set_value(
+        &mut self,
+        property: IndexEntryProperty,
+        value: &ObjectValue,
+        old_value: &Option<ObjectValue>,
+    ) {
+    }
+    fn on_before_set_value(
+        &mut self,
+        property: IndexEntryProperty,
+        value: &ObjectValue,
+        old_value: &Option<ObjectValue>,
+    ) {
+    }
     fn on_before_move_subobject(&mut self) {}
     fn on_after_move_subobject(&mut self) {}
 }
