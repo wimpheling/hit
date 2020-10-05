@@ -17,20 +17,22 @@ impl Model {
             interfaces: vec![],
         };
     }
-    pub fn new_with_fields(name: String, label: String, fields: Fields) -> Model {
+
+    // TODO: remove
+    /* pub fn new_with_fields(name: String, label: String, fields: Fields) -> Model {
         return Model {
             name: name,
             label: label,
             fields: fields,
             interfaces: vec![],
         };
-    }
+    } */
 
     pub fn get_name(&self) -> &String {
-        return &self.name;
+        &self.name
     }
     pub fn get_label(&self) -> &String {
-        return &self.label;
+        &self.label
     }
 
     pub fn get_field(&self, name: &str) -> Option<&ModelFieldRef> {
@@ -42,12 +44,13 @@ impl Model {
     }
 
     pub(in crate) fn get_fields(&self) -> &Fields {
-        return &self.fields;
+        &self.fields
     }
 }
 
-impl PartialEq for Model {
+// TODO : is that useful ?
+/* impl PartialEq for Model {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
-}
+} */

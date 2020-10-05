@@ -27,7 +27,7 @@ impl Listeners {
     pub fn remove(&mut self, property: &str, listener_id: &str) -> Result<(), HitError> {
         let listeners = self
             .get_property_listeners_mut(property)
-            .ok_or(HitError::ListenerNotFound(property.to_string()))?;
+            .ok_or(HitError::ListenerNotFound(listener_id.to_string()))?;
         listeners.retain(|listener2| listener2.borrow().get_unique_id() != listener_id);
         Ok(())
     }
@@ -49,11 +49,11 @@ pub type FieldListenerRef = Rc<RefCell<dyn FieldListener>>;
 pub trait FieldListener {
     fn on_update(&mut self, value: &ObjectValue);
     fn get_unique_id(&self) -> &str;
-    fn on_delete(&mut self);
 }
 
-impl PartialEq for dyn FieldListener {
+// TODO: is this useful ?
+/* impl PartialEq for dyn FieldListener {
     fn eq(&self, other: &Self) -> bool {
         self.get_unique_id() == other.get_unique_id()
     }
-}
+} */

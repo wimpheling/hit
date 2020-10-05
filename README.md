@@ -234,17 +234,20 @@ TODO: write this chapter
 - write rust doc
 - / complete event/plugin system
 - test move function
+- test field structs
 - refactor move function with allows_model
-- complete validation system
+- test create_object_helpers
+- integrate model_type index in Hit
 
 # TODO : After stabilization
 
 - clarify API
+- complete validation system
 - do we need insert quietly ?
-- implement ACID transactions ?
-- Should Kernel be typed/dynamic ? May be useful for extending though
-
-- Allow interfaces in authorized models
 - enums for string type
 - unique in parent/parent.parent
   dependencies =>
+
+# TODO : less prioritary
+
+- implement ACID transactions ?

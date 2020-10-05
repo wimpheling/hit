@@ -230,6 +230,7 @@ impl Hit {
 
         self.index.set_value(id, property, value.clone())?;
 
+        //TODO: make proper validation (in an error object, non-blocking, with events)
         model_field
             .borrow()
             .validate(
@@ -360,6 +361,8 @@ impl Hit {
         }
     }
 }
+
+// TODO : is that useful ?
 impl Iterator for Hit {
     type Item = HitEntry;
     fn next(&mut self) -> Option<HitEntry> {
