@@ -1,6 +1,7 @@
 # hit
 
 ![Build Status](https://github.com/wimpheling/indexed-model/workflows/build/badge.svg)
+![codecov](https://codecov.io/gh/wimpheling/indexed-model/branch/master/graph/badge.svg?token=czzbPcCyZM)
 
 `hit` is a Rust library to handle data structured in tree-like documents with these features:
 
