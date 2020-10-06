@@ -39,26 +39,31 @@ Here is an example
 }
 ``` -->
 
-The values can be either be simple (string, numeric, date) values, or their can contain **other sub objects**. Every sub-object (except the root one) can thus be located as being in a **property** of another **object**.
+The values can be either be
+
+- simple (string, numeric, date)
+- or they can contain **other sub objects**. Every sub-object (except the root one) can thus be located as being in a **property** of another **object**.
+- they can also contain **references** to other objects.
+
 (TODO : link to property types)
 
 ## Indexed
 
-Every `object` (except, not yet implemented, embedded sub-objects) is indexed. That implies :
+Every `object` <!-- (except, not yet implemented, embedded sub-objects) --> is indexed. That implies :
 
-- every object must have an `_id` field, with a value of type `string`
+- every object must have an `_id`, with a rust `String` value
 - every object (except the root object) can be located using these three indices :
   - parent_id
   - parent_property
   - parent_position
 
-The indexation allows `hit` to provide (TODO LINK) `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, and enforce consistency rules : you cannot delete an `object` as long as there are references to it in the document.
+The indexation allows `hit` to provide (TODO LINK) `reference` and `reference_array` type fields. They are inspired by foreign keys in relation databases, and `hit` enforces consistency rules : you cannot delete an `object` as long as there are references to it in the document.
 
-The index also allows you to easily find all the references to an object.
+The index also allows you to easily find all the references to an object. (TODO: link to method)
 
 ## Typed
 
-Every `object` in a document must have a (TODO: Link) `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `hit` must be initialized with a `kernel` that contains the definitions.
+Every `object` in a document must have a (TODO: Link) `Model`. A model is identified by a string id, and is referenced in the `type` property of the `object`. To resolve model definitions from the ids, every instance of `hit` must be initialized with a (TODO: link) `Kernel` that contains the definitions.
 
 The models :
 
@@ -80,7 +85,7 @@ TODO
 
 ## Creating a `hit` instance
 
-To initiate a hit data instance, you need a (TODO: link) **kernel** with model definitions. One of the core kernels, officially supported by me, is the recursively designed (TODO: link) `hit_model`, which allows you to modelize models for `hit`.
+To create a `hit` data instance, you need a (TODO: link) `Kernel` with model definitions. One of the core kernels, officially supported by me, is the recursively designed (TODO: link) `hit_model`, which allows you to modelize models for `hit`.
 
 To make it more simple, let's start with the basic, although completely useless (TODO: link) `hit_test_file_model`, that represents a directory/file structure, with links.
 
@@ -88,7 +93,7 @@ We will use ( TODO : link ) `Hit::new_with_values` to create the model. If you d
 
 ```rust
 use hit_file_model::create_kernel;
-use hit::{ Hit, ObjectValue };
+use hit::{ Hit, ObjectValue, IndexEntryProperty };
 use std::collections::HashMap;
 
 // create the kernel
@@ -99,10 +104,10 @@ let id = "my_id".into();
 
 // initiate the name value for our root object
 let mut values = HashMap::new();
-values.insert("name".into(), ObjectValue::String(name.to_string()));
+values.insert("name".into(), ObjectValue::String("name".into()));
 
 // we can now create the hit instance
-let my_model = Hit::new_with_values(
+let hit_instance = Hit::new_with_values(
   id,
   kernel,
   values,
@@ -113,7 +118,7 @@ let my_model = Hit::new_with_values(
 
 ## Property types
 
-`hit` allows the following property types as values:
+`hit` allows the following property types as values. The (TODO: link) `ObjectValue` enum handles this type system.
 
 Simple values :
 
@@ -130,7 +135,7 @@ These values are set using the (TODO: link) `Hit::set` value.
 - **boolean**
 - **date**
 
-  a `data` field accepts timestamps as rust `i64` values.
+  a `date` field accepts timestamps as rust `i64` values.
 
 Complex values :
 
@@ -152,11 +157,52 @@ These fields can only be populated using specific methods from the `Hit` struct.
 
   likewise, a `reference_array` field accepts several references.
 
-The following chapters will explain how to use these value types.
+The following sub-chapters will explain how to use these value types. The examples will use the previously created `hit_test_file_model` instance.
 
-## Setting a simple value
+## Setting a simple/scalar value
+
+You can set a simple value using the (TODO : link) `Hit::set` method.
+
+Example :
+
+```rust
+hit_instance::set(
+  "my_id".into(),
+  "name".into(),
+  ObjectValue::String("my_instance_name".into())
+).expect("This should set the root object name");
+```
+
+The action may return an error :
+
+- (TODO: link): `HitError::IDNotFound` if the model id does not exist
+- (TODO: link): `HitError::PropertyNotFound` if the model doesn't have the specified property
+- (TODO: link): `HitError::InvalidDataType` if the model property doesn't accept that value
 
 ## Adding an object
+
+You can add a subobject to an existing `object` using the `Hit::insert` method. You will need to provide :
+
+- the `model_type` of the object, which is the id it is known as by the Kernel.
+- the `String` id of the newly inserted object.
+- You can provide values for some fields of the object in a `Hashmap<String, ObjectValue>`
+- An object must always have a parent: you have to provide an id and a property name where to insert it
+- You can insert an object in a specific position of the property it will be in, by specifiying the id of the object it will be isnerted before. If you don't provide an id (by using `None` in the function call), the object will be inserted at the end of the list.
+
+Example :
+
+```rust
+hit_instance::insert(
+  "file/folder".into(),
+  "id2".into(),
+  Hashmap::new(),
+  IndexEntryProperty {
+    id: "my_id".into(),
+    property: "folders".into(),
+  },
+  None,
+).expect("Insertion has failed");
+```
 
 ## Removing an object
 
@@ -226,7 +272,7 @@ A `model` has the following properties:
 
 TODO : create the macro ^^
 
-### Kernel Plugins
+# Plugins / Event handlers
 
 TODO: write this chapter
 
@@ -250,3 +296,7 @@ TODO: write this chapter
 - refactor move function with allows_model
 - implement ACID transactions ?
 - integrate model_type index in Hit
+
+```
+
+```
