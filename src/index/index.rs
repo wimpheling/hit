@@ -24,7 +24,10 @@ pub struct Index {
     pub(in crate::index) plugins: IndexPlugins,
 }
 
-pub type IndexPlugins = Plugins<!, IndexEntryRef>;
+// TODO : used to use never_type
+// not sure why ?
+// pub type IndexPlugins = Plugins<!, IndexEntryRef>;
+pub type IndexPlugins = Plugins<(), IndexEntryRef>;
 
 impl Index {
     pub fn new_for_import(id: &str, plugins: IndexPlugins) -> Index {

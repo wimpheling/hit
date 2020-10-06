@@ -205,6 +205,8 @@ A `model` has the following properties:
   - (TODO: link) Reference
   - (TODO: link) Reference Array
 
+## Model macro
+
 ## Validators
 
 ### Field validators
@@ -214,8 +216,6 @@ A `model` has the following properties:
 ### Standard library
 
 ## Creating custom field types
-
-## Model macro
 
 ## Kernel
 
