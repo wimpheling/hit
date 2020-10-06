@@ -1,4 +1,4 @@
-# hit
+# 🎯 hit
 
 ![Build Status](https://github.com/wimpheling/indexed-model/workflows/build/badge.svg)
 ![codecov](https://codecov.io/gh/wimpheling/indexed-model/branch/master/graph/badge.svg?token=czzbPcCyZM)
