@@ -15,30 +15,6 @@ This library was intended to manage, in memory, deeply nested documents with str
 
 Every document is structured like a document tree, in a similar way to MongoDB documents. That means a document always start with a root `object`. In `hit` an `object` is defined as a key/value list.
 
-<!--
-Here is an example
-
-```json
-{
-  "_id": "my_id",
-  "_type": "item/document",
-  "hello": "world",
-  "foo": 12,
-  "items": [
-    {
-      "_id": "other_id",
-      "_type": "item/name",
-      "name": "other_name"
-    },
-    {
-      "_id": "yet_other_id",
-      "_type": "item/name",
-      "name": "yet_other_name"
-    }
-  ]
-}
-``` -->
-
 The values can be either be
 
 - simple (string, numeric, date)
@@ -228,6 +204,12 @@ There are some basic data integrity rules that `hit` models will not let you bre
 ## Non-blocking validation
 
 The main validation model is _non-blocking_ : that means you can assign invalid values to properties of your objects.
+
+# Guide : Persistence
+
+## JSON import/export
+
+## HitImporter/Exporter : create your own serializer/deserializer
 
 # Guide: creating models
 
