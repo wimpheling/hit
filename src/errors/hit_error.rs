@@ -1,5 +1,5 @@
 use std::clone::Clone;
-use thiserror::Error;
+use thiserror::*;
 
 #[derive(Error, Clone, Debug, PartialEq)]
 pub enum HitError {
@@ -65,6 +65,4 @@ pub enum HitError {
     CannotDeleteRootObject(),
     #[error("BeforeId is not present in this array: `{0}`")]
     InvalidBeforeId(String),
-    #[error("`{key}` error: `{message}` ")]
-    DomainError { key: String, message: String },
 }

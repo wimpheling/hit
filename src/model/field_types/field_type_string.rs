@@ -1,9 +1,12 @@
-use crate::model::field_types::{check_if_required, run_validators};
+use crate::{
+    errors::ValidationError,
+    model::field_types::{check_if_required, run_validators},
+};
 
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::ObjectValue;
-use crate::HitError;
+use anyhow::Error;
 use std::default::Default;
 
 #[derive(Default)]
@@ -30,15 +33,11 @@ impl ModelField for FieldTypeString {
         return false;
     }
 
-    fn validate(
-        &self,
-        value: &ObjectValue,
-        context: &ValidatorContext,
-    ) -> Result<(), Vec<HitError>> {
+    fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> Result<(), Vec<Error>> {
         match value {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::String(value) => {
-                let mut errors: Vec<HitError> = vec![];
+                let mut errors: Vec<Error> = vec![];
                 run_validators(&self.validators, value, &mut errors, context);
 
                 if errors.len() > 0 {
@@ -46,7 +45,7 @@ impl ModelField for FieldTypeString {
                 }
                 return Ok(());
             }
-            _ => Err(vec![HitError::InvalidDataType()]),
+            _ => Err(vec![anyhow::anyhow!(ValidationError::InvalidDataType())]),
         }
     }
     fn is_vec_reference(&self) -> bool {

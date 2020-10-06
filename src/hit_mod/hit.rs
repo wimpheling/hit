@@ -10,6 +10,7 @@ use crate::object_data::Id;
 use crate::object_data::{ObjectValue, ObjectValues};
 use crate::plugins::DeletePlugin;
 use crate::plugins::Plugins;
+use crate::utils::ModelPropertyVectors;
 use crate::HitError;
 use crate::Kernel;
 
@@ -40,6 +41,7 @@ pub struct Hit {
     pub(in crate) model_index: Rc<RefCell<ModelIndex>>,
     pub(in crate) plugins: HitPlugins,
     pub kernel: Rc<HitKernel>,
+    pub(in crate) errors: ModelPropertyVectors<String>,
 }
 
 impl Hit {
@@ -69,6 +71,7 @@ impl Hit {
             model_index: model_index,
             plugins: kernel.get_plugins(),
             kernel: kernel,
+            errors: ModelPropertyVectors::new(),
         })
     }
 
@@ -231,18 +234,26 @@ impl Hit {
         self.index.set_value(id, property, value.clone())?;
 
         //TODO: make proper validation (in an error object, non-blocking, with events)
-        model_field
-            .borrow()
-            .validate(
-                &value,
-                &ValidatorContext {
-                    id: &id.to_string(),
-                    property: &property.to_string(),
-                    index: Rc::new(self),
-                },
-            )
-            //TODO: replace with validation errors
-            .map_err(|_| HitError::ValidationError())?;
+        let validation_errors = model_field.borrow().validate(
+            &value,
+            &ValidatorContext {
+                id: &id.to_string(),
+                property: &property.to_string(),
+                index: Rc::new(self),
+            },
+        );
+        match validation_errors {
+            Ok(_) => {
+                self.errors.delete(id, property);
+            }
+            Err(validation_errors) => {
+                self.errors.delete(id, property);
+                for error in validation_errors.iter() {
+                    self.errors.add(id, property, error.to_string());
+                }
+            }
+        }
+        //TODO: replace with validation errors
 
         for plugin in self.plugins.plugins.iter() {
             plugin.borrow_mut().on_after_set_value(

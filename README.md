@@ -205,11 +205,15 @@ There are some basic data integrity rules that `hit` models will not let you bre
 
 The main validation model is _non-blocking_ : that means you can assign invalid values to properties of your objects.
 
-# Guide : Persistence
+# Persisting `hit` data
 
 ## JSON import/export
 
 ## HitImporter/Exporter : create your own serializer/deserializer
+
+# Plugins / Event handlers
+
+TODO: write this chapter
 
 # Guide: creating models
 
@@ -254,20 +258,16 @@ A `model` has the following properties:
 
 TODO : create the macro ^^
 
-# Plugins / Event handlers
-
-TODO: write this chapter
-
 # TODO : stabilization
 
 - / write guide
 - write rust doc
 - test field structs ?
+- complete validation system
 
 # TODO : After stabilization
 
 - clarify API
-- complete validation system
 - do we need insert quietly ?
 - enums for string type
 - unique in parent/parent.parent

@@ -1,10 +1,10 @@
-use crate::hit_mod::hit::ModelIndex;
 use crate::hit_mod::{Hit, HitKernel, HitPlugins};
 use crate::index::IndexEntryProperty;
 use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;
 use crate::plugins::Plugins;
 use crate::HitError;
+use crate::{hit_mod::hit::ModelIndex, utils::ModelPropertyVectors};
 use std::cell::RefCell;
 
 use std::rc::Rc;
@@ -58,6 +58,7 @@ impl IndexModelImporter {
             model_index: self.model_index,
             plugins: self.plugins,
             kernel: self.kernel,
+            errors: ModelPropertyVectors::new(),
         })
     }
 }

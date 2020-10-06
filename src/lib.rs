@@ -17,7 +17,7 @@ mod test_kernel;
 mod tests;
 
 // TODO
-// mod utils;
+mod utils;
 
 pub use index::IndexEntryProperty;
 

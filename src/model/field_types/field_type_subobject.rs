@@ -1,12 +1,15 @@
-use crate::model::field_types::{
-    check_if_required, check_reference_exists, check_reference_is_authorized, run_validators,
-    ReturnHitError,
+use crate::{
+    errors::ValidationError,
+    model::field_types::{
+        check_if_required, check_reference_exists, check_reference_is_authorized, run_validators,
+        ReturnHitError,
+    },
 };
 
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
-use crate::HitError;
+use anyhow::Error;
 
 pub struct FieldTypeSubobject {
     pub required: bool,
@@ -35,13 +38,11 @@ impl ModelField for FieldTypeSubobject {
         match value {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::Reference(value) => {
-                let mut errors: Vec<HitError> = vec![];
+                let mut errors: Vec<Error> = vec![];
                 //verify validity of reference
                 let entry = check_reference_exists(value, context)?;
                 if !check_reference_is_authorized(&self.authorized_models, &entry.get_model()) {
-                    return Err(vec![HitError::ModelNotAllowed(
-                        entry.get_model().get_name().clone(),
-                    )]);
+                    return Err(vec![anyhow::anyhow!(ValidationError::ModelNotAllowed())]);
                 }
                 //Run validators
                 run_validators(&self.validators, value, &mut errors, context);
@@ -51,7 +52,7 @@ impl ModelField for FieldTypeSubobject {
                 }
                 return Ok(());
             }
-            _ => Err(vec![HitError::InvalidDataType()]),
+            _ => Err(vec![anyhow::anyhow!(ValidationError::InvalidDataType())]),
         }
     }
     fn is_vec_reference(&self) -> bool {
