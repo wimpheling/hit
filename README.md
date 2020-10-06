@@ -1,5 +1,7 @@
 # hit
 
+![Build Status](https://github.com/wimpheling/indexed-model/workflows/build/badge.svg)
+
 `hit` is a Rust library to handle data structured in tree-like documents with these features:
 
 - **H**ierarchical
