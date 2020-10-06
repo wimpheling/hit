@@ -10,7 +10,7 @@ This library was intended to manage, in memory, deeply nested documents with str
 
 ## Hierarchical
 
-Every document is structured like a document tree, in a similar way to MongoDB documents. That means a document always start with a root `object`, that is, a list of keys and values.
+Every document is structured like a document tree, in a similar way to MongoDB documents. That means a document always start with a root `object`. In `hit` an `object` is defined as a key/value list.
 
 <!--
 Here is an example
@@ -229,15 +229,9 @@ TODO: write this chapter
 
 # TODO : stabilization
 
-- / add serious tests
 - / write guide
 - write rust doc
-- / complete event/plugin system
-- test move function
-- test field structs
-- refactor move function with allows_model
-- test create_object_helpers
-- integrate model_type index in Hit
+- test field structs ?
 
 # TODO : After stabilization
 
@@ -250,4 +244,6 @@ TODO: write this chapter
 
 # TODO : less prioritary
 
+- refactor move function with allows_model
 - implement ACID transactions ?
+- integrate model_type index in Hit

@@ -1,4 +1,7 @@
+// TODO: test the fields
+#[cfg(not(tarpaulin_include))]
 pub mod field_types;
+
 mod model;
 mod model_field;
 pub mod validators;

@@ -57,7 +57,7 @@ impl Display for DateTimeUtc {
 }
 
 // TODO : is that needed ?
-impl Display for ObjectValue {
+/* impl Display for ObjectValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
             ObjectValue::Bool(a) => {
@@ -106,6 +106,6 @@ impl Display for ObjectValue {
         }
         return Ok(());
     }
-}
+} */
 
 pub type ObjectValues = HashMap<String, ObjectValue>;
