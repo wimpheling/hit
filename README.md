@@ -1,7 +1,7 @@
 # 🎯 hit
 
-![Build Status](https://github.com/wimpheling/indexed-model/workflows/build/badge.svg)
-![codecov](https://codecov.io/gh/wimpheling/indexed-model/branch/master/graph/badge.svg?token=czzbPcCyZM)
+![Build Status](https://github.com/wimpheling/hit/workflows/build/badge.svg)
+![codecov](https://codecov.io/gh/wimpheling/hit/branch/master/graph/badge.svg?token=czzbPcCyZM)
 
 `hit` is a Rust library to handle data structured in tree-like documents with these features:
 
@@ -96,7 +96,7 @@ let hit_instance = Hit::new_with_values(
 
 `hit` allows the following property types as values. The (TODO: link) `ObjectValue` enum handles this type system.
 
-Simple values :
+### Simple values
 
 These values are set using the (TODO: link) `Hit::set` value.
 
@@ -113,7 +113,7 @@ These values are set using the (TODO: link) `Hit::set` value.
 
   a `date` field accepts timestamps as rust `i64` values.
 
-Complex values :
+### Complex values
 
 These fields can only be populated using specific methods from the `Hit` struct.
 
