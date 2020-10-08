@@ -41,17 +41,17 @@ impl<T: PartialEq> ModelPropertyVectors<T> {
         property_map.entry(property.into()).or_insert_with(Vec::new)
     }
 
-    fn get_mut(&mut self, id: &str, property: &str) -> Option<&mut Vec<T>> {
+    /*    fn get_mut(&mut self, id: &str, property: &str) -> Option<&mut Vec<T>> {
         let properties = self.get_property_map_mut(id)?;
         properties.get_mut(property)
-    }
+    } */
 
     pub fn add(&mut self, id: &str, property: &str, value: T) {
         let vector = self.get_or_create_mut(id, property);
         vector.push(value);
     }
 
-    pub fn remove(&mut self, id: &str, property: &str, value: &T) {
+    /*  pub fn remove(&mut self, id: &str, property: &str, value: &T) {
         let vector = self.get_mut(id, property);
         match vector {
             Some(vector) => {
@@ -62,7 +62,7 @@ impl<T: PartialEq> ModelPropertyVectors<T> {
             }
             None => {}
         }
-    }
+    } */
 
     pub fn delete(&mut self, id: &str, property: &str) {
         let property_map = self.get_property_map_mut(id);

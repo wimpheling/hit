@@ -3,12 +3,12 @@ use crate::{
     model::field_types::{
         check_reference_exists, check_reference_is_authorized, run_validators, ReturnHitError,
     },
+    HitError,
 };
 
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
-use anyhow::Error;
 use std::default::Default;
 
 #[derive(Default)]
@@ -22,10 +22,12 @@ fn validate_reference(
     sub_value: &Reference,
     context: &ValidatorContext,
     authorized_models: &Vec<String>,
-) -> Result<(), Vec<Error>> {
+) -> Result<(), HitError> {
     let entry = check_reference_exists(sub_value, context)?;
     if !check_reference_is_authorized(authorized_models, &entry.get_model()) {
-        return Err(vec![anyhow::anyhow!(ValidationError::ModelNotAllowed())]);
+        return Err(HitError::ModelNotAllowed(
+            entry.get_model().get_name().into(),
+        ));
     }
     Ok(())
 }
@@ -47,30 +49,28 @@ impl ModelField for FieldTypeSubobjectArray {
     }
     fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnHitError {
         match value {
-            ObjectValue::Null => Ok(()),
+            ObjectValue::Null => Ok(None),
             ObjectValue::VecSubObjects(value) => {
-                let mut errors: Vec<Error> = vec![];
+                let mut errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
                 for sub_value in value {
-                    match validate_reference(&sub_value, context, &self.authorized_models) {
-                        Err(errs) => errors.extend(errs),
-                        Ok(_r) => {}
-                    }
+                    validate_reference(&sub_value, context, &self.authorized_models)?;
                 }
 
                 //No need to validate further if we have bad references
+
                 if errors.len() > 0 {
-                    return Err(errors);
+                    return Ok(Some(errors));
                 }
                 //Run validators
                 run_validators(&self.validators, value, &mut errors, context);
 
                 if errors.len() > 0 {
-                    return Err(errors);
+                    return Ok(Some(errors));
                 }
-                return Ok(());
+                return Ok(None);
             }
-            _ => Err(vec![anyhow::anyhow!(ValidationError::InvalidDataType())]),
+            _ => Err(HitError::InvalidDataType()),
         }
     }
     fn is_vec_reference(&self) -> bool {

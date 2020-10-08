@@ -1,4 +1,3 @@
-use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
 use crate::{
@@ -8,7 +7,10 @@ use crate::{
         ReturnHitError,
     },
 };
-use anyhow::Error;
+use crate::{
+    model::validators::{ValidatorContext, Validators},
+    HitError,
+};
 
 #[derive(Default)]
 pub struct FieldTypeReference {
@@ -38,21 +40,18 @@ impl ModelField for FieldTypeReference {
         match value {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::Reference(value) => {
-                let mut errors: Vec<Error> = vec![];
+                let mut errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
                 let entry = check_reference_exists(value, context)?;
-                if !check_reference_is_authorized(&self.authorized_models, &entry.get_model()) {
-                    return Err(vec![anyhow::anyhow!(ValidationError::ModelNotAllowed())]);
-                }
                 //Run validators
                 run_validators(&self.validators, value, &mut errors, context);
 
                 if errors.len() > 0 {
-                    return Err(errors);
+                    return Ok(Some(errors));
                 }
-                return Ok(());
+                return Ok(None);
             }
-            _ => Err(vec![anyhow::anyhow!(ValidationError::InvalidDataType())]),
+            _ => Err(HitError::InvalidDataType()),
         }
     }
     fn is_vec_reference(&self) -> bool {

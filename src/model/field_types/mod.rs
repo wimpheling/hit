@@ -9,12 +9,15 @@ mod field_type_string_vec;
 mod field_type_subobject;
 mod field_type_subobject_array;
 
-use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::Model;
 use crate::object_data::Reference;
 use crate::HitError;
 use crate::{errors::ValidationError, hit_mod::HitEntry};
-use anyhow::Error;
+use crate::{
+    errors::ValidationErrorLevel,
+    errors::VALIDATION_ERROR_REQUIRED,
+    model::validators::{ValidatorContext, Validators},
+};
 pub use field_type_bool::FieldTypeBool;
 pub use field_type_date::FieldTypeDate;
 pub use field_type_float::FieldTypeFloat;
@@ -26,26 +29,28 @@ pub use field_type_string_vec::FieldTypeStringVec;
 pub use field_type_subobject::FieldTypeSubobject;
 pub use field_type_subobject_array::FieldTypeSubobjectArray;
 
-fn check_if_required(required: bool) -> Result<(), Vec<Error>> {
+fn check_if_required(required: bool) -> Result<Option<Vec<ValidationError>>, HitError> {
     if required == true {
-        return Err(vec![anyhow::anyhow!(ValidationError::Required())]);
+        return Ok(Some(vec![ValidationError {
+            key: VALIDATION_ERROR_REQUIRED.to_string(),
+            level: ValidationErrorLevel::Error,
+            arguments: None,
+        }]));
     }
-    return Ok(());
+    return Ok(None);
 }
 
-type ReturnHitError = Result<(), Vec<Error>>;
+type ReturnHitError = Result<Option<Vec<ValidationError>>, HitError>;
 
 fn check_reference_exists<'a>(
     value: &Reference,
     context: &'a ValidatorContext<'a>,
-) -> Result<HitEntry, Vec<Error>> {
+) -> Result<HitEntry, HitError> {
     //check reference
     let entry = context.index.get(&value.id);
     match entry {
         None => {
-            return Err(vec![anyhow::anyhow!(
-                ValidationError::ReferenceDoesNotExist()
-            )]);
+            return Err(HitError::InvalidReference(value.id.to_string()));
         }
         Some(entry) => Ok(entry),
     }
@@ -66,14 +71,15 @@ fn check_reference_is_authorized(authorized_models: &Vec<String>, model: &Model)
 pub fn run_validators<T>(
     validators: &Validators<T>,
     value: &T,
-    all_errors: &mut Vec<Error>,
+    all_errors: &mut Vec<ValidationError>,
     context: &ValidatorContext,
-) -> () {
+) -> Result<(), HitError> {
     for validator in validators.iter() {
-        let errors = validator.borrow().validate(value, context);
+        let errors = validator.borrow().validate(value, context)?;
         match errors {
-            Err(errors) => all_errors.extend(errors),
-            Ok(_arg) => {}
+            Some(errors) => all_errors.extend(errors),
+            None => {}
         }
     }
+    Ok(())
 }

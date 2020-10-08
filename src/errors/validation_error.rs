@@ -1,11 +1,16 @@
-#[derive(thiserror::Error, Clone, Debug, PartialEq)]
-pub enum ValidationError {
-    #[error("FIELD_REQUIRED")]
-    Required(),
-    #[error("INVALID_DATA_TYPE")]
-    InvalidDataType(),
-    #[error("MODEL_NOT_ALLOWED")]
-    ModelNotAllowed(),
-    #[error("REFERENCE_DOES_NOT_EXIST")]
-    ReferenceDoesNotExist(),
+use std::collections::HashMap;
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum ValidationErrorLevel {
+    Warning,
+    Error,
 }
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ValidationError {
+    pub key: String,
+    pub level: ValidationErrorLevel,
+    pub arguments: Option<HashMap<String, String>>,
+}
+
+pub static VALIDATION_ERROR_REQUIRED: &str = "REQUIRED";

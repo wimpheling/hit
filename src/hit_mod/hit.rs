@@ -1,4 +1,3 @@
-use crate::events::FieldListenerRef;
 use crate::hit_mod::helpers::can_move_object;
 use crate::hit_mod::hit_entry::HitEntry;
 use crate::index::Index;
@@ -13,6 +12,7 @@ use crate::plugins::Plugins;
 use crate::utils::ModelPropertyVectors;
 use crate::HitError;
 use crate::Kernel;
+use crate::{errors::ValidationError, events::FieldListenerRef};
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -41,7 +41,7 @@ pub struct Hit {
     pub(in crate) model_index: Rc<RefCell<ModelIndex>>,
     pub(in crate) plugins: HitPlugins,
     pub kernel: Rc<HitKernel>,
-    pub(in crate) errors: ModelPropertyVectors<String>,
+    pub(in crate) errors: ModelPropertyVectors<ValidationError>,
 }
 
 impl Hit {
@@ -241,15 +241,15 @@ impl Hit {
                 property: &property.to_string(),
                 index: Rc::new(self),
             },
-        );
+        )?;
         match validation_errors {
-            Ok(_) => {
+            None => {
                 self.errors.delete(id, property);
             }
-            Err(validation_errors) => {
+            Some(validation_errors) => {
                 self.errors.delete(id, property);
-                for error in validation_errors.iter() {
-                    self.errors.add(id, property, error.to_string());
+                for error in validation_errors.into_iter() {
+                    self.errors.add(id, property, error);
                 }
             }
         }

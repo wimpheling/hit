@@ -1,5 +1,6 @@
 use crate::{
     field_types::*, modele, validators::Validator, Hit, IndexEntryProperty, ObjectValue, Reference,
+    ValidationError, ValidationErrorLevel,
 };
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -26,14 +27,6 @@ impl Kernel<Rc<Model>, HitEntry> for TestEventsKernel {
         vec!["test/test".to_string()]
     }
 }
-#[derive(thiserror::Error, Clone, Debug, PartialEq)]
-enum TestCustomError {
-    #[error("TEST_ERROR")]
-    MyTestError(),
-    #[error("TEST_CONTEXT_ERROR")]
-    MyTestContextError(),
-}
-
 struct IsNotId2Validator {}
 
 impl Validator<Reference> for IsNotId2Validator {
@@ -41,11 +34,15 @@ impl Validator<Reference> for IsNotId2Validator {
         &self,
         value: &Reference,
         _context: &crate::validators::ValidatorContext,
-    ) -> Result<(), Vec<anyhow::Error>> {
+    ) -> Result<Option<Vec<ValidationError>>, HitError> {
         if value.id == "id2" {
-            return Err(vec![anyhow::anyhow!(TestCustomError::MyTestError())]);
+            return Ok(Some(vec![ValidationError {
+                key: "TEST_ERROR".into(),
+                level: ValidationErrorLevel::Error,
+                arguments: Some(vec![("id".into(), value.id.clone())].into_iter().collect()),
+            }]));
         }
-        Ok(())
+        Ok(None)
     }
 }
 struct OnlyIdInReferenceValidator {}
@@ -55,11 +52,15 @@ impl Validator<Reference> for OnlyIdInReferenceValidator {
         &self,
         _value: &Reference,
         context: &crate::validators::ValidatorContext,
-    ) -> Result<(), Vec<anyhow::Error>> {
+    ) -> Result<Option<Vec<ValidationError>>, HitError> {
         if context.id == "id" && context.property == "reference" {
-            return Err(vec![anyhow::anyhow!(TestCustomError::MyTestContextError())]);
+            return Ok(Some(vec![ValidationError {
+                key: "TEST__CUSTOM_ERROR".into(),
+                level: ValidationErrorLevel::Error,
+                arguments: None,
+            }]));
         }
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -136,7 +137,14 @@ fn it_should_return_an_error_on_reference_arrays_when_validator_detects_it() {
         },
     )
     .expect("Error");
-    assert_eq!(hit.errors.get("id", "references").unwrap(), &vec!["a"]);
+    assert_eq!(
+        hit.errors.get("id", "references").unwrap(),
+        &vec![ValidationError {
+            key: "TEST_ERROR".into(),
+            level: ValidationErrorLevel::Error,
+            arguments: Some(vec![("id".into(), "id2".into())].into_iter().collect()),
+        }]
+    );
 }
 
 #[test]
@@ -150,7 +158,11 @@ fn it_should_return_an_error_on_set_when_validator_detects_it() {
     .expect("Error");
     assert_eq!(
         hit.errors.get("id", "reference").unwrap(),
-        &vec!["TEST_ERROR"]
+        &vec![ValidationError {
+            key: "TEST_ERROR".into(),
+            level: ValidationErrorLevel::Error,
+            arguments: Some(vec![("id".into(), "id2".into())].into_iter().collect()),
+        }]
     );
     hit.set(
         "id",

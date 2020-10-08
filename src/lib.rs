@@ -41,4 +41,6 @@ pub use json::import::import_from_string;
 pub use plugins::{DeletePlugin, InitPlugin, ModelTypeIndexer, Plugin, Plugins};
 
 pub use errors::HitError;
+pub use errors::ValidationError;
+pub use errors::ValidationErrorLevel;
 pub use model::helpers;
