@@ -263,7 +263,7 @@ TODO : create the macro ^^
 - / write guide
 - write rust doc
 - test field structs ?
-- complete validation system
+- validation for ref arrays
 
 # TODO : After stabilization
 
@@ -275,9 +275,11 @@ TODO : create the macro ^^
 
 # TODO : less prioritary
 
+- use rust enum for modifications
 - refactor move function with allows_model
 - implement ACID transactions ?
 - integrate model_type index in Hit
+- use strongly typed, yet extensible errors for validation ? How to do that ?
 
 ```
 

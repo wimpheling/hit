@@ -2,7 +2,7 @@ use crate::index::IndexEntryProperty;
 use crate::model::Model;
 use crate::object_data::ObjectValues;
 use crate::plugins::DeletePlugin;
-use crate::plugins::InitPlugin;
+use crate::plugins::InitEntryPlugin;
 use crate::plugins::Plugin;
 use crate::HitError;
 use crate::{hit_mod::HitEntry, ObjectValue};
@@ -33,7 +33,7 @@ impl ModelTypeIndexer {
     }
 }
 
-impl InitPlugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
+impl InitEntryPlugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
     fn on_init_add_entry(
         &mut self,
         model: Rc<Model>,

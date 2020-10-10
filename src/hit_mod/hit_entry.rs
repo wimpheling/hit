@@ -1,7 +1,7 @@
-use crate::index::IndexEntry;
 use crate::model::Model;
 use crate::object_data::Id;
 use crate::object_data::ObjectValue;
+use crate::{index::IndexEntry, ObjectValues};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -28,5 +28,10 @@ impl HitEntry {
     pub fn get_parent_id(&self) -> Option<String> {
         let entry = self.entry.borrow();
         return entry.get_parent_id();
+    }
+
+    pub fn get_data(&self) -> ObjectValues {
+        let entry = self.entry.borrow();
+        entry.data.clone()
     }
 }

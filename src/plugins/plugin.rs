@@ -1,9 +1,23 @@
-use crate::object_data::ObjectValues;
 use crate::HitError;
 use crate::{index::IndexEntryProperty, ObjectValue};
+use crate::{object_data::ObjectValues, Hit};
 
-pub trait InitPlugin<ExtraData, Entry> {
+pub trait InitEntryPlugin<ExtraData, Entry> {
     fn on_init_add_entry(
+        &mut self,
+        extra_data: ExtraData,
+        id: &str,
+        data: ObjectValues,
+        parent: Option<IndexEntryProperty>,
+    );
+}
+
+pub trait AfterImportPlugin<ExtraData, Entry> {
+    fn after_import(&mut self, hit: &Hit);
+}
+
+pub trait InitEntryAfterIndexPlugin<ExtraData, Entry> {
+    fn for_each_entry(
         &mut self,
         extra_data: ExtraData,
         id: &str,

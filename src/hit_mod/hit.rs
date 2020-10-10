@@ -16,7 +16,6 @@ use crate::{errors::ValidationError, events::FieldListenerRef};
 
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::iter::Iterator;
 use std::rc::Rc;
 
 pub type HitPlugins = Plugins<Rc<Model>, HitEntry>;
@@ -371,12 +370,8 @@ impl Hit {
             None => Err(HitError::IDNotFound(id.to_string())),
         }
     }
-}
 
-// TODO : is that useful ?
-impl Iterator for Hit {
-    type Item = HitEntry;
-    fn next(&mut self) -> Option<HitEntry> {
+    pub fn iter(&self) -> Option<HitEntry> {
         // Let's loop until we find something that should not be filtered.
         loop {
             match self.model_index.borrow().map.iter().next() {

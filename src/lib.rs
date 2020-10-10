@@ -38,7 +38,9 @@ pub use json::export::export;
 pub use json::import::import;
 pub use json::import::import_from_string;
 
-pub use plugins::{DeletePlugin, InitPlugin, ModelTypeIndexer, Plugin, Plugins};
+pub use plugins::{
+    AfterImportPlugin, DeletePlugin, InitEntryPlugin, ModelTypeIndexer, Plugin, Plugins,
+};
 
 pub use errors::HitError;
 pub use errors::ValidationError;

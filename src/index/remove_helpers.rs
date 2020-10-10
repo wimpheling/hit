@@ -4,6 +4,7 @@ use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::object_data::ObjectValue;
 use crate::HitError;
+use crate::Hit;
 
 fn find_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;

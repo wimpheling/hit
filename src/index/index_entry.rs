@@ -18,7 +18,7 @@ pub struct IndexEntryProperty {
 
 pub struct IndexEntry {
     id: Id,
-    pub(in crate::index) data: ObjectValues,
+    pub(in crate) data: ObjectValues,
     parent: Option<IndexEntryProperty>,
     pub(in crate::index) references: Vec<IndexEntryProperty>,
     property_change_listeners: Listeners,
