@@ -2,7 +2,7 @@
 extern crate mopa;
 
 mod errors;
-mod events;
+pub mod events;
 mod hit_mod;
 mod index;
 mod json;

@@ -264,6 +264,7 @@ TODO : create the macro ^^
 - write rust doc
 - test field structs ?
 - validation for ref arrays
+- test delete of object containing other objects
 
 # TODO : After stabilization
 
@@ -272,6 +273,7 @@ TODO : create the macro ^^
 - enums for string type
 - unique in parent/parent.parent
   dependencies =>
+- use linkedhashmap instead of hashmap to keep order (needed for numerotation plugin) ?
 
 # TODO : less prioritary
 

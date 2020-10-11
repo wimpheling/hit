@@ -4,22 +4,28 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-pub struct Listeners(HashMap<String, Vec<FieldListenerRef>>);
+pub struct Listeners<T>(HashMap<String, Vec<FieldListenerRef<T>>>);
 
-impl Listeners {
+impl<T> Listeners<T> {
     pub fn new() -> Self {
         Listeners(HashMap::new())
     }
 
-    fn get_or_create_property_listeners(&mut self, property: &str) -> &mut Vec<FieldListenerRef> {
+    fn get_or_create_property_listeners(
+        &mut self,
+        property: &str,
+    ) -> &mut Vec<FieldListenerRef<T>> {
         self.0.entry(property.to_string()).or_insert(vec![])
     }
 
-    fn get_property_listeners_mut(&mut self, property: &str) -> Option<&mut Vec<FieldListenerRef>> {
+    fn get_property_listeners_mut(
+        &mut self,
+        property: &str,
+    ) -> Option<&mut Vec<FieldListenerRef<T>>> {
         self.0.get_mut(property)
     }
 
-    pub fn insert(&mut self, property: &str, value: FieldListenerRef) {
+    pub fn insert(&mut self, property: &str, value: FieldListenerRef<T>) {
         let listeners = self.get_or_create_property_listeners(property);
         listeners.push(value);
     }
@@ -32,7 +38,7 @@ impl Listeners {
         Ok(())
     }
 
-    pub fn dispatch_value(&mut self, property: &str, value: &ObjectValue) {
+    pub fn dispatch_value(&mut self, property: &str, value: &T) {
         match self.get_property_listeners_mut(property) {
             Some(listeners) => {
                 for listener in listeners.iter_mut() {
@@ -44,10 +50,10 @@ impl Listeners {
     }
 }
 
-pub type FieldListenerRef = Rc<RefCell<dyn FieldListener>>;
+pub type FieldListenerRef<T> = Rc<RefCell<dyn FieldListener<T>>>;
 
-pub trait FieldListener {
-    fn on_update(&mut self, value: &ObjectValue);
+pub trait FieldListener<T> {
+    fn on_update(&mut self, value: &T);
     fn get_unique_id(&self) -> &str;
 }
 

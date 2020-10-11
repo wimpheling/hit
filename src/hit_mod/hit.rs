@@ -215,6 +215,7 @@ impl Hit {
                 },
                 &value,
                 &old_value,
+                &self,
             );
         }
 
@@ -262,6 +263,7 @@ impl Hit {
                 },
                 &value,
                 &old_value,
+                &self,
             );
         }
         Ok(())
@@ -287,6 +289,7 @@ impl Hit {
                 &id,
                 values.clone(),
                 parent.clone(),
+                &self,
             );
         }
 
@@ -320,6 +323,7 @@ impl Hit {
                 &id,
                 values.clone(),
                 parent.clone(),
+                &self,
             );
         }
         Ok(())
@@ -335,7 +339,7 @@ impl Hit {
         &self,
         id: &str,
         field: &str,
-        listener: FieldListenerRef,
+        listener: FieldListenerRef<ObjectValue>,
     ) -> Result<String, HitError> {
         let model = self.get_model_or_error(id)?;
         model
@@ -384,6 +388,16 @@ impl Hit {
                 }
                 None => return None,
             }
+        }
+    }
+
+    pub fn get_parent_index(&self, id: &str) -> Option<usize> {
+        let parent = self.get(id)?.get_parent()?;
+        match self.get_value(&parent.id, &parent.property)? {
+            ObjectValue::VecSubObjects(parent_value) => {
+                parent_value.iter().position(|r| r.id == id)
+            }
+            _ => None,
         }
     }
 }

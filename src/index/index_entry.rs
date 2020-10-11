@@ -21,7 +21,7 @@ pub struct IndexEntry {
     pub(in crate) data: ObjectValues,
     parent: Option<IndexEntryProperty>,
     pub(in crate::index) references: Vec<IndexEntryProperty>,
-    property_change_listeners: Listeners,
+    property_change_listeners: Listeners<ObjectValue>,
 }
 
 impl IndexEntry {
@@ -79,7 +79,7 @@ impl IndexEntry {
             .dispatch_value(&property, &value.clone());
     }
 
-    pub fn add_listener(&mut self, property: &str, listener: FieldListenerRef) {
+    pub fn add_listener(&mut self, property: &str, listener: FieldListenerRef<ObjectValue>) {
         self.property_change_listeners.insert(property, listener);
     }
 

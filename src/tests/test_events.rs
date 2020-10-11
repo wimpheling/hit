@@ -53,7 +53,7 @@ struct TestPropertyListener {
     id: String,
 }
 
-impl FieldListener for TestPropertyListener {
+impl FieldListener<ObjectValue> for TestPropertyListener {
     fn on_update(&mut self, value: &ObjectValue) {
         self.event_count += 1;
     }

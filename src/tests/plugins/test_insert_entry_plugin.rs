@@ -20,6 +20,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
+        instance: &Hit,
     ) {
         self.before_insert_count += 1;
     }
@@ -30,6 +31,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
+        instance: &Hit,
     ) {
         self.after_insert_count += 1;
     }
@@ -39,6 +41,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _property: IndexEntryProperty,
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
+        instance: &Hit,
     ) {
         self.before_set_value_count += 1;
     }
@@ -48,6 +51,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _property: IndexEntryProperty,
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
+        instance: &Hit,
     ) {
         self.after_set_value_count += 1;
     }

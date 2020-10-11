@@ -38,6 +38,7 @@ pub trait Plugin<ExtraData, Entry> {
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,
+        instance: &Hit,
     );
     fn on_after_add_entry(
         &mut self,
@@ -45,6 +46,7 @@ pub trait Plugin<ExtraData, Entry> {
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,
+        instance: &Hit,
     );
 
     fn on_before_set_value(
@@ -52,12 +54,14 @@ pub trait Plugin<ExtraData, Entry> {
         property: IndexEntryProperty,
         value: &ObjectValue,
         old_value: &Option<ObjectValue>,
+        instance: &Hit,
     );
     fn on_after_set_value(
         &mut self,
         property: IndexEntryProperty,
         value: &ObjectValue,
         old_value: &Option<ObjectValue>,
+        instance: &Hit,
     );
     fn on_before_move_subobject(&mut self);
     fn on_after_move_subobject(&mut self);
