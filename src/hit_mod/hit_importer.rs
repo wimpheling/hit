@@ -1,11 +1,14 @@
-use crate::hit_mod::{Hit, HitKernel, HitPlugins};
 use crate::index::IndexEntryProperty;
 use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;
 use crate::plugins::Plugins;
 use crate::HitError;
 use crate::{hit_mod::hit::ModelIndex, utils::ModelPropertyVectors};
-use std::cell::RefCell;
+use crate::{
+    hit_mod::{Hit, HitKernel, HitPlugins},
+    ObjectValue,
+};
+use std::{cell::RefCell, collections::HashMap};
 
 use std::rc::Rc;
 
@@ -42,7 +45,21 @@ impl IndexModelImporter {
         self.model_index
             .borrow_mut()
             .map
-            .insert(id.to_string(), model);
+            .insert(id.to_string(), model.clone());
+
+        // put keys in the order defined in the model
+        let mut new_values: ObjectValues = HashMap::new();
+        for (key, _field) in model.fields.iter() {
+            match values.get(key) {
+                Some(value) => {
+                    new_values.insert(key.to_string(), value.clone());
+                }
+                None => {
+                    new_values.insert(key.to_string(), ObjectValue::Null);
+                }
+            }
+        }
+
         self.index.add_item(id, values, parent)?;
         Ok(())
     }

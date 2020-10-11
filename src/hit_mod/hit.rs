@@ -308,6 +308,36 @@ impl Hit {
             return Err(HitError::ModelNotAllowed(model_type.into()));
         }
 
+        // put the data in the correct field order, initialize null data
+        // and validate the data of the new object
+        let mut ordered_values: ObjectValues = HashMap::new();
+        for (property, model_field) in new_object_model.fields.iter() {
+            //does the field accept the object value
+            match values.get(property) {
+                Some(value) => {
+                    match value {
+                        ObjectValue::Null => {}
+                        _ => {
+                            if !model_field.borrow().accepts_for_set(
+                                &value,
+                                &ValidatorContext {
+                                    id: id,
+                                    property: property,
+                                    index: Rc::new(self),
+                                },
+                            ) {
+                                return Err(HitError::InvalidDataType());
+                            }
+                        }
+                    };
+                    ordered_values.insert(property.to_string(), value.clone());
+                }
+                None => {
+                    ordered_values.insert(property.to_string(), ObjectValue::Null);
+                }
+            }
+        }
+
         // update the data
         self.index
             .insert(id, values.clone(), parent.clone(), before_id)?;
