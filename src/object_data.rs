@@ -1,6 +1,7 @@
 use chrono::DateTime;
 use chrono::NaiveDateTime;
 use chrono::Utc;
+use linked_hash_map::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 
 use std::collections::HashMap;
@@ -108,4 +109,4 @@ impl Display for DateTimeUtc {
     }
 } */
 
-pub type ObjectValues = HashMap<String, ObjectValue>;
+pub type ObjectValues = LinkedHashMap<String, ObjectValue>;

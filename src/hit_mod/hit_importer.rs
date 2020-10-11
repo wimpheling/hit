@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::index::IndexEntryProperty;
 use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;
@@ -48,7 +50,7 @@ impl IndexModelImporter {
             .insert(id.to_string(), model.clone());
 
         // put keys in the order defined in the model
-        let mut new_values: ObjectValues = HashMap::new();
+        let mut new_values: ObjectValues = LinkedHashMap::new();
         for (key, _field) in model.fields.iter() {
             match values.get(key) {
                 Some(value) => {

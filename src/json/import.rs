@@ -4,6 +4,7 @@ use crate::json::utils::*;
 use crate::json::JSONImportError;
 use crate::object_data::{DateTimeUtc, ObjectValue, ObjectValues};
 use chrono::{DateTime, Utc};
+use linked_hash_map::LinkedHashMap;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -77,7 +78,7 @@ fn import_data<'index>(
     let parent = get_parent(data)?;
     let sub_data = get_object_property(data, String::from("data"))?;
     let sub_data = get_value_as_object(sub_data)?;
-    let mut new_data: ObjectValues = HashMap::new();
+    let mut new_data: ObjectValues = LinkedHashMap::new();
 
     for (key, value) in sub_data {
         //checks that the model field exists

@@ -16,7 +16,7 @@ use crate::object_data::Reference;
 use crate::plugins::Plugins;
 use crate::HitError;
 use std::collections::btree_map::Iter;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 pub struct Index {
     pub(in crate::index) index: BTreeMap<Id, IndexEntryRef>,
@@ -122,7 +122,7 @@ impl Index {
     pub fn insert(
         &mut self,
         id: &str,
-        values: HashMap<String, ObjectValue>,
+        values: ObjectValues,
         parent: IndexEntryProperty,
         before_id: Option<String>,
     ) -> Result<(), HitError> {
@@ -140,7 +140,7 @@ impl Index {
     pub(in crate::index) fn insert_raw(
         &mut self,
         id: &str,
-        values: HashMap<String, ObjectValue>,
+        values: ObjectValues,
         parent: Option<IndexEntryProperty>,
     ) -> Result<(), HitError> {
         //check id doesnt exist
@@ -157,7 +157,7 @@ impl Index {
     fn insert_quietly(
         &mut self,
         id: &str,
-        values: HashMap<String, ObjectValue>,
+        values: ObjectValues,
         parent: IndexEntryProperty,
         before_id: Option<String>,
     ) -> Result<(), HitError> {
@@ -271,6 +271,8 @@ impl Index {
 
 #[cfg(test)]
 mod tests {
+    use linked_hash_map::LinkedHashMap;
+
     use crate::index::Index;
     use crate::plugins::Plugins;
     use crate::HitError;
@@ -279,7 +281,7 @@ mod tests {
     use std::collections::HashMap;
     #[test]
     fn it_should_create_a_new_index_with_values() {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert("test".into(), ObjectValue::Bool(true));
         values.insert("testString".into(), ObjectValue::String("value".into()));
         assert!(Index::new("id", values, Plugins::new()).is_ok());
@@ -287,7 +289,7 @@ mod tests {
 
     #[test]
     fn it_should_fail_creating_a_new_index_with_reference_values() {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert(
             "reference".into(),
             ObjectValue::Reference(Reference { id: "a".into() }),
@@ -300,7 +302,7 @@ mod tests {
 
     #[test]
     fn it_should_fail_creating_a_new_index_with_reference_array_values() {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert(
             "reference".into(),
             ObjectValue::VecReference(vec![Reference { id: "a".into() }]),
@@ -312,7 +314,7 @@ mod tests {
     }
     #[test]
     fn it_should_fail_creating_a_new_index_with_subobject_values() {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert(
             "reference".into(),
             ObjectValue::SubObject(Reference { id: "a".into() }),
@@ -321,7 +323,7 @@ mod tests {
     }
     #[test]
     fn it_should_fail_creating_a_new_index_with_subobject_array_values() {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert(
             "reference".into(),
             ObjectValue::VecSubObjects(vec![Reference { id: "a".into() }]),
@@ -331,7 +333,7 @@ mod tests {
 
     #[test]
     fn it_should_get_existing_data() {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert("test".into(), ObjectValue::Bool(true));
         let index = Index::new("id", values, Plugins::new()).ok().unwrap();
 

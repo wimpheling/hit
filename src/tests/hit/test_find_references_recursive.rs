@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::test_kernel::create_test_kernel;
 use crate::Hit;
 use crate::IndexEntryProperty;
@@ -12,7 +14,7 @@ fn create_hit_with_references() -> Hit {
     hit.insert(
         "test/test",
         "id2",
-        HashMap::new(),
+        LinkedHashMap::new(),
         IndexEntryProperty {
             id: "id".into(),
             property: "sub_items".into(),
@@ -23,7 +25,7 @@ fn create_hit_with_references() -> Hit {
     hit.insert(
         "test/test",
         "id3",
-        HashMap::new(),
+        LinkedHashMap::new(),
         IndexEntryProperty {
             id: "id2".into(),
             property: "sub_items".into(),
@@ -34,7 +36,7 @@ fn create_hit_with_references() -> Hit {
     hit.insert(
         "test/test",
         "id4",
-        HashMap::new(),
+        LinkedHashMap::new(),
         IndexEntryProperty {
             id: "id3".into(),
             property: "sub_items".into(),

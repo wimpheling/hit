@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::{field_types::*, modele, Hit, IndexEntryProperty, ObjectValue};
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -195,7 +197,7 @@ fn it_should_call_both_insert_callbacks() {
         .insert(
             "test/test".into(),
             "id2",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
                 property: "subitems".into(),
@@ -207,7 +209,7 @@ fn it_should_call_both_insert_callbacks() {
         .insert(
             "test/test".into(),
             "id3",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
                 property: "subitems".into(),
@@ -234,7 +236,7 @@ fn it_should_call_only_before_insert_callback_when_insert_fails() {
         .insert(
             "test/test_b".into(),
             "id2",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
                 property: "subitems".into(),

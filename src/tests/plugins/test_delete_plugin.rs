@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::{field_types::*, modele, IndexEntryProperty};
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
@@ -93,7 +95,7 @@ fn it_should_call_the_before_delete_callback_only_before_an_error() {
         .insert(
             "test/test".into(),
             "id2",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
                 property: "subitems".into(),
@@ -131,7 +133,7 @@ fn it_should_call_both_callbacks_when_deleting() {
         .insert(
             "test/test".into(),
             "id2",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
                 property: "subitems".into(),

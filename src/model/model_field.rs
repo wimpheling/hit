@@ -2,9 +2,9 @@ use crate::model::Model;
 use crate::object_data::ObjectValue;
 use crate::HitError;
 use crate::{errors::ValidationError, model::validators::ValidatorContext};
+use linked_hash_map::LinkedHashMap;
 use mopa;
 use std::cell::RefCell;
-use std::collections::BTreeMap;
 use std::rc::Rc;
 
 pub trait ModelField: mopa::Any {
@@ -23,4 +23,4 @@ mopafy!(ModelField);
 
 pub type ModelFieldRef = Rc<RefCell<dyn ModelField>>;
 
-pub type Fields = BTreeMap<String, ModelFieldRef>;
+pub type Fields = LinkedHashMap<String, ModelFieldRef>;

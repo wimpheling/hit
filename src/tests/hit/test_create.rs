@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::test_kernel::create_test_kernel;
 use crate::Hit;
 use crate::ObjectValue;
@@ -15,7 +17,7 @@ fn it_should_create_a_new_hit_instance() {
 #[test]
 fn it_should_create_a_new_hit_instance_with_values() {
     let kernel = Rc::new(create_test_kernel());
-    let mut values: ObjectValues = HashMap::new();
+    let mut values: ObjectValues = LinkedHashMap::new();
     values.insert("name".into(), ObjectValue::String("my_hit".into()));
     let hit = Hit::new_with_values("id", kernel, values, "test/test").unwrap();
     assert!(hit.get("id").is_some());

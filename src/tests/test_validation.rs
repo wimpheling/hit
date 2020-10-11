@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::{
     field_types::*, modele, validators::Validator, Hit, IndexEntryProperty, ObjectValue, Reference,
     ValidationError, ValidationErrorLevel,
@@ -104,7 +106,7 @@ fn get_test_hit() -> Hit {
     hit.insert(
         "test/test".into(),
         "id2".into(),
-        HashMap::new(),
+        LinkedHashMap::new(),
         IndexEntryProperty {
             id: "id".into(),
             property: "subitems".into(),

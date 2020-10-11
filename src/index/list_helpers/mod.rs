@@ -52,6 +52,8 @@ pub fn mutate_insert_in_reference_array(
 
 #[cfg(test)]
 mod tests {
+    use linked_hash_map::LinkedHashMap;
+
     use crate::index::{Index, IndexEntryProperty};
     use crate::HitError;
     use crate::ObjectValue;
@@ -64,13 +66,13 @@ mod tests {
         name: &str,
         parent: IndexEntryProperty,
     ) -> Result<(), HitError> {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert("name".into(), ObjectValue::String(name.to_string()));
         index.insert(id, values, parent, None)
     }
 
     fn insert_parent(index: &mut Index, id: &str, name: &str) -> Result<(), HitError> {
-        let mut values = HashMap::new();
+        let mut values = LinkedHashMap::new();
         values.insert("name".into(), ObjectValue::String(name.to_string()));
         index.insert_raw(id, values, None)
     }

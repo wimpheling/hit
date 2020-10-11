@@ -1,5 +1,6 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::model::{Fields, ModelFieldRef};
-use std::collections::BTreeMap;
 
 pub struct Model {
     name: String,
@@ -13,7 +14,7 @@ impl Model {
         return Model {
             name: name,
             label: label,
-            fields: BTreeMap::new(),
+            fields: LinkedHashMap::new(),
             interfaces: vec![],
         };
     }

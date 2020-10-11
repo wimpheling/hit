@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::{
     field_types::*, helpers::get_all_permissions, helpers::get_all_targets, modele,
     IndexEntryProperty,
@@ -99,7 +101,7 @@ fn it_should_find_all_targets_for_an_object() {
         .insert(
             "test/test",
             "id2",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id".into(),
                 property: "subitems".into(),
@@ -111,7 +113,7 @@ fn it_should_find_all_targets_for_an_object() {
         .insert(
             "test/test2",
             "id3",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id2".into(),
                 property: "subitems".into(),
@@ -124,7 +126,7 @@ fn it_should_find_all_targets_for_an_object() {
         .insert(
             "test/test3",
             "id5",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id3".into(),
                 property: "subitems_does_not_accept_object".into(),
@@ -136,7 +138,7 @@ fn it_should_find_all_targets_for_an_object() {
         .insert(
             "test/test2",
             "id4",
-            HashMap::new(),
+            LinkedHashMap::new(),
             IndexEntryProperty {
                 id: "id2".into(),
                 property: "subitems".into(),

@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::test_kernel::create_test_kernel;
 use crate::Hit;
 use crate::HitError;
@@ -14,7 +16,7 @@ fn it_should_insert_a_reference() {
     hit.insert(
         "test/test",
         "id2",
-        HashMap::new(),
+        LinkedHashMap::new(),
         IndexEntryProperty {
             id: "id".into(),
             property: "sub_items".into(),

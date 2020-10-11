@@ -1,3 +1,5 @@
+use linked_hash_map::LinkedHashMap;
+
 use crate::hit_mod::helpers::can_move_object;
 use crate::hit_mod::hit_entry::HitEntry;
 use crate::index::Index;
@@ -45,7 +47,7 @@ pub struct Hit {
 
 impl Hit {
     pub fn new(id: &str, model_type: &str, kernel: Rc<HitKernel>) -> Result<Hit, HitError> {
-        Hit::new_with_values(id, kernel, HashMap::new(), model_type)
+        Hit::new_with_values(id, kernel, LinkedHashMap::new(), model_type)
     }
     pub fn new_with_values(
         id: &str,
@@ -273,7 +275,7 @@ impl Hit {
         &mut self,
         model_type: &str,
         id: &str,
-        values: HashMap<String, ObjectValue>,
+        values: ObjectValues,
         parent: IndexEntryProperty,
         before_id: Option<String>,
     ) -> Result<(), HitError> {
@@ -310,7 +312,7 @@ impl Hit {
 
         // put the data in the correct field order, initialize null data
         // and validate the data of the new object
-        let mut ordered_values: ObjectValues = HashMap::new();
+        let mut ordered_values: ObjectValues = LinkedHashMap::new();
         for (property, model_field) in new_object_model.fields.iter() {
             //does the field accept the object value
             match values.get(property) {
