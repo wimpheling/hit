@@ -4,26 +4,22 @@ use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::object_data::ObjectValue;
 use crate::HitError;
-use crate::Hit;
 
-fn find_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
+pub fn get_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     let entry = entry.borrow();
     Ok(entry.references.clone())
 }
 
-pub fn find_references_recursive(
-    index: &Index,
-    id: &str,
-) -> Result<Vec<IndexEntryProperty>, HitError> {
-    Ok(find_references(index, id)?)
-}
-
-pub fn remove_object(index: &mut Index, id: &str) -> Result<(), HitError> {
-    remove_object_children(index, id)?;
+pub fn remove_object_helper(index: &mut Index, id: &str) -> Result<(), HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+    remove_object_children(index, id)?;
     //remove references from properties
-    unindex_references_from_properties(index, id)?;
+
+    // TODO: what does this do exactly?
+    // should not be used because you can't delete if there are references
+    // unindex_references_from_properties(index, id)?;
+
     //remove object from id list in parent
     remove_subobject_from_parent_array(index, id)?;
     //remove object from index
@@ -44,16 +40,20 @@ fn unindex_references_from_properties(index: &mut Index, id: &str) -> Result<(),
 }
 
 fn remove_object_children(index: &mut Index, id: &str) -> Result<(), HitError> {
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-    for (_, value) in entry.borrow().data.iter() {
+    let data = {
+        let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+        let entry = entry.borrow();
+        entry.data.clone()
+    };
+    for (_, value) in data.iter() {
         match value {
             ObjectValue::VecSubObjects(value) => {
                 for val in value {
-                    remove_object(index, &val.id)?;
+                    remove_object_helper(index, &val.id)?;
                 }
             }
             ObjectValue::SubObject(value) => {
-                remove_object(index, &value.id)?;
+                remove_object_helper(index, &value.id)?;
             }
             _ => {}
         }

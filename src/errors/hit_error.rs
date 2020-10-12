@@ -1,5 +1,7 @@
-use std::clone::Clone;
+use std::{clone::Clone, collections::HashMap};
 use thiserror::*;
+
+use crate::IndexEntryProperty;
 
 #[derive(Error, Clone, Debug, PartialEq)]
 pub enum HitError {
@@ -59,8 +61,8 @@ pub enum HitError {
     CannotRemoveReferenceFromThisDataType(),
     #[error("An object cannot be delete from a property that is not an object array")]
     CannotRemoveObjectFromThisDataType(),
-    #[error("This object cannot be deleted because there are references to it: `{0}`")]
-    CannotDeleteObjectWithReferences(String),
+    #[error("This object cannot be deleted because there are references to it")]
+    CannotDeleteObjectWithReferences(HashMap<String, Vec<IndexEntryProperty>>),
     #[error("The root object cannot be deleted")]
     CannotDeleteRootObject(),
     #[error("BeforeId is not present in this array: `{0}`")]

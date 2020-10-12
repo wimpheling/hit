@@ -25,6 +25,7 @@ pub type HitKernel = dyn Kernel<Rc<Model>, HitEntry>;
 
 pub(in crate) struct ModelIndex {
     pub map: HashMap<String, Rc<Model>>,
+    // TODO: why are these in here ?
     pub plugins: Vec<Rc<RefCell<dyn DeletePlugin<HitEntry>>>>,
 }
 
@@ -128,12 +129,18 @@ impl Hit {
         }
     }
 
-    pub fn find_references_recursive(&self, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
-        self.index.find_references_recursive(id)
+    pub fn get_references(&self, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
+        self.index.get_references(id)
     }
 
-    pub fn remove_object(&mut self, id: &str) -> Result<(), HitError> {
-        self.index.remove_object(id)
+    pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
+        // TODO : should also remove model indexes of the deleted objects
+        let id_list = self.index.remove_object(id)?;
+        for id in id_list.iter() {
+            let mut model_index = self.model_index.borrow_mut();
+            model_index.map.remove(id);
+        }
+        Ok(id_list)
     }
 
     pub fn can_move_object(

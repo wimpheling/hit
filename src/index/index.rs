@@ -6,7 +6,7 @@ use crate::index::reference_helpers::remove_reference_from_parent_array_from_pro
 use crate::index::reference_index_helpers::{
     index_object_references, index_reference, unindex_reference, unindex_reference_from_property,
 };
-use crate::index::remove_helpers::{find_references_recursive, remove_object};
+use crate::index::remove_helpers::{get_references, remove_object_helper};
 use crate::index::subobject_helpers::insert_subobject_in_array;
 use crate::index::{IndexEntry, IndexEntryProperty, IndexEntryRef};
 use crate::object_data::Id;
@@ -17,6 +17,8 @@ use crate::plugins::Plugins;
 use crate::HitError;
 use std::collections::btree_map::Iter;
 use std::collections::BTreeMap;
+
+use super::find_references_before_deletion::find_references_recursive;
 
 pub struct Index {
     pub(in crate::index) index: BTreeMap<Id, IndexEntryRef>,
@@ -222,32 +224,34 @@ impl Index {
         Ok(())
     }
 
-    pub(in crate) fn find_references_recursive(
-        &self,
-        id: &str,
-    ) -> Result<Vec<IndexEntryProperty>, HitError> {
-        find_references_recursive(&self, id)
+    pub(in crate) fn get_references(&self, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
+        get_references(&self, id)
     }
 
-    pub fn remove_object(&mut self, id: &str) -> Result<(), HitError> {
+    pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
         let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
         for plugin in self.plugins.delete_plugins.iter() {
             plugin.borrow_mut().on_before_delete_entry(&entry)?;
         }
 
-        let references = find_references_recursive(&self, id)?;
+        // TODO: should be handled in remove_object
+        /*  let references = get_references(&self, id)?;
         if references.len() > 0 {
             return Err(HitError::CannotDeleteObjectWithReferences(id.to_string()));
-        }
+        } */
 
         let (parent_entry, parent) =
             get_parent_index_entry(self, &id)?.ok_or(HitError::CannotDeleteRootObject())?;
 
-        remove_object(self, id)?;
+        let (refs, id_list) = find_references_recursive(self, id)?;
+        if refs.len() > 0 {
+            return Err(HitError::CannotDeleteObjectWithReferences(refs));
+        }
+        remove_object_helper(self, id)?;
 
         //remove from ref index the references in the object's data
         Index::dispatch_value_property(parent_entry, &parent.property);
-        Ok(())
+        Ok(id_list)
     }
 
     pub fn move_object(

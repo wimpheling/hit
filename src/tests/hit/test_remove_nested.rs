@@ -6,8 +6,7 @@ use crate::HitError;
 use crate::IndexEntryProperty;
 use crate::ObjectValue;
 use crate::Reference;
-use std::collections::HashMap;
-use std::rc::Rc;
+use std::{collections::HashMap, rc::Rc};
 
 fn create_hit_with_subobjects() -> Hit {
     let kernel = Rc::new(create_test_kernel());
@@ -45,55 +44,63 @@ fn create_hit_with_subobjects() -> Hit {
         None,
     )
     .expect("Error");
+    return hit;
+}
+
+#[test]
+fn it_should_remove_an_object_containing_other_objects() {
+    let mut hit = create_hit_with_subobjects();
+    hit.remove_object("id2").expect("Error");
+    assert!(hit.get("id2").is_none());
+    let parent_sub_items = hit.get_value("id", "sub_items").expect("Error");
+    assert_eq!(parent_sub_items, ObjectValue::Null);
+}
+
+#[test]
+fn it_should_return_an_error_when_a_nested_object_has_references() {
+    let mut hit = create_hit_with_subobjects();
+
     hit.insert_reference(
-        "id2",
+        "id3",
         IndexEntryProperty {
             id: "id".into(),
             property: "references".into(),
         },
     )
     .expect("Error");
-    return hit;
-}
 
-#[test]
-fn it_should_remove_an_object() {
-    let mut hit = create_hit_with_subobjects();
-    let parent_sub_items = hit.get_value("id3", "sub_items").expect("Error");
-    assert_eq!(
-        parent_sub_items,
-        ObjectValue::VecSubObjects(vec![Reference {
-            id: "id4".to_string()
-        }])
-    );
-    hit.remove_object("id4").expect("Error");
-    assert!(hit.get("id4").is_none());
-    let parent_sub_items = hit.get_value("id3", "sub_items").expect("Error");
-    assert_eq!(parent_sub_items, ObjectValue::Null);
-}
-
-#[test]
-fn it_should_return_an_error_when_id_is_invalid() {
-    let mut hit = create_hit_with_subobjects();
-    assert_eq!(
-        hit.remove_object("id421").err().unwrap(),
-        HitError::IDNotFound("id421".into())
-    );
-}
-
-#[test]
-fn it_should_return_an_error_when_object_has_references() {
-    let mut hit = create_hit_with_subobjects();
     let mut expected_error = HashMap::new();
     expected_error.insert(
-        "id2".into(),
+        "id3".into(),
         vec![IndexEntryProperty {
             id: "id".into(),
             property: "references".into(),
         }],
     );
+
     assert_eq!(
         hit.remove_object("id2").err().unwrap(),
         HitError::CannotDeleteObjectWithReferences(expected_error)
     );
+}
+
+#[test]
+fn it_should_not_return_an_error_when_a_nested_object_has_nested_references() {
+    let mut hit = create_hit_with_subobjects();
+
+    hit.insert_reference(
+        "id3",
+        IndexEntryProperty {
+            id: "id2".into(),
+            property: "references".into(),
+        },
+    )
+    .expect("Error");
+
+    hit.remove_object("id2").expect("Error");
+    assert!(hit.get("id2").is_none());
+    assert!(hit.get("id3").is_none());
+    assert!(hit.get("id4").is_none());
+    let parent_sub_items = hit.get_value("id", "sub_items").expect("Error");
+    assert_eq!(parent_sub_items, ObjectValue::Null);
 }

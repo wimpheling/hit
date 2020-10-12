@@ -273,7 +273,7 @@ TODO : create the macro ^^
 - enums for string type
 - unique in parent/parent.parent
   dependencies =>
-- use linkedhashmap instead of hashmap to keep order (needed for numerotation plugin) ?
+- provide methods so you don't need to use LinkedHashMap to use hit
 
 # TODO : less prioritary
 

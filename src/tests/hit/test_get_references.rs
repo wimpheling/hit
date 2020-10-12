@@ -73,7 +73,7 @@ fn create_hit_with_references() -> Hit {
 fn it_should_find_all_references() {
     // TODO : more tests, redo the code etc
     let hit = create_hit_with_references();
-    let references = hit.find_references_recursive("id2").expect("Error");
+    let references = hit.get_references("id2").expect("Error");
 
     let mock_object = vec![
         IndexEntryProperty {
@@ -104,7 +104,7 @@ fn it_should_find_all_references_after_removal_from_array() {
         },
     )
     .expect("Error");
-    let references = hit.find_references_recursive("id2").expect("Error");
+    let references = hit.get_references("id2").expect("Error");
 
     let mock_object = vec![
         IndexEntryProperty {
@@ -135,7 +135,7 @@ fn it_should_find_all_references_after_update() {
         ObjectValue::Reference(Reference { id: "id2".into() }),
     )
     .expect("Error");
-    let references = hit.find_references_recursive("id2").expect("Error");
+    let references = hit.get_references("id2").expect("Error");
 
     let mock_object = vec![
         IndexEntryProperty {
@@ -160,7 +160,7 @@ fn it_should_find_all_references_after_set_to_null() {
     let mut hit = create_hit_with_references();
     hit.set("id3", "reference", ObjectValue::Null)
         .expect("Error");
-    let references = hit.find_references_recursive("id2").expect("Error");
+    let references = hit.get_references("id2").expect("Error");
 
     let mock_object = vec![
         IndexEntryProperty {
