@@ -4,7 +4,7 @@ use crate::test_kernel::create_test_kernel;
 use crate::Hit;
 use crate::ObjectValue;
 use crate::ObjectValues;
-use std::collections::HashMap;
+
 use std::rc::Rc;
 
 #[test]

@@ -1,4 +1,3 @@
-use crate::index::reference_index_helpers::unindex_reference_from_property;
 use crate::index::subobject_helpers::remove_subobject_from_parent_array;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
@@ -27,14 +26,6 @@ pub fn remove_object_helper(index: &mut Index, id: &str) -> Result<(), HitError>
 
     for plugin in index.plugins.delete_plugins.iter() {
         plugin.borrow_mut().on_after_delete_entry(&entry)?;
-    }
-    Ok(())
-}
-
-fn unindex_references_from_properties(index: &mut Index, id: &str) -> Result<(), HitError> {
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-    for (key, _) in entry.borrow().data.iter() {
-        unindex_reference_from_property(index, id, key)?;
     }
     Ok(())
 }

@@ -3,8 +3,7 @@ use crate::object_data::{ObjectValue, Reference};
 use crate::{
     errors::ValidationError,
     model::field_types::{
-        check_if_required, check_reference_exists, check_reference_is_authorized, run_validators,
-        ReturnHitError,
+        check_if_required, check_reference_exists, run_validators, ReturnHitError,
     },
 };
 use crate::{
@@ -42,9 +41,9 @@ impl ModelField for FieldTypeReference {
             ObjectValue::Reference(value) => {
                 let mut errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
-                let entry = check_reference_exists(value, context)?;
+                let _entry = check_reference_exists(value, context)?;
                 //Run validators
-                run_validators(&self.validators, value, &mut errors, context);
+                run_validators(&self.validators, value, &mut errors, context)?;
 
                 if errors.len() > 0 {
                     return Ok(Some(errors));

@@ -282,7 +282,7 @@ mod tests {
     use crate::HitError;
     use crate::ObjectValue;
     use crate::Reference;
-    use std::collections::HashMap;
+    
     #[test]
     fn it_should_create_a_new_index_with_values() {
         let mut values = LinkedHashMap::new();

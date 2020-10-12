@@ -63,7 +63,7 @@ impl ModelField for FieldTypeSubobjectArray {
                     return Ok(Some(errors));
                 }
                 //Run validators
-                run_validators(&self.validators, value, &mut errors, context);
+                run_validators(&self.validators, value, &mut errors, context)?;
 
                 if errors.len() > 0 {
                     return Ok(Some(errors));

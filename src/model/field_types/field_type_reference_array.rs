@@ -1,8 +1,6 @@
 use crate::{
     errors::ValidationError,
-    model::field_types::{
-        check_reference_exists, check_reference_is_authorized, run_validators, ReturnHitError,
-    },
+    model::field_types::{check_reference_exists, run_validators, ReturnHitError},
     HitError,
 };
 
@@ -38,8 +36,8 @@ impl ModelField for FieldTypeReferenceArray {
             ObjectValue::Reference(value) => {
                 let mut errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
-                let entry = check_reference_exists(value, context)?;
-                run_validators(&self.validators, value, &mut errors, context);
+                let _entry = check_reference_exists(value, context)?;
+                run_validators(&self.validators, value, &mut errors, context)?;
                 if errors.len() > 0 {
                     return Ok(Some(errors));
                 }

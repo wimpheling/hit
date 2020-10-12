@@ -5,7 +5,6 @@ use crate::Hit;
 use crate::HitError;
 use crate::IndexEntryProperty;
 use crate::ObjectValue;
-use crate::Reference;
 use std::{collections::HashMap, rc::Rc};
 
 fn create_hit_with_subobjects() -> Hit {

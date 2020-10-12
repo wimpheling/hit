@@ -69,7 +69,7 @@ impl Plugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
         _id: &str,
         _data: ObjectValues,
         _parent: IndexEntryProperty,
-        instance: &Hit,
+        _instance: &Hit,
     ) {
     }
     fn on_after_add_entry(
@@ -78,24 +78,24 @@ impl Plugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
         id: &str,
         _data: ObjectValues,
         _parent: IndexEntryProperty,
-        instance: &Hit,
+        _instance: &Hit,
     ) {
         self.add_to_index(model, id);
     }
     fn on_after_set_value(
         &mut self,
-        property: IndexEntryProperty,
-        value: &ObjectValue,
-        old_value: &Option<ObjectValue>,
-        instance: &Hit,
+        _property: IndexEntryProperty,
+        _value: &ObjectValue,
+        _old_value: &Option<ObjectValue>,
+        _instance: &Hit,
     ) {
     }
     fn on_before_set_value(
         &mut self,
-        property: IndexEntryProperty,
-        value: &ObjectValue,
-        old_value: &Option<ObjectValue>,
-        instance: &Hit,
+        _property: IndexEntryProperty,
+        _value: &ObjectValue,
+        _old_value: &Option<ObjectValue>,
+        _instance: &Hit,
     ) {
     }
     fn on_before_move_subobject(&mut self) {}

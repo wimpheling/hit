@@ -58,7 +58,7 @@ mod tests {
     use crate::HitError;
     use crate::ObjectValue;
     use crate::Plugins;
-    use std::collections::HashMap;
+    
 
     fn insert_string_field(
         index: &mut Index,

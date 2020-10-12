@@ -1,8 +1,8 @@
 use crate::index::list_helpers::{
-    get_parent_index_entry, get_parent_index_entry_from_parent, get_parent_property_value,
+    get_parent_index_entry_from_parent, get_parent_property_value,
     mutate_insert_in_ref_array,
 };
-use crate::index::{Index, IndexEntryProperty, IndexEntryRef};
+use crate::index::{Index, IndexEntryProperty};
 use crate::object_data::ObjectValue;
 use crate::object_data::Reference;
 use crate::HitError;

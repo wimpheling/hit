@@ -1,7 +1,7 @@
 use linked_hash_map::LinkedHashMap;
 
 use crate::{field_types::*, modele, IndexEntryProperty};
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{DeletePlugin, Hit, HitError, Kernel, Plugins};
 use crate::{HitEntry, Model};

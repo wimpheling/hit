@@ -5,7 +5,7 @@ use crate::Hit;
 use crate::IndexEntryProperty;
 use crate::ObjectValue;
 use crate::Reference;
-use std::collections::HashMap;
+
 use std::rc::Rc;
 
 fn create_hit_with_references() -> Hit {

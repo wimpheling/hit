@@ -10,7 +10,7 @@ use crate::{
     hit_mod::{Hit, HitKernel, HitPlugins},
     ObjectValue,
 };
-use std::{cell::RefCell, collections::HashMap};
+use std::cell::RefCell;
 
 use std::rc::Rc;
 

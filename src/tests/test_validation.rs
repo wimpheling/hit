@@ -4,7 +4,7 @@ use crate::{
     field_types::*, modele, validators::Validator, Hit, IndexEntryProperty, ObjectValue, Reference,
     ValidationError, ValidationErrorLevel,
 };
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{HitEntry, HitError, Kernel, Model, Plugins};
 

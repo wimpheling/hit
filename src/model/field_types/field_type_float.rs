@@ -39,7 +39,7 @@ impl ModelField for FieldTypeFloat {
             ObjectValue::Null => check_if_required(self.required),
             ObjectValue::F32(value) => {
                 let mut errors: Vec<ValidationError> = vec![];
-                run_validators(&self.validators, value, &mut errors, context);
+                run_validators(&self.validators, value, &mut errors, context)?;
 
                 if errors.len() > 0 {
                     return Ok(Some(errors));

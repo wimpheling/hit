@@ -4,7 +4,7 @@ use chrono::Utc;
 use linked_hash_map::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 
-use std::collections::HashMap;
+
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 pub type Id = String;

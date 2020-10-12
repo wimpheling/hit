@@ -4,7 +4,7 @@ use crate::{
     field_types::*, helpers::get_all_permissions, helpers::get_all_targets, modele,
     IndexEntryProperty,
 };
-use std::{collections::HashMap, rc::Rc};
+use std::{rc::Rc};
 
 use crate::{Hit, HitError, Kernel, Plugins};
 use crate::{HitEntry, Model};

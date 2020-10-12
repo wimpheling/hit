@@ -43,7 +43,7 @@ impl ModelField for FieldTypeDate {
             ObjectValue::Date(value) => {
                 let mut errors: Vec<ValidationError> = vec![];
                 let date = value.get_date();
-                run_validators(&self.validators, &date, &mut errors, context);
+                run_validators(&self.validators, &date, &mut errors, context)?;
 
                 if errors.len() > 0 {
                     return Ok(Some(errors));

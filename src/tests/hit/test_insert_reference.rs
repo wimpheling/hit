@@ -6,7 +6,7 @@ use crate::HitError;
 use crate::IndexEntryProperty;
 use crate::ObjectValue;
 use crate::Reference;
-use std::collections::HashMap;
+
 use std::rc::Rc;
 
 #[test]

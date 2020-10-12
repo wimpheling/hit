@@ -61,7 +61,7 @@ mod tests {
             Ok(_index) => assert!(false),
             Err(error) => assert!(matches!(
                 error,
-                JSONImportError::HitError(HitError::DuplicateID(id))
+                JSONImportError::HitError(HitError::DuplicateID(_id))
             )),
         }
     }

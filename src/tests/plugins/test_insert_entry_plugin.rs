@@ -1,7 +1,7 @@
 use linked_hash_map::LinkedHashMap;
 
 use crate::{field_types::*, modele, Hit, IndexEntryProperty, ObjectValue};
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{HitEntry, HitError, Kernel, Model, Plugin, Plugins};
 
@@ -22,7 +22,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
-        instance: &Hit,
+        _instance: &Hit,
     ) {
         self.before_insert_count += 1;
     }
@@ -33,7 +33,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
-        instance: &Hit,
+        _instance: &Hit,
     ) {
         self.after_insert_count += 1;
     }
@@ -43,7 +43,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _property: IndexEntryProperty,
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
-        instance: &Hit,
+        _instance: &Hit,
     ) {
         self.before_set_value_count += 1;
     }
@@ -53,7 +53,7 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         _property: IndexEntryProperty,
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
-        instance: &Hit,
+        _instance: &Hit,
     ) {
         self.after_set_value_count += 1;
     }

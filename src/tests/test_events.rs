@@ -8,7 +8,7 @@ pub struct TestEventsKernel {
 }
 
 impl Kernel<Rc<Model>, HitEntry> for TestEventsKernel {
-    fn get_model(&self, name: &str) -> Result<Rc<Model>, HitError> {
+    fn get_model(&self, _name: &str) -> Result<Rc<Model>, HitError> {
         return Ok(self.model.clone());
     }
 
@@ -54,7 +54,7 @@ struct TestPropertyListener {
 }
 
 impl FieldListener<ObjectValue> for TestPropertyListener {
-    fn on_update(&mut self, value: &ObjectValue) {
+    fn on_update(&mut self, _value: &ObjectValue) {
         self.event_count += 1;
     }
 
