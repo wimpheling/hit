@@ -26,9 +26,6 @@ pub struct Index {
     pub(in crate::index) plugins: IndexPlugins,
 }
 
-// TODO : used to use never_type
-// not sure why ?
-// pub type IndexPlugins = Plugins<!, IndexEntryRef>;
 pub type IndexPlugins = Plugins<(), IndexEntryRef>;
 
 impl Index {
@@ -282,7 +279,7 @@ mod tests {
     use crate::HitError;
     use crate::ObjectValue;
     use crate::Reference;
-    
+
     #[test]
     fn it_should_create_a_new_index_with_values() {
         let mut values = LinkedHashMap::new();

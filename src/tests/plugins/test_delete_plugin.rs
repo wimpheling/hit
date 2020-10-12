@@ -40,10 +40,7 @@ impl Kernel<Rc<Model>, HitEntry> for TestDeletePluginKernel {
 
     fn get_plugins(&self) -> crate::Plugins<Rc<Model>, HitEntry> {
         let mut plugins = Plugins::new();
-        // TODO : this should be built in HIT ?
         plugins.delete_plugins.push(self.test_delete_plugin.clone());
-        /*  plugins.init_plugins.push(self.model_types_index.clone());
-        plugins.plugins.push(self.model_types_index.clone()); */
         plugins
     }
 

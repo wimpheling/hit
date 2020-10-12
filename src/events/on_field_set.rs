@@ -55,10 +55,3 @@ pub trait FieldListener<T> {
     fn on_update(&mut self, value: &T);
     fn get_unique_id(&self) -> &str;
 }
-
-// TODO: is this useful ?
-/* impl PartialEq for dyn FieldListener {
-    fn eq(&self, other: &Self) -> bool {
-        self.get_unique_id() == other.get_unique_id()
-    }
-} */

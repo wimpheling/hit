@@ -71,7 +71,6 @@ fn create_hit_with_references() -> Hit {
 
 #[test]
 fn it_should_find_all_references() {
-    // TODO : more tests, redo the code etc
     let hit = create_hit_with_references();
     let references = hit.get_references("id2").expect("Error");
 
@@ -94,7 +93,6 @@ fn it_should_find_all_references() {
 
 #[test]
 fn it_should_find_all_references_after_removal_from_array() {
-    // TODO : more tests, redo the code etc
     let mut hit = create_hit_with_references();
     hit.remove_reference(
         "id2".into(),
@@ -121,7 +119,6 @@ fn it_should_find_all_references_after_removal_from_array() {
 
 #[test]
 fn it_should_find_all_references_after_update() {
-    // TODO : more tests, redo the code etc
     let mut hit = create_hit_with_references();
     hit.set(
         "id3",
@@ -156,7 +153,6 @@ fn it_should_find_all_references_after_update() {
 
 #[test]
 fn it_should_find_all_references_after_set_to_null() {
-    // TODO : more tests, redo the code etc
     let mut hit = create_hit_with_references();
     hit.set("id3", "reference", ObjectValue::Null)
         .expect("Error");

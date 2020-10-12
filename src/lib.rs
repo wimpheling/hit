@@ -16,7 +16,6 @@ mod test_kernel;
 #[cfg(test)]
 mod tests;
 
-// TODO
 mod utils;
 
 pub use index::IndexEntryProperty;

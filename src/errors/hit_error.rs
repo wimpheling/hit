@@ -22,7 +22,6 @@ pub enum HitError {
     // Todo : Is it useful for it to be different than invalid reference ?
     #[error("Invalid Reference in array")]
     InvalidReferenceInArray(),
-    //TODO : should it be mandatory ?
     #[error("Invalid reference type")]
     InvalidReferenceType(),
     #[error("Invalid reference type in an array")]

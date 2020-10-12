@@ -58,7 +58,6 @@ mod tests {
     use crate::HitError;
     use crate::ObjectValue;
     use crate::Plugins;
-    
 
     fn insert_string_field(
         index: &mut Index,
@@ -107,7 +106,6 @@ mod tests {
         match value {
             ObjectValue::VecReference(refs) => refs.iter().position(|r| r.id == id).unwrap(),
             ObjectValue::VecSubObjects(refs) => refs.iter().position(|r| r.id == id).unwrap(),
-            // TODO : should not panic
             _ => panic!("Invalid value"),
         }
     }

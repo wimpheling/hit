@@ -32,7 +32,6 @@ impl Validator<String> for MaxLength {
         _context: &ValidatorContext,
     ) -> Result<Option<Vec<ValidationError>>, HitError> {
         if value.len() as u8 > self.length {
-            // TODO : this should not be a HitError, but a validation error
             return Ok(Some(vec![ValidationError {
                 key: MAX_LENGTH.to_string(),
                 level: ValidationErrorLevel::Error,

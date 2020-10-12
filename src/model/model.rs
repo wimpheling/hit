@@ -19,16 +19,6 @@ impl Model {
         };
     }
 
-    // TODO: remove
-    /* pub fn new_with_fields(name: String, label: String, fields: Fields) -> Model {
-        return Model {
-            name: name,
-            label: label,
-            fields: fields,
-            interfaces: vec![],
-        };
-    } */
-
     pub fn get_name(&self) -> &String {
         &self.name
     }
@@ -48,10 +38,3 @@ impl Model {
         &self.fields
     }
 }
-
-// TODO : is that useful ?
-/* impl PartialEq for Model {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-    }
-} */

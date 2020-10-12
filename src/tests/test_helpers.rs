@@ -4,7 +4,7 @@ use crate::{
     field_types::*, helpers::get_all_permissions, helpers::get_all_targets, modele,
     IndexEntryProperty,
 };
-use std::{rc::Rc};
+use std::rc::Rc;
 
 use crate::{Hit, HitError, Kernel, Plugins};
 use crate::{HitEntry, Model};
@@ -147,7 +147,7 @@ fn it_should_find_all_targets_for_an_object() {
         )
         .expect("Error");
 
-    let permissions = get_all_permissions(kernel.clone()).expect("TODO2");
+    let permissions = get_all_permissions(kernel.clone()).expect("Error");
 
     let targets = get_all_targets("test/test", &hit_item, &permissions).expect("Error");
     let expected_results: Vec<String> = vec!["id".into(), "id2".into(), "id3".into(), "id4".into()];

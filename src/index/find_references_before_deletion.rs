@@ -38,7 +38,6 @@ pub(in crate::index) fn find_references_recursive(
     index: &Index,
     id: &str,
 ) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
-    // TODO: ignore references that would be deleted (references inside the deleted objects)
     let mut output: HashMap<String, Vec<IndexEntryProperty>> = HashMap::new();
     let mut id_list: Vec<String> = vec![];
 

@@ -59,22 +59,24 @@ impl Hit {
         let mut model_index = ModelIndex::new();
         model_index.plugins = kernel.get_plugins().delete_plugins;
         let model = kernel.get_model(model_type)?;
-
-        //TODO : validate values
-        //  - check all fields are in the model
-        //  - check the values are accepted by the fields
+        //TODO : initialize the values in the order defined by the model
 
         model_index.map.insert(id.to_string(), model);
         let model_index = Rc::new(RefCell::new(model_index));
         let mut plugins = Plugins::new();
         plugins.delete_plugins.push(model_index.clone());
-        Ok(Hit {
-            index: Index::new(id, values, plugins)?,
+
+        let mut hit = Hit {
+            index: Index::new(id, LinkedHashMap::new(), plugins)?,
             model_index: model_index,
             plugins: kernel.get_plugins(),
             kernel: kernel,
             errors: ModelPropertyVectors::new(),
-        })
+        };
+        for (key, value) in values.iter() {
+            hit.set(id, key, value.clone())?;
+        }
+        Ok(hit)
     }
 
     pub fn contains_key(&self, key: &str) -> bool {
@@ -134,8 +136,9 @@ impl Hit {
     }
 
     pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
-        // TODO : should also remove model indexes of the deleted objects
         let id_list = self.index.remove_object(id)?;
+
+        //remove model indexes of the deleted objects
         for id in id_list.iter() {
             let mut model_index = self.model_index.borrow_mut();
             model_index.map.remove(id);
@@ -242,7 +245,6 @@ impl Hit {
 
         self.index.set_value(id, property, value.clone())?;
 
-        //TODO: make proper validation (in an error object, non-blocking, with events)
         let validation_errors = model_field.borrow().validate(
             &value,
             &ValidatorContext {
@@ -262,7 +264,6 @@ impl Hit {
                 }
             }
         }
-        //TODO: replace with validation errors
 
         for plugin in self.plugins.plugins.iter() {
             plugin.borrow_mut().on_after_set_value(
@@ -276,6 +277,44 @@ impl Hit {
             );
         }
         Ok(())
+    }
+
+    fn validate_inserted_values(
+        &mut self,
+        new_object_model: &Rc<Model>,
+        id: &str,
+        values: &ObjectValues,
+    ) -> Result<ObjectValues, HitError> {
+        // put the data in the correct field order, initialize null data
+        // and validate the data of the new object
+        let mut ordered_values: ObjectValues = LinkedHashMap::new();
+        for (property, model_field) in new_object_model.fields.iter() {
+            //does the field accept the object value
+            match values.get(property) {
+                Some(value) => {
+                    match value {
+                        ObjectValue::Null => {}
+                        _ => {
+                            if !model_field.borrow().accepts_for_set(
+                                &value,
+                                &ValidatorContext {
+                                    id: id,
+                                    property: property,
+                                    index: Rc::new(self),
+                                },
+                            ) {
+                                return Err(HitError::InvalidDataType());
+                            }
+                        }
+                    };
+                    ordered_values.insert(property.to_string(), value.clone());
+                }
+                None => {
+                    ordered_values.insert(property.to_string(), ObjectValue::Null);
+                }
+            }
+        }
+        Ok(ordered_values)
     }
 
     pub fn insert(
@@ -317,36 +356,7 @@ impl Hit {
             return Err(HitError::ModelNotAllowed(model_type.into()));
         }
 
-        // put the data in the correct field order, initialize null data
-        // and validate the data of the new object
-        let mut ordered_values: ObjectValues = LinkedHashMap::new();
-        for (property, model_field) in new_object_model.fields.iter() {
-            //does the field accept the object value
-            match values.get(property) {
-                Some(value) => {
-                    match value {
-                        ObjectValue::Null => {}
-                        _ => {
-                            if !model_field.borrow().accepts_for_set(
-                                &value,
-                                &ValidatorContext {
-                                    id: id,
-                                    property: property,
-                                    index: Rc::new(self),
-                                },
-                            ) {
-                                return Err(HitError::InvalidDataType());
-                            }
-                        }
-                    };
-                    ordered_values.insert(property.to_string(), value.clone());
-                }
-                None => {
-                    ordered_values.insert(property.to_string(), ObjectValue::Null);
-                }
-            }
-        }
-
+        let values = self.validate_inserted_values(&new_object_model, id, &values)?;
         // update the data
         self.index
             .insert(id, values.clone(), parent.clone(), before_id)?;

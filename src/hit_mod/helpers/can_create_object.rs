@@ -30,7 +30,6 @@ fn get_allowed_fields(
 pub type ObjectPermissions = HashMap<String, HashMap<String, Vec<String>>>;
 
 // Indexes all the models where a given model can be added (used for suggestions)
-// TODO : test
 pub fn get_all_permissions(kernel: Rc<HitKernel>) -> Result<ObjectPermissions, HitError> {
     let mut output: ObjectPermissions = HashMap::new();
     let list_of_models_clone = kernel.clone().get_models();

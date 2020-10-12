@@ -1,6 +1,5 @@
 use crate::index::list_helpers::{
-    get_parent_index_entry_from_parent, get_parent_property_value,
-    mutate_insert_in_ref_array,
+    get_parent_index_entry_from_parent, get_parent_property_value, mutate_insert_in_ref_array,
 };
 use crate::index::{Index, IndexEntryProperty};
 use crate::object_data::ObjectValue;
@@ -10,36 +9,7 @@ use crate::HitError;
 pub fn remove_subobject_from_parent_array(index: &mut Index, id: &str) -> Result<(), HitError> {
     remove_from_subobject_array(index, &id)
 }
-/* TODO: remove ?
 
-pub fn remove_subobject_from_parent_array_from_property(
-    index: &mut Index,
-    parent: IndexEntryProperty,
-    id: &str,
-) -> Result<ObjectValue, String> {
-    let entry = index
-        .get(&parent.id)
-        .ok_or(format!("Id of referencer object not found : {}", parent.id))?;
-    let data = get_parent_property_value(&entry, &parent);
-    let new_data = mutate_remove_from_subobject_array(data, id)?;
-    match new_data {
-        Some(new_data) => {
-            entry.borrow_mut().data.insert(
-                parent.property,
-                ObjectValue::VecSubObjects(new_data.clone()),
-            );
-            Ok(ObjectValue::VecSubObjects(new_data))
-        }
-        None => {
-            entry
-                .borrow_mut()
-                .data
-                .insert(parent.property, ObjectValue::Null);
-            Ok(ObjectValue::Null)
-        }
-    }
-}
- */
 pub fn insert_subobject_in_array(
     index: &mut Index,
     parent: IndexEntryProperty,

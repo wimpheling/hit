@@ -59,11 +59,6 @@ impl IndexEntry {
         &self.id
     }
 
-    // TODO : use it !
-    /* fn unindex_reference(&mut self, parent: &IndexEntryProperty, _id: &str) {
-        self.references.retain(|x| x != parent);
-    } */
-
     pub(in crate::index) fn set(
         &mut self,
         property: &str,

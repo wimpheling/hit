@@ -13,11 +13,6 @@ pub fn get_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>
 pub fn remove_object_helper(index: &mut Index, id: &str) -> Result<(), HitError> {
     let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     remove_object_children(index, id)?;
-    //remove references from properties
-
-    // TODO: what does this do exactly?
-    // should not be used because you can't delete if there are references
-    // unindex_references_from_properties(index, id)?;
 
     //remove object from id list in parent
     remove_subobject_from_parent_array(index, id)?;

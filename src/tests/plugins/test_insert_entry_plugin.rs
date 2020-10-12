@@ -58,13 +58,9 @@ impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
         self.after_set_value_count += 1;
     }
 
-    fn on_before_move_subobject(&mut self) {
-        todo!()
-    }
+    fn on_before_move_subobject(&mut self) {}
 
-    fn on_after_move_subobject(&mut self) {
-        todo!()
-    }
+    fn on_after_move_subobject(&mut self) {}
 }
 
 pub struct TestPluginKernel {
@@ -90,7 +86,6 @@ impl Kernel<Rc<Model>, HitEntry> for TestPluginKernel {
 
     fn get_plugins(&self) -> Plugins<Rc<Model>, HitEntry> {
         let mut plugins = Plugins::new();
-        // TODO : this should be built in HIT ?
         plugins.plugins.push(self.test_plugin.clone());
         plugins
     }

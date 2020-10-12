@@ -4,7 +4,6 @@ use chrono::Utc;
 use linked_hash_map::LinkedHashMap;
 use serde::{Deserialize, Serialize};
 
-
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 pub type Id = String;
@@ -56,57 +55,5 @@ impl Display for DateTimeUtc {
         return Ok(());
     }
 }
-
-// TODO : is that needed ?
-/* impl Display for ObjectValue {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match self {
-            ObjectValue::Bool(a) => {
-                if a == &true {
-                    write!(f, "true")?;
-                } else {
-                    write!(f, "false")?;
-                }
-            }
-            ObjectValue::String(val) => {
-                write!(f, "{}", val)?;
-            }
-            ObjectValue::F32(val) => {
-                write!(f, "{:.1}", val)?;
-            }
-            ObjectValue::I32(val) => {
-                write!(f, "{:.1}", val)?;
-            }
-            ObjectValue::Date(val) => {
-                write!(f, "{}", val)?;
-            }
-            ObjectValue::VecSubObjects(val) => {
-                for subval in val.iter() {
-                    write!(f, "{}", subval.id)?;
-                }
-            }
-            ObjectValue::VecReference(val) => {
-                for subval in val.iter() {
-                    write!(f, "{}", subval.id)?;
-                }
-            }
-            ObjectValue::VecString(val) => {
-                for subval in val.iter() {
-                    write!(f, "{}", subval)?;
-                }
-            }
-            ObjectValue::Reference(val) => {
-                write!(f, "{}", val.id)?;
-            }
-            ObjectValue::SubObject(val) => {
-                write!(f, "{}", val.id)?;
-            }
-            ObjectValue::Null => {
-                write!(f, "NULL")?;
-            }
-        }
-        return Ok(());
-    }
-} */
 
 pub type ObjectValues = LinkedHashMap<String, ObjectValue>;
