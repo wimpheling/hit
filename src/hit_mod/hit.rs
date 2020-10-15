@@ -138,10 +138,13 @@ impl Hit {
 
         // before plugins call
         for plugin in self.plugins.delete_plugins.iter() {
-            plugin.borrow_mut().on_before_delete_entry(&HitEntry {
-                entry: entry.clone(),
-                model: model.clone(),
-            })?;
+            plugin.borrow_mut().on_before_delete_entry(
+                &HitEntry {
+                    entry: entry.clone(),
+                    model: model.clone(),
+                },
+                &self,
+            )?;
         }
 
         let id_list = self.index.remove_object(id)?;
@@ -154,10 +157,13 @@ impl Hit {
 
         // after plugins call
         for plugin in self.plugins.delete_plugins.iter() {
-            plugin.borrow_mut().on_after_delete_entry(&HitEntry {
-                entry: entry.clone(),
-                model: model.clone(),
-            })?;
+            plugin.borrow_mut().on_after_delete_entry(
+                &HitEntry {
+                    entry: entry.clone(),
+                    model: model.clone(),
+                },
+                &self,
+            )?;
         }
         Ok(id_list)
     }
