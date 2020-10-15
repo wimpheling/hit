@@ -33,7 +33,7 @@ impl ModelTypeIndexer {
     }
 }
 
-impl InitEntryPlugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
+impl InitEntryPlugin<HitEntry> for ModelTypeIndexer {
     fn on_init_add_entry(
         &mut self,
         model: Rc<Model>,
@@ -62,7 +62,7 @@ impl DeletePlugin<HitEntry> for ModelTypeIndexer {
     }
 }
 
-impl Plugin<Rc<Model>, HitEntry> for ModelTypeIndexer {
+impl Plugin<HitEntry> for ModelTypeIndexer {
     fn on_before_add_entry(
         &mut self,
         _model: Rc<Model>,

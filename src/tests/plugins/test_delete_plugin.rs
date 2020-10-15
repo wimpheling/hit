@@ -29,7 +29,7 @@ pub struct TestDeletePluginKernel {
     test_delete_plugin: Rc<RefCell<TestDeletePlugin>>,
 }
 
-impl Kernel<Rc<Model>, HitEntry> for TestDeletePluginKernel {
+impl Kernel<HitEntry> for TestDeletePluginKernel {
     fn get_model(&self, _name: &str) -> Result<Rc<Model>, HitError> {
         return Ok(self.model.clone());
     }
@@ -38,7 +38,7 @@ impl Kernel<Rc<Model>, HitEntry> for TestDeletePluginKernel {
         return vec![&self.model];
     }
 
-    fn get_plugins(&self) -> crate::Plugins<Rc<Model>, HitEntry> {
+    fn get_plugins(&self) -> crate::Plugins<HitEntry> {
         let mut plugins = Plugins::new();
         plugins.delete_plugins.push(self.test_delete_plugin.clone());
         plugins

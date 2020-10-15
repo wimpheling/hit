@@ -18,8 +18,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-pub type HitPlugins = Plugins<Rc<Model>, HitEntry>;
-pub type HitKernel = dyn Kernel<Rc<Model>, HitEntry>;
+pub type HitPlugins = Plugins<HitEntry>;
+pub type HitKernel = dyn Kernel<HitEntry>;
 
 pub(in crate) struct ModelIndex {
     pub map: HashMap<String, Rc<Model>>,

@@ -14,7 +14,7 @@ pub struct TestKernel {
     model: Rc<Model>,
 }
 
-impl Kernel<Rc<Model>, HitEntry> for TestKernel {
+impl Kernel<HitEntry> for TestKernel {
     fn get_model(&self, name: &str) -> Result<Rc<Model>, HitError> {
         if name == "test/test" {
             return Ok(self.model.clone());
@@ -26,7 +26,7 @@ impl Kernel<Rc<Model>, HitEntry> for TestKernel {
     fn get_instantiable_models(&self) -> Vec<&Model> {
         return vec![&self.model];
     }
-    fn get_plugins(&self) -> Plugins<Rc<Model>, HitEntry> {
+    fn get_plugins(&self) -> Plugins<HitEntry> {
         Plugins::new()
     }
     fn get_models(&self) -> Vec<String> {
@@ -67,7 +67,7 @@ pub fn create_test_kernel() -> TestKernel {
         Rc::new(RefCell::new(FieldTypeReference {
             name: String::from("reference"),
             required: false,
-            validators: vec![], 
+            validators: vec![],
             authorized_models: vec!["test/test".into()],
         })),
     );

@@ -1,25 +1,27 @@
-use crate::HitError;
+use std::rc::Rc;
+
 use crate::{index::IndexEntryProperty, ObjectValue};
 use crate::{object_data::ObjectValues, Hit};
+use crate::{HitError, Model};
 
-pub trait InitEntryPlugin<ExtraData, Entry> {
+pub trait InitEntryPlugin<Entry> {
     fn on_init_add_entry(
         &mut self,
-        extra_data: ExtraData,
+        model: Rc<Model>,
         id: &str,
         data: ObjectValues,
         parent: Option<IndexEntryProperty>,
     );
 }
 
-pub trait AfterImportPlugin<ExtraData, Entry> {
+pub trait AfterImportPlugin<Entry> {
     fn after_import(&mut self, hit: &Hit);
 }
 
-pub trait InitEntryAfterIndexPlugin<ExtraData, Entry> {
+pub trait InitEntryAfterIndexPlugin<Entry> {
     fn for_each_entry(
         &mut self,
-        extra_data: ExtraData,
+        model: Rc<Model>,
         id: &str,
         data: ObjectValues,
         parent: Option<IndexEntryProperty>,
@@ -31,10 +33,10 @@ pub trait DeletePlugin<Entry> {
     fn on_after_delete_entry(&mut self, entry: &Entry) -> Result<(), HitError>;
 }
 
-pub trait Plugin<ExtraData, Entry> {
+pub trait Plugin<Entry> {
     fn on_before_add_entry(
         &mut self,
-        extra_data: ExtraData,
+        model: Rc<Model>,
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,
@@ -42,7 +44,7 @@ pub trait Plugin<ExtraData, Entry> {
     );
     fn on_after_add_entry(
         &mut self,
-        extra_data: ExtraData,
+        model: Rc<Model>,
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,

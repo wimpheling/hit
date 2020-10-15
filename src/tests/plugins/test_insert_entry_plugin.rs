@@ -15,7 +15,7 @@ struct TestPlugin {
     after_move_subobject_count: i32,
 }
 
-impl Plugin<Rc<Model>, HitEntry> for TestPlugin {
+impl Plugin<HitEntry> for TestPlugin {
     fn on_before_add_entry(
         &mut self,
         _extra_data: Rc<Model>,
@@ -69,7 +69,7 @@ pub struct TestPluginKernel {
     test_plugin: Rc<RefCell<TestPlugin>>,
 }
 
-impl Kernel<Rc<Model>, HitEntry> for TestPluginKernel {
+impl Kernel<HitEntry> for TestPluginKernel {
     fn get_model(&self, name: &str) -> Result<Rc<Model>, HitError> {
         if name == "test/test" {
             return Ok(self.model.clone());
@@ -84,7 +84,7 @@ impl Kernel<Rc<Model>, HitEntry> for TestPluginKernel {
         return vec![&self.model, &self.model2];
     }
 
-    fn get_plugins(&self) -> Plugins<Rc<Model>, HitEntry> {
+    fn get_plugins(&self) -> Plugins<HitEntry> {
         let mut plugins = Plugins::new();
         plugins.plugins.push(self.test_plugin.clone());
         plugins
