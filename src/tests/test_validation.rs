@@ -6,7 +6,7 @@ use crate::{
 };
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{HitEntry, HitError, Kernel, Model, Plugins};
+use crate::{HitError, Kernel, Model, Plugins};
 
 pub struct TestEventsKernel {
     model: Rc<Model>,

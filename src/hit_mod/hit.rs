@@ -186,13 +186,33 @@ impl Hit {
     ) -> Result<(), HitError> {
         //check destination is allowed
         let target_model = self.get_model_or_error(&property.id)?;
+
+        for plugin in self.plugins.plugins.iter() {
+            plugin.borrow_mut().on_before_move_subobject(
+                id,
+                property.clone(),
+                before_id.clone(),
+                &self,
+            )?;
+        }
+
         self.can_move_object(
             id,
             &property.id,
             target_model.get_name(),
             &property.property,
         )?;
-        self.index.move_object(id, property, before_id)
+        self.index
+            .move_object(id, property.clone(), before_id.clone())?;
+        for plugin in self.plugins.plugins.iter() {
+            plugin.borrow_mut().on_after_move_subobject(
+                id,
+                property.clone(),
+                before_id.clone(),
+                &self,
+            )?;
+        }
+        Ok(())
     }
 
     pub fn get_model(&self, id: &str) -> Option<Rc<Model>> {

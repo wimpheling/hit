@@ -5,7 +5,6 @@ use crate::model::field_types::FieldTypeString;
 use crate::model::field_types::FieldTypeSubobjectArray;
 use crate::model::Model;
 use crate::plugins::Plugins;
-use crate::HitEntry;
 use crate::HitError;
 use std::cell::RefCell;
 use std::rc::Rc;

@@ -65,6 +65,18 @@ pub trait Plugin {
         old_value: &Option<ObjectValue>,
         instance: &Hit,
     );
-    fn on_before_move_subobject(&mut self);
-    fn on_after_move_subobject(&mut self);
+    fn on_before_move_subobject(
+        &mut self,
+        id: &str,
+        property: IndexEntryProperty,
+        before_id: Option<String>,
+        instance: &Hit,
+    ) -> Result<(), HitError>;
+    fn on_after_move_subobject(
+        &mut self,
+        id: &str,
+        property: IndexEntryProperty,
+        before_id: Option<String>,
+        instance: &Hit,
+    ) -> Result<(), HitError>;
 }

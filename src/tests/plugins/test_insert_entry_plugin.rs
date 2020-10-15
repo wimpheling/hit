@@ -3,7 +3,7 @@ use linked_hash_map::LinkedHashMap;
 use crate::{field_types::*, modele, Hit, IndexEntryProperty, ObjectValue};
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{HitEntry, HitError, Kernel, Model, Plugin, Plugins};
+use crate::{HitError, Kernel, Model, Plugin, Plugins};
 
 #[derive(Debug)]
 struct TestPlugin {
@@ -58,9 +58,26 @@ impl Plugin for TestPlugin {
         self.after_set_value_count += 1;
     }
 
-    fn on_before_move_subobject(&mut self) {}
-
-    fn on_after_move_subobject(&mut self) {}
+    fn on_before_move_subobject(
+        &mut self,
+        _id: &str,
+        _property: IndexEntryProperty,
+        _before_id: Option<String>,
+        _instance: &Hit,
+    ) -> Result<(), HitError> {
+        self.before_move_subobject_count += 1;
+        Ok(())
+    }
+    fn on_after_move_subobject(
+        &mut self,
+        _id: &str,
+        _property: IndexEntryProperty,
+        _before_id: Option<String>,
+        _instance: &Hit,
+    ) -> Result<(), HitError> {
+        self.after_move_subobject_count += 1;
+        Ok(())
+    }
 }
 
 pub struct TestPluginKernel {
@@ -105,6 +122,9 @@ fn create_test_plugin_model() -> Rc<Model> {
         },
         "subitems2": FieldTypeSubobjectArray {
             authorized_models: vec!["test/impossible".to_string()]
+        },
+        "subitems3": FieldTypeSubobjectArray {
+            authorized_models: vec!["test/test".to_string()]
         },
         "references": FieldTypeReferenceArray {
             authorized_models: vec!["test/test".to_string()]
@@ -243,4 +263,42 @@ fn it_should_call_only_before_insert_callback_when_insert_fails() {
     let borrowed_plugin = plugin.borrow();
     assert_eq!(borrowed_plugin.before_insert_count, 1);
     assert_eq!(borrowed_plugin.after_insert_count, 0);
+}
+
+#[test]
+fn it_should_call_both_move_callbacks() {
+    let plugin = create_test_plugin();
+    let mut hit_item = Hit::new(
+        "id".into(),
+        "test/test".into(),
+        Rc::new(create_test_plugin_kernel(plugin.clone())),
+    )
+    .expect("Error 1");
+
+    hit_item
+        .insert(
+            "test/test".into(),
+            "id2",
+            LinkedHashMap::new(),
+            IndexEntryProperty {
+                id: "id".into(),
+                property: "subitems".into(),
+            },
+            None,
+        )
+        .expect("Error 2");
+
+    hit_item
+        .move_object(
+            "id2",
+            IndexEntryProperty {
+                id: "id".into(),
+                property: "subitems3".into(),
+            },
+            None,
+        )
+        .expect("Error 2");
+    let borrowed_plugin = plugin.borrow();
+    assert_eq!(borrowed_plugin.before_move_subobject_count, 1);
+    assert_eq!(borrowed_plugin.after_move_subobject_count, 1);
 }

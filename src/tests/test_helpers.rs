@@ -6,8 +6,8 @@ use crate::{
 };
 use std::rc::Rc;
 
+use crate::Model;
 use crate::{Hit, HitError, Kernel, Plugins};
-use crate::{HitEntry, Model};
 
 pub struct TestHelpersKernel {
     model: Rc<Model>,
