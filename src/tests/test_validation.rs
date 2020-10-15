@@ -117,6 +117,7 @@ fn get_test_hit() -> Hit {
     hit
 }
 
+// TODO
 // #[test]
 fn it_should_return_an_error_on_reference_arrays_when_validator_detects_it() {
     let mut hit = get_test_hit();

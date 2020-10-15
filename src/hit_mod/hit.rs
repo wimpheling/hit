@@ -4,12 +4,10 @@ use crate::hit_mod::helpers::can_move_object;
 use crate::hit_mod::hit_entry::HitEntry;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
-use crate::index::IndexEntryRef;
 use crate::model::validators::ValidatorContext;
 use crate::model::Model;
 use crate::object_data::Id;
 use crate::object_data::{ObjectValue, ObjectValues};
-use crate::plugins::DeletePlugin;
 use crate::plugins::Plugins;
 use crate::utils::ModelPropertyVectors;
 use crate::HitError;
@@ -25,15 +23,12 @@ pub type HitKernel = dyn Kernel<Rc<Model>, HitEntry>;
 
 pub(in crate) struct ModelIndex {
     pub map: HashMap<String, Rc<Model>>,
-    // TODO: why are these in here ?
-    pub plugins: Vec<Rc<RefCell<dyn DeletePlugin<HitEntry>>>>,
 }
 
 impl ModelIndex {
     pub fn new() -> Self {
         ModelIndex {
             map: HashMap::new(),
-            plugins: vec![],
         }
     }
 }
@@ -57,17 +52,14 @@ impl Hit {
         model_type: &str,
     ) -> Result<Hit, HitError> {
         let mut model_index = ModelIndex::new();
-        model_index.plugins = kernel.get_plugins().delete_plugins;
         let model = kernel.get_model(model_type)?;
         //TODO : initialize the values in the order defined by the model
 
         model_index.map.insert(id.to_string(), model);
         let model_index = Rc::new(RefCell::new(model_index));
-        let mut plugins = Plugins::new();
-        plugins.delete_plugins.push(model_index.clone());
 
         let mut hit = Hit {
-            index: Index::new(id, LinkedHashMap::new(), plugins)?,
+            index: Index::new(id, LinkedHashMap::new())?,
             model_index: model_index,
             plugins: kernel.get_plugins(),
             kernel: kernel,
@@ -136,12 +128,36 @@ impl Hit {
     }
 
     pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
+        let entry = self
+            .index
+            .get(id)
+            .ok_or(HitError::IDNotFound(id.to_string()))?;
+        let model = self
+            .get_model(id)
+            .ok_or(HitError::IDNotFound(id.to_string()))?;
+
+        // before plugins call
+        for plugin in self.plugins.delete_plugins.iter() {
+            plugin.borrow_mut().on_before_delete_entry(&HitEntry {
+                entry: entry.clone(),
+                model: model.clone(),
+            })?;
+        }
+
         let id_list = self.index.remove_object(id)?;
 
         //remove model indexes of the deleted objects
         for id in id_list.iter() {
             let mut model_index = self.model_index.borrow_mut();
             model_index.map.remove(id);
+        }
+
+        // after plugins call
+        for plugin in self.plugins.delete_plugins.iter() {
+            plugin.borrow_mut().on_after_delete_entry(&HitEntry {
+                entry: entry.clone(),
+                model: model.clone(),
+            })?;
         }
         Ok(id_list)
     }
@@ -448,38 +464,5 @@ impl Hit {
             }
             _ => None,
         }
-    }
-}
-
-impl DeletePlugin<IndexEntryRef> for ModelIndex {
-    fn on_after_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), HitError> {
-        let entry_borrowed = entry.borrow();
-        let id = entry_borrowed.get_id();
-        let model = self
-            .map
-            .get(id)
-            .ok_or(HitError::NoModelForId(id.to_string()))?;
-        for plugin in self.plugins.iter() {
-            plugin.borrow_mut().on_after_delete_entry(&HitEntry {
-                entry: entry.clone(),
-                model: model.clone(),
-            })?;
-        }
-        Ok(())
-    }
-    fn on_before_delete_entry(&mut self, entry: &IndexEntryRef) -> Result<(), HitError> {
-        let entry_borrowed = entry.borrow();
-        let id = entry_borrowed.get_id();
-        let model = self
-            .map
-            .get(id)
-            .ok_or(HitError::NoModelForId(id.to_string()))?;
-        for plugin in self.plugins.iter() {
-            plugin.borrow_mut().on_before_delete_entry(&HitEntry {
-                entry: entry.clone(),
-                model: model.clone(),
-            })?;
-        }
-        Ok(())
     }
 }

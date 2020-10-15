@@ -3,7 +3,6 @@ use linked_hash_map::LinkedHashMap;
 use crate::index::IndexEntryProperty;
 use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;
-use crate::plugins::Plugins;
 use crate::HitError;
 use crate::{hit_mod::hit::ModelIndex, utils::ModelPropertyVectors};
 use crate::{
@@ -23,13 +22,10 @@ pub struct IndexModelImporter {
 
 impl IndexModelImporter {
     pub fn new(id: &str, kernel: Rc<HitKernel>) -> Self {
-        let mut model_index = ModelIndex::new();
-        model_index.plugins = kernel.get_plugins().delete_plugins;
+        let model_index = ModelIndex::new();
         let model_index = Rc::new(RefCell::new(model_index));
-        let mut plugins = Plugins::new();
-        plugins.delete_plugins.push(model_index.clone());
         IndexModelImporter {
-            index: IndexImporter::new(id, plugins),
+            index: IndexImporter::new(id),
             model_index: model_index,
             plugins: kernel.get_plugins(),
             kernel: kernel,

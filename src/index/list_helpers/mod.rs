@@ -57,7 +57,6 @@ mod tests {
     use crate::index::{Index, IndexEntryProperty};
     use crate::HitError;
     use crate::ObjectValue;
-    use crate::Plugins;
 
     fn insert_string_field(
         index: &mut Index,
@@ -111,7 +110,7 @@ mod tests {
     }
 
     fn init_index() -> Index {
-        let mut index = Index::new_for_import(&String::from("id1"), Plugins::new());
+        let mut index = Index::new_for_import(&String::from("id1"));
         insert_parent(&mut index, "id1", "Name Of The Model 1").expect("Error");
         insert_sub_field(&mut index, "a", "id2", 0).expect("Error");
         insert_sub_field(&mut index, "b", "id3", 1).expect("Error");

@@ -13,7 +13,6 @@ use crate::object_data::Id;
 use crate::object_data::ObjectValue;
 use crate::object_data::ObjectValues;
 use crate::object_data::Reference;
-use crate::plugins::Plugins;
 use crate::HitError;
 use std::collections::btree_map::Iter;
 use std::collections::BTreeMap;
@@ -23,25 +22,20 @@ use super::find_references_before_deletion::find_references_recursive;
 pub struct Index {
     pub(in crate::index) index: BTreeMap<Id, IndexEntryRef>,
     id: Id,
-    pub(in crate::index) plugins: IndexPlugins,
 }
 
-pub type IndexPlugins = Plugins<(), IndexEntryRef>;
-
 impl Index {
-    pub fn new_for_import(id: &str, plugins: IndexPlugins) -> Index {
+    pub fn new_for_import(id: &str) -> Index {
         Index {
             index: BTreeMap::new(),
             id: id.to_string(),
-            plugins: plugins,
         }
     }
 
-    pub fn new(id: &str, values: ObjectValues, plugins: IndexPlugins) -> Result<Index, HitError> {
+    pub fn new(id: &str, values: ObjectValues) -> Result<Index, HitError> {
         let mut index = Index {
             index: BTreeMap::new(),
             id: id.to_string(),
-            plugins: plugins,
         };
         //Disallow references and subobjects
         for (_, value) in values.iter() {
@@ -226,17 +220,6 @@ impl Index {
     }
 
     pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
-        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
-        for plugin in self.plugins.delete_plugins.iter() {
-            plugin.borrow_mut().on_before_delete_entry(&entry)?;
-        }
-
-        // TODO: should be handled in remove_object
-        /*  let references = get_references(&self, id)?;
-        if references.len() > 0 {
-            return Err(HitError::CannotDeleteObjectWithReferences(id.to_string()));
-        } */
-
         let (parent_entry, parent) =
             get_parent_index_entry(self, &id)?.ok_or(HitError::CannotDeleteRootObject())?;
 
@@ -275,7 +258,6 @@ mod tests {
     use linked_hash_map::LinkedHashMap;
 
     use crate::index::Index;
-    use crate::plugins::Plugins;
     use crate::HitError;
     use crate::ObjectValue;
     use crate::Reference;
@@ -285,7 +267,7 @@ mod tests {
         let mut values = LinkedHashMap::new();
         values.insert("test".into(), ObjectValue::Bool(true));
         values.insert("testString".into(), ObjectValue::String("value".into()));
-        assert!(Index::new("id", values, Plugins::new()).is_ok());
+        assert!(Index::new("id", values).is_ok());
     }
 
     #[test]
@@ -296,7 +278,7 @@ mod tests {
             ObjectValue::Reference(Reference { id: "a".into() }),
         );
         assert!(matches!(
-            Index::new("id", values, Plugins::new()).err(),
+            Index::new("id", values).err(),
             Some(HitError::CanOnlySetScalarValuesInInsertedObject())
         ));
     }
@@ -309,7 +291,7 @@ mod tests {
             ObjectValue::VecReference(vec![Reference { id: "a".into() }]),
         );
         assert!(matches!(
-            Index::new("id", values, Plugins::new()).err(),
+            Index::new("id", values).err(),
             Some(HitError::CanOnlySetScalarValuesInInsertedObject())
         ));
     }
@@ -320,7 +302,7 @@ mod tests {
             "reference".into(),
             ObjectValue::SubObject(Reference { id: "a".into() }),
         );
-        assert!(Index::new("id", values, Plugins::new()).is_err());
+        assert!(Index::new("id", values).is_err());
     }
     #[test]
     fn it_should_fail_creating_a_new_index_with_subobject_array_values() {
@@ -329,14 +311,14 @@ mod tests {
             "reference".into(),
             ObjectValue::VecSubObjects(vec![Reference { id: "a".into() }]),
         );
-        assert!(Index::new("id", values, Plugins::new()).is_err());
+        assert!(Index::new("id", values).is_err());
     }
 
     #[test]
     fn it_should_get_existing_data() {
         let mut values = LinkedHashMap::new();
         values.insert("test".into(), ObjectValue::Bool(true));
-        let index = Index::new("id", values, Plugins::new()).ok().unwrap();
+        let index = Index::new("id", values).ok().unwrap();
 
         let item = index.get("id").unwrap();
         let item = item.borrow();

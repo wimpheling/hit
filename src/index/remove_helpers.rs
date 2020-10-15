@@ -11,7 +11,6 @@ pub fn get_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>
 }
 
 pub fn remove_object_helper(index: &mut Index, id: &str) -> Result<(), HitError> {
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     remove_object_children(index, id)?;
 
     //remove object from id list in parent
@@ -19,9 +18,6 @@ pub fn remove_object_helper(index: &mut Index, id: &str) -> Result<(), HitError>
     //remove object from index
     index.index.remove(&id.to_string());
 
-    for plugin in index.plugins.delete_plugins.iter() {
-        plugin.borrow_mut().on_after_delete_entry(&entry)?;
-    }
     Ok(())
 }
 

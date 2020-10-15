@@ -1,4 +1,3 @@
-use crate::index::index::IndexPlugins;
 use crate::index::{Index, IndexEntryProperty};
 use crate::object_data::{ObjectValue, ObjectValues};
 use crate::HitError;
@@ -10,10 +9,10 @@ pub struct IndexImporter {
 }
 
 impl IndexImporter {
-    pub fn new(id: &str, plugins: IndexPlugins) -> Self {
+    pub fn new(id: &str) -> Self {
         IndexImporter {
             collected_refs: HashMap::new(),
-            index: Index::new_for_import(id, plugins),
+            index: Index::new_for_import(id),
         }
     }
 
