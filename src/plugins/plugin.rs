@@ -1,10 +1,10 @@
 use std::rc::Rc;
 
-use crate::{index::IndexEntryProperty, ObjectValue};
+use crate::{index::IndexEntryProperty, HitEntry, ObjectValue};
 use crate::{object_data::ObjectValues, Hit};
 use crate::{HitError, Model};
 
-pub trait InitEntryPlugin<Entry> {
+pub trait InitEntryPlugin {
     fn on_init_add_entry(
         &mut self,
         model: Rc<Model>,
@@ -14,11 +14,11 @@ pub trait InitEntryPlugin<Entry> {
     );
 }
 
-pub trait AfterImportPlugin<Entry> {
+pub trait AfterImportPlugin {
     fn after_import(&mut self, hit: &Hit);
 }
 
-pub trait InitEntryAfterIndexPlugin<Entry> {
+pub trait InitEntryAfterIndexPlugin {
     fn for_each_entry(
         &mut self,
         model: Rc<Model>,
@@ -28,12 +28,12 @@ pub trait InitEntryAfterIndexPlugin<Entry> {
     );
 }
 
-pub trait DeletePlugin<Entry> {
-    fn on_before_delete_entry(&mut self, entry: &Entry) -> Result<(), HitError>;
-    fn on_after_delete_entry(&mut self, entry: &Entry) -> Result<(), HitError>;
+pub trait DeletePlugin {
+    fn on_before_delete_entry(&mut self, entry: &HitEntry) -> Result<(), HitError>;
+    fn on_after_delete_entry(&mut self, entry: &HitEntry) -> Result<(), HitError>;
 }
 
-pub trait Plugin<Entry> {
+pub trait Plugin {
     fn on_before_add_entry(
         &mut self,
         model: Rc<Model>,

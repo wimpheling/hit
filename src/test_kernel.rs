@@ -14,7 +14,7 @@ pub struct TestKernel {
     model: Rc<Model>,
 }
 
-impl Kernel<HitEntry> for TestKernel {
+impl Kernel for TestKernel {
     fn get_model(&self, name: &str) -> Result<Rc<Model>, HitError> {
         if name == "test/test" {
             return Ok(self.model.clone());
@@ -26,7 +26,7 @@ impl Kernel<HitEntry> for TestKernel {
     fn get_instantiable_models(&self) -> Vec<&Model> {
         return vec![&self.model];
     }
-    fn get_plugins(&self) -> Plugins<HitEntry> {
+    fn get_plugins(&self) -> Plugins {
         Plugins::new()
     }
     fn get_models(&self) -> Vec<String> {

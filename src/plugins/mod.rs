@@ -8,14 +8,14 @@ use std::clone::Clone;
 use std::rc::Rc;
 
 #[derive(Clone)]
-pub struct Plugins<U> {
-    pub init_plugins: Vec<Rc<RefCell<dyn InitEntryPlugin<U>>>>,
-    pub after_import_plugins: Vec<Rc<RefCell<dyn AfterImportPlugin<U>>>>,
-    pub plugins: Vec<Rc<RefCell<dyn Plugin<U>>>>,
-    pub delete_plugins: Vec<Rc<RefCell<dyn DeletePlugin<U>>>>,
+pub struct Plugins {
+    pub init_plugins: Vec<Rc<RefCell<dyn InitEntryPlugin>>>,
+    pub after_import_plugins: Vec<Rc<RefCell<dyn AfterImportPlugin>>>,
+    pub plugins: Vec<Rc<RefCell<dyn Plugin>>>,
+    pub delete_plugins: Vec<Rc<RefCell<dyn DeletePlugin>>>,
 }
 
-impl<U> Plugins<U> {
+impl Plugins {
     pub fn new() -> Self {
         Plugins {
             init_plugins: vec![],

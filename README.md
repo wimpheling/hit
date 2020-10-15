@@ -268,7 +268,6 @@ TODO : create the macro ^^
 
 # TODO : After stabilization
 
-- remove genericity from plugins
 - clarify API
 - do we need insert quietly ?
 - enums for string type

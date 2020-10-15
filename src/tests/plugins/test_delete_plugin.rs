@@ -12,7 +12,7 @@ struct TestDeletePlugin {
     after_delete_count: i32,
 }
 
-impl DeletePlugin<HitEntry> for TestDeletePlugin {
+impl DeletePlugin for TestDeletePlugin {
     fn on_before_delete_entry(&mut self, _entry: &HitEntry) -> Result<(), HitError> {
         self.before_delete_count = self.before_delete_count + 1;
         Ok(())
@@ -29,7 +29,7 @@ pub struct TestDeletePluginKernel {
     test_delete_plugin: Rc<RefCell<TestDeletePlugin>>,
 }
 
-impl Kernel<HitEntry> for TestDeletePluginKernel {
+impl Kernel for TestDeletePluginKernel {
     fn get_model(&self, _name: &str) -> Result<Rc<Model>, HitError> {
         return Ok(self.model.clone());
     }
@@ -38,7 +38,7 @@ impl Kernel<HitEntry> for TestDeletePluginKernel {
         return vec![&self.model];
     }
 
-    fn get_plugins(&self) -> crate::Plugins<HitEntry> {
+    fn get_plugins(&self) -> crate::Plugins {
         let mut plugins = Plugins::new();
         plugins.delete_plugins.push(self.test_delete_plugin.clone());
         plugins

@@ -12,7 +12,7 @@ pub struct TestEventsKernel {
     model: Rc<Model>,
 }
 
-impl Kernel<HitEntry> for TestEventsKernel {
+impl Kernel for TestEventsKernel {
     fn get_model(&self, _name: &str) -> Result<Rc<Model>, HitError> {
         return Ok(self.model.clone());
     }
@@ -21,7 +21,7 @@ impl Kernel<HitEntry> for TestEventsKernel {
         return vec![&self.model];
     }
 
-    fn get_plugins(&self) -> Plugins<HitEntry> {
+    fn get_plugins(&self) -> Plugins {
         Plugins::new()
     }
 

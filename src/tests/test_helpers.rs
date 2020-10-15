@@ -15,7 +15,7 @@ pub struct TestHelpersKernel {
     model3: Rc<Model>,
 }
 
-impl Kernel<HitEntry> for TestHelpersKernel {
+impl Kernel for TestHelpersKernel {
     fn get_model(&self, _name: &str) -> Result<Rc<Model>, HitError> {
         if _name == "test/test" {
             return Ok(self.model.clone());
@@ -33,7 +33,7 @@ impl Kernel<HitEntry> for TestHelpersKernel {
         return vec![&self.model];
     }
 
-    fn get_plugins(&self) -> crate::Plugins<HitEntry> {
+    fn get_plugins(&self) -> crate::Plugins {
         Plugins::new()
     }
 
