@@ -105,7 +105,7 @@ impl Plugin for ModelTypeIndexer {
     fn on_before_move_subobject(
         &mut self,
         _id: &str,
-        _property: IndexEntryProperty,
+        _target: IndexEntryProperty,
         _before_id: Option<String>,
         _instance: &Hit,
     ) -> Result<(), HitError> {
@@ -114,7 +114,8 @@ impl Plugin for ModelTypeIndexer {
     fn on_after_move_subobject(
         &mut self,
         _id: &str,
-        _property: IndexEntryProperty,
+        _target: IndexEntryProperty,
+        _original_parent: IndexEntryProperty,
         _before_id: Option<String>,
         _instance: &Hit,
     ) -> Result<(), HitError> {

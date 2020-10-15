@@ -181,33 +181,35 @@ impl Hit {
     pub fn move_object(
         &mut self,
         id: &str,
-        property: IndexEntryProperty,
+        target: IndexEntryProperty,
         before_id: Option<String>,
     ) -> Result<(), HitError> {
         //check destination is allowed
-        let target_model = self.get_model_or_error(&property.id)?;
+        let target_model = self.get_model_or_error(&target.id)?;
+        if !self.model_index.borrow().map.contains_key(id) {
+            return Err(HitError::IDNotFound(id.into()));
+        }
+        let original_parent = self
+            .get_parent(id)
+            .ok_or(HitError::CannotMoveRootObject())?;
 
         for plugin in self.plugins.plugins.iter() {
             plugin.borrow_mut().on_before_move_subobject(
-                id,
-                property.clone(),
+                id.clone(),
+                target.clone(),
                 before_id.clone(),
                 &self,
             )?;
         }
 
-        self.can_move_object(
-            id,
-            &property.id,
-            target_model.get_name(),
-            &property.property,
-        )?;
+        self.can_move_object(id, &target.id, target_model.get_name(), &target.property)?;
         self.index
-            .move_object(id, property.clone(), before_id.clone())?;
+            .move_object(id, target.clone(), before_id.clone())?;
         for plugin in self.plugins.plugins.iter() {
             plugin.borrow_mut().on_after_move_subobject(
-                id,
-                property.clone(),
+                id.clone(),
+                target.clone(),
+                original_parent.clone(),
                 before_id.clone(),
                 &self,
             )?;
@@ -482,8 +484,12 @@ impl Hit {
         }
     }
 
+    fn get_parent(&self, id: &str) -> Option<IndexEntryProperty> {
+        self.get(id)?.get_parent()
+    }
+
     pub fn get_parent_index(&self, id: &str) -> Option<usize> {
-        let parent = self.get(id)?.get_parent()?;
+        let parent = self.get_parent(id)?;
         match self.get_value(&parent.id, &parent.property)? {
             ObjectValue::VecSubObjects(parent_value) => {
                 parent_value.iter().position(|r| r.id == id)
