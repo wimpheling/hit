@@ -1,3 +1,4 @@
+#![feature(hash_set_entry)]
 #[macro_use]
 extern crate mopa;
 
@@ -17,6 +18,8 @@ mod test_kernel;
 mod tests;
 
 mod utils;
+
+pub mod prelude;
 
 pub use index::IndexEntryProperty;
 

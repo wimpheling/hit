@@ -4,12 +4,15 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 pub type Validators<T> = Vec<Rc<RefCell<dyn Validator<T>>>>;
+
 pub trait Validator<T> {
     fn validate(
         &self,
         value: &T,
         context: &ValidatorContext,
     ) -> Result<Option<Vec<ValidationError>>, HitError>;
+
+    fn on_kernel_init(&mut self, field_name: &str, model_name: &str) -> Result<(), HitError>;
 }
 
 pub struct MaxLength {
@@ -39,5 +42,9 @@ impl Validator<String> for MaxLength {
             }]));
         }
         return Ok(None);
+    }
+
+    fn on_kernel_init(&mut self, field_name: &str, model_name: &str) -> Result<(), HitError> {
+        Ok(())
     }
 }
