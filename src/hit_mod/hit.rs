@@ -297,12 +297,10 @@ impl Hit {
                 index: Rc::new(self),
             },
         )?;
+        self.errors.delete(id, property);
         match validation_errors {
-            None => {
-                self.errors.delete(id, property);
-            }
+            None => {}
             Some(validation_errors) => {
-                self.errors.delete(id, property);
                 for error in validation_errors.into_iter() {
                     self.errors.add(id, property, error);
                 }
@@ -484,7 +482,7 @@ impl Hit {
         }
     }
 
-    fn get_parent(&self, id: &str) -> Option<IndexEntryProperty> {
+    pub fn get_parent(&self, id: &str) -> Option<IndexEntryProperty> {
         self.get(id)?.get_parent()
     }
 
