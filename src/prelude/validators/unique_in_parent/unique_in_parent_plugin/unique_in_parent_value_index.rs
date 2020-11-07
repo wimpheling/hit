@@ -3,7 +3,7 @@ use std::collections::HashMap;
 #[derive(Clone)]
 struct UniqueInParentValueIndexValue {
     id: String,
-    value: String,
+    value: Option<String>,
 }
 
 pub struct UniqueInParentValueIndex(HashMap<String, Vec<UniqueInParentValueIndexValue>>);
@@ -31,13 +31,13 @@ impl UniqueInParentValueIndex {
         parent_id: &str,
         parent_property_name: &str,
         target_id: &str,
-        target_value: &str,
+        target_value: Option<String>,
     ) {
         let key = Self::get_key(property_name, parent_id, parent_property_name);
         let results = { self.get_results(&key, target_id) };
         results.push(UniqueInParentValueIndexValue {
             id: target_id.to_string(),
-            value: target_value.to_string(),
+            value: target_value,
         });
     }
     pub fn remove_value(

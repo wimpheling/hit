@@ -38,8 +38,13 @@ impl UniqueInParentIndex {
                     match data.get(field_name) {
                         Some(data) => match data {
                             ObjectValue::String(value) => {
-                                self.index
-                                    .set(field_name, &parent.id, &parent.property, id, value);
+                                self.index.set(
+                                    field_name,
+                                    &parent.id,
+                                    &parent.property,
+                                    id,
+                                    Some(value.to_string()),
+                                );
                             }
                             _ => {}
                         },
@@ -142,7 +147,7 @@ impl Plugin for UniqueInParentIndex {
                         &parent.id,
                         &parent.property,
                         &property.id,
-                        value,
+                        Some(value.to_string()),
                     );
                 }
                 _ => {}
@@ -168,6 +173,35 @@ impl Plugin for UniqueInParentIndex {
         before_id: Option<String>,
         instance: &crate::Hit,
     ) -> Result<(), HitError> {
+        let model = instance
+            .get_model(id)
+            .ok_or(HitError::NoModelForId(id.to_string()))?;
+        if self.model_names.contains(model.get_name()) {
+            for (field_name, _field) in model.get_fields().iter() {
+                if self.property_names.contains(field_name) {
+                    // Remove from origin index
+                    self.index.remove_value(
+                        field_name,
+                        &original_parent.id,
+                        &original_parent.property,
+                        id,
+                    );
+
+                    // Add to target index
+                    let value = {
+                        match instance.get_value(id, field_name) {
+                            Some(value) => match value {
+                                ObjectValue::String(value) => Some(value),
+                                _ => None,
+                            },
+                            None => None,
+                        }
+                    };
+                    self.index
+                        .set(field_name, &target.id, &target.property, id, value)
+                }
+            }
+        }
         Ok(())
     }
 }
