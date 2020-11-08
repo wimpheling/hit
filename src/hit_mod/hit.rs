@@ -1,6 +1,5 @@
 use linked_hash_map::LinkedHashMap;
 
-use crate::hit_mod::hit_entry::HitEntry;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::model::validators::ValidatorContext;
@@ -12,6 +11,7 @@ use crate::utils::ModelPropertyVectors;
 use crate::HitError;
 use crate::Kernel;
 use crate::{errors::ValidationError, events::FieldListenerRef};
+use crate::{events::Listeners, hit_mod::hit_entry::HitEntry};
 use crate::{hit_mod::helpers::can_move_object, ModelField};
 
 use std::cell::RefCell;
@@ -39,6 +39,7 @@ pub struct Hit {
     pub(in crate) plugins: HitPlugins,
     pub kernel: Rc<HitKernel>,
     pub(in crate) errors: ModelPropertyVectors<ValidationError>,
+    pub(in crate) errors_subscriptions: Listeners<Vec<ValidationError>>,
 }
 
 impl Hit {
@@ -64,10 +65,12 @@ impl Hit {
             plugins: kernel.get_plugins(),
             kernel: kernel,
             errors: ModelPropertyVectors::new(),
+            errors_subscriptions: Listeners::new(),
         };
         for (key, value) in values.iter() {
             hit.set(id, key, value.clone())?;
         }
+        hit.validate_all();
         Ok(hit)
     }
 
@@ -290,7 +293,7 @@ impl Hit {
 
         self.index.set_value(id, property, value.clone())?;
 
-        for plugin in self.plugins.plugins.iter() {
+        for plugin in { self.plugins.plugins.clone() }.iter() {
             plugin.borrow_mut().on_after_set_value(
                 IndexEntryProperty {
                     id: id.into(),
@@ -394,7 +397,7 @@ impl Hit {
             .insert(id.to_string(), new_object_model.clone());
 
         // after_add_entry hook
-        for plugin in self.get_plugins().plugins.iter() {
+        for plugin in { self.get_plugins().plugins.clone() }.iter() {
             plugin.borrow_mut().on_after_add_entry(
                 new_object_model.clone(),
                 &id,
@@ -412,6 +415,7 @@ impl Hit {
     pub fn get_main_object_id(&self) -> &Id {
         return &self.index.get_main_object_id();
     }
+
     pub fn subscribe_field(
         &self,
         id: &str,
@@ -428,6 +432,7 @@ impl Hit {
                 {
                     entry.borrow_mut().add_listener(field, listener.clone());
                 }
+
                 let listener_id = {
                     let borrow = listener.borrow();
                     borrow.get_unique_id().to_string()
@@ -437,6 +442,7 @@ impl Hit {
             None => Err(HitError::IDNotFound(id.to_string())),
         }
     }
+
     pub fn unsubscribe_field(
         &self,
         id: &str,
@@ -498,7 +504,7 @@ impl Hit {
             },
         )?;
         self.errors.delete(id, property);
-        match validation_errors {
+        match validation_errors.clone() {
             None => {}
             Some(validation_errors) => {
                 for error in validation_errors.into_iter() {
@@ -506,6 +512,19 @@ impl Hit {
                 }
             }
         }
+
+        // dispatch event
+
+        self.errors_subscriptions.dispatch_value(
+            &Self::get_validation_subscription_key(id, property),
+            &{
+                match validation_errors {
+                    Some(validation_errors) => validation_errors,
+                    None => vec![],
+                }
+            },
+        );
+
         Ok(())
     }
 
@@ -523,5 +542,57 @@ impl Hit {
             value.or(Some(ObjectValue::Null)).unwrap(),
         )?;
         Ok(())
+    }
+
+    fn get_validation_subscription_key(id: &str, field: &str) -> String {
+        format!("{}{}", id, field)
+    }
+    pub fn get_validation_errors(&self, id: &str, field: &str) -> Option<&Vec<ValidationError>> {
+        self.errors.get(id, field)
+    }
+    pub fn subscribe_field_validation(
+        &mut self,
+        id: &str,
+        field: &str,
+        listener: FieldListenerRef<Vec<ValidationError>>,
+    ) {
+        self.errors_subscriptions
+            .insert(&Self::get_validation_subscription_key(id, field), listener);
+    }
+
+    pub fn unsubscribe_field_validation(
+        &mut self,
+        id: &str,
+        field: &str,
+        listener_id: &str,
+    ) -> Result<(), HitError> {
+        self.errors_subscriptions.remove(
+            &Self::get_validation_subscription_key(id, field),
+            listener_id,
+        )
+    }
+
+    pub(in crate) fn validate_all(&mut self) {
+        for entry in self.iter() {
+            let id = entry.get_id();
+            // TODO : remove unwrap
+            let model = self.get_model(&id).unwrap();
+            for (field_name, field) in model.get_fields().iter() {
+                let field = field.borrow();
+                let value = self
+                    .get_value(&id, field_name)
+                    .or(Some(ObjectValue::Null))
+                    .unwrap();
+                // TODO: catch HitError
+                field.validate(
+                    &value,
+                    &ValidatorContext {
+                        id: &id,
+                        property: field_name,
+                        index: Rc::new(&self),
+                    },
+                );
+            }
+        }
     }
 }
