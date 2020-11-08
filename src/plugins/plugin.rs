@@ -48,7 +48,7 @@ pub trait Plugin {
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,
-        instance: &Hit,
+        instance: &mut Hit,
     );
 
     fn on_before_set_value(
@@ -63,7 +63,7 @@ pub trait Plugin {
         property: IndexEntryProperty,
         value: &ObjectValue,
         old_value: &Option<ObjectValue>,
-        instance: &Hit,
+        instance: &mut Hit,
     );
     fn on_before_move_subobject(
         &mut self,
@@ -78,6 +78,6 @@ pub trait Plugin {
         target: IndexEntryProperty,
         original_parent: IndexEntryProperty,
         before_id: Option<String>,
-        instance: &Hit,
+        instance: &mut Hit,
     ) -> Result<(), HitError>;
 }

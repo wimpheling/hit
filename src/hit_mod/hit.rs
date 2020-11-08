@@ -1,6 +1,5 @@
 use linked_hash_map::LinkedHashMap;
 
-use crate::hit_mod::helpers::can_move_object;
 use crate::hit_mod::hit_entry::HitEntry;
 use crate::index::Index;
 use crate::index::IndexEntryProperty;
@@ -13,6 +12,7 @@ use crate::utils::ModelPropertyVectors;
 use crate::HitError;
 use crate::Kernel;
 use crate::{errors::ValidationError, events::FieldListenerRef};
+use crate::{hit_mod::helpers::can_move_object, ModelField};
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -205,13 +205,14 @@ impl Hit {
         self.can_move_object(id, &target.id, target_model.get_name(), &target.property)?;
         self.index
             .move_object(id, target.clone(), before_id.clone())?;
-        for plugin in self.plugins.plugins.iter() {
+        let plugins = { self.plugins.plugins.clone() };
+        for plugin in plugins.iter() {
             plugin.borrow_mut().on_after_move_subobject(
                 id.clone(),
                 target.clone(),
                 original_parent.clone(),
                 before_id.clone(),
-                &self,
+                self,
             )?;
         }
         Ok(())
@@ -289,24 +290,6 @@ impl Hit {
 
         self.index.set_value(id, property, value.clone())?;
 
-        let validation_errors = model_field.borrow().validate(
-            &value,
-            &ValidatorContext {
-                id: &id.to_string(),
-                property: &property.to_string(),
-                index: Rc::new(self),
-            },
-        )?;
-        self.errors.delete(id, property);
-        match validation_errors {
-            None => {}
-            Some(validation_errors) => {
-                for error in validation_errors.into_iter() {
-                    self.errors.add(id, property, error);
-                }
-            }
-        }
-
         for plugin in self.plugins.plugins.iter() {
             plugin.borrow_mut().on_after_set_value(
                 IndexEntryProperty {
@@ -315,9 +298,12 @@ impl Hit {
                 },
                 &value,
                 &old_value,
-                &self,
+                self,
             );
         }
+
+        self._validate_field(model_field, id, property, value)?;
+
         Ok(())
     }
 
@@ -414,7 +400,7 @@ impl Hit {
                 &id,
                 values.clone(),
                 parent.clone(),
-                &self,
+                self,
             );
         }
         Ok(())
@@ -494,5 +480,48 @@ impl Hit {
             }
             _ => None,
         }
+    }
+
+    fn _validate_field(
+        &mut self,
+        model_field: &Rc<RefCell<dyn ModelField>>,
+        id: &str,
+        property: &str,
+        value: ObjectValue,
+    ) -> Result<(), HitError> {
+        let validation_errors = model_field.borrow().validate(
+            &value,
+            &ValidatorContext {
+                id: &id.to_string(),
+                property: &property.to_string(),
+                index: Rc::new(self),
+            },
+        )?;
+        self.errors.delete(id, property);
+        match validation_errors {
+            None => {}
+            Some(validation_errors) => {
+                for error in validation_errors.into_iter() {
+                    self.errors.add(id, property, error);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub fn validate_field(&mut self, id: &str, property: &str) -> Result<(), HitError> {
+        let model = self.get_model_or_error(id)?;
+        let model_field = model
+            .get_field(property)
+            .ok_or(HitError::PropertyNotFound(property.to_string()))?;
+
+        let value = self.get_value(id, property);
+        self._validate_field(
+            model_field,
+            id,
+            property,
+            value.or(Some(ObjectValue::Null)).unwrap(),
+        )?;
+        Ok(())
     }
 }
