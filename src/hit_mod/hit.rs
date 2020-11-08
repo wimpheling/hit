@@ -69,7 +69,7 @@ impl Hit {
         };
         for (key, value) in values.iter() {
             hit.set(id, key, value.clone())?;
-        }
+        }   
         hit.validate_all();
         Ok(hit)
     }
