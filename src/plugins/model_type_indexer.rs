@@ -82,7 +82,7 @@ impl Plugin for ModelTypeIndexer {
         id: &str,
         _data: ObjectValues,
         _parent: IndexEntryProperty,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) {
         self.add_to_index(model, id);
     }
@@ -91,7 +91,7 @@ impl Plugin for ModelTypeIndexer {
         _property: IndexEntryProperty,
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) {
     }
     fn on_before_set_value(
@@ -117,7 +117,7 @@ impl Plugin for ModelTypeIndexer {
         _target: IndexEntryProperty,
         _original_parent: IndexEntryProperty,
         _before_id: Option<String>,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) -> Result<(), HitError> {
         Ok(())
     }

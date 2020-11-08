@@ -33,7 +33,7 @@ impl Plugin for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) {
         self.after_insert_count += 1;
     }
@@ -53,7 +53,7 @@ impl Plugin for TestPlugin {
         _property: IndexEntryProperty,
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) {
         self.after_set_value_count += 1;
     }
@@ -74,7 +74,7 @@ impl Plugin for TestPlugin {
         _target: IndexEntryProperty,
         _original_parent: IndexEntryProperty,
         _before_id: Option<String>,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) -> Result<(), HitError> {
         self.after_move_subobject_count += 1;
         Ok(())
