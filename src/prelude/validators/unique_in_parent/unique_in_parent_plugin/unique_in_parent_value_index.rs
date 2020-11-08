@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 #[derive(Clone)]
-struct UniqueInParentValueIndexValue {
-    id: String,
-    value: Option<String>,
+pub struct UniqueInParentValueIndexValue {
+    pub id: String,
+    pub value: Option<String>,
 }
 
 pub struct UniqueInParentValueIndex(HashMap<String, Vec<UniqueInParentValueIndexValue>>);
@@ -16,7 +16,10 @@ impl UniqueInParentValueIndex {
     fn get_key(property_name: &str, parent_id: &str, parent_property_name: &str) -> String {
         format!("{}{}{}", property_name, parent_id, parent_property_name)
     }
-    fn get_results(
+    fn get_results(&self, key: &str) -> Option<&Vec<UniqueInParentValueIndexValue>> {
+        self.0.get(key)
+    }
+    fn get_results_and_remove_id(
         &mut self,
         key: &str,
         target_id: &str,
@@ -34,7 +37,7 @@ impl UniqueInParentValueIndex {
         target_value: Option<String>,
     ) {
         let key = Self::get_key(property_name, parent_id, parent_property_name);
-        let results = { self.get_results(&key, target_id) };
+        let results = { self.get_results_and_remove_id(&key, target_id) };
         results.push(UniqueInParentValueIndexValue {
             id: target_id.to_string(),
             value: target_value,
@@ -48,6 +51,15 @@ impl UniqueInParentValueIndex {
         target_id: &str,
     ) {
         let key = Self::get_key(property_name, parent_id, parent_property_name);
-        self.get_results(&key, target_id);
+        self.get_results_and_remove_id(&key, target_id);
+    }
+    pub fn get(
+        &self,
+        property_name: &str,
+        parent_id: &str,
+        parent_property_name: &str,
+    ) -> Option<&Vec<UniqueInParentValueIndexValue>> {
+        let key = Self::get_key(property_name, parent_id, parent_property_name);
+        self.get_results(&key)
     }
 }
