@@ -20,6 +20,12 @@ pub struct FieldTypeReference {
 }
 
 impl ModelField for FieldTypeReference {
+    fn on_kernel_init(&mut self, model_name: &str) {
+        for validator in self.validators.clone() {
+            let mut validator = validator.borrow_mut();
+            validator.on_kernel_init(&self.name, model_name);
+        }
+    }
     fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
             ObjectValue::Null => !self.required,

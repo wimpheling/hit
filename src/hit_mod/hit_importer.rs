@@ -1,14 +1,14 @@
 use linked_hash_map::LinkedHashMap;
 
-use crate::index::IndexEntryProperty;
-use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;
 use crate::HitError;
+use crate::{events::Listeners, index::IndexEntryProperty};
 use crate::{hit_mod::hit::ModelIndex, utils::ModelPropertyVectors};
 use crate::{
     hit_mod::{Hit, HitKernel, HitPlugins},
     ObjectValue,
 };
+use crate::{index::IndexImporter, validators::ValidatorContext};
 use std::cell::RefCell;
 
 use std::rc::Rc;
@@ -67,13 +67,19 @@ impl IndexModelImporter {
     }
 
     pub fn finish_import(self) -> Result<Hit, HitError> {
+        let errors = ModelPropertyVectors::new();
+        // validate every item
         let index = self.index.finish_import()?;
-        Ok(Hit {
+        let mut hit = Hit {
             index: index,
             model_index: self.model_index,
             plugins: self.plugins,
             kernel: self.kernel,
-            errors: ModelPropertyVectors::new(),
-        })
+            errors: errors,
+            errors_subscriptions: Listeners::new(),
+        };
+        hit.validate_all();
+
+        Ok(hit)
     }
 }

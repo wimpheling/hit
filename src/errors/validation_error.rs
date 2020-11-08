@@ -1,12 +1,13 @@
+use serde::Serialize;
 use std::collections::HashMap;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 pub enum ValidationErrorLevel {
     Warning,
     Error,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct ValidationError {
     pub key: String,
     pub level: ValidationErrorLevel,
@@ -19,14 +20,14 @@ impl ValidationError {
             key: key,
             level: ValidationErrorLevel::Warning,
             arguments: arguments,
-        }
+        };
     }
     pub fn error(key: String, arguments: Option<HashMap<String, String>>) -> ValidationError {
         return ValidationError {
             key: key,
             level: ValidationErrorLevel::Error,
             arguments: arguments,
-        }
+        };
     }
 }
 

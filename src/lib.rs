@@ -17,7 +17,7 @@ mod test_kernel;
 #[cfg(test)]
 mod tests;
 
-mod utils;
+pub mod utils;
 
 pub mod prelude;
 
