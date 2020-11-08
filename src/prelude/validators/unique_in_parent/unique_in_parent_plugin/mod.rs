@@ -7,15 +7,15 @@ use crate::{HitError, InitEntryPlugin};
 
 use self::unique_in_parent_value_index::UniqueInParentValueIndex;
 
-pub struct UniqueInParentIndex {
+pub struct UniqueInParentPlugin {
     pub(in crate::prelude::validators::unique_in_parent) property_names: HashSet<String>,
     pub(in crate::prelude::validators::unique_in_parent) model_names: HashSet<String>,
-    index: UniqueInParentValueIndex,
+    pub(in crate::prelude::validators::unique_in_parent) index: UniqueInParentValueIndex,
 }
 
-impl UniqueInParentIndex {
+impl UniqueInParentPlugin {
     pub fn new() -> Self {
-        UniqueInParentIndex {
+        UniqueInParentPlugin {
             property_names: HashSet::new(),
             model_names: HashSet::new(),
             index: UniqueInParentValueIndex::new(),
@@ -56,7 +56,7 @@ impl UniqueInParentIndex {
     }
 }
 
-impl InitEntryPlugin for UniqueInParentIndex {
+impl InitEntryPlugin for UniqueInParentPlugin {
     fn on_init_add_entry(
         &mut self,
         model: Rc<crate::Model>,
@@ -72,7 +72,7 @@ impl InitEntryPlugin for UniqueInParentIndex {
     }
 }
 
-impl DeletePlugin for UniqueInParentIndex {
+impl DeletePlugin for UniqueInParentPlugin {
     fn on_before_delete_entry(
         &mut self,
         entry: &crate::HitEntry,
@@ -99,7 +99,7 @@ impl DeletePlugin for UniqueInParentIndex {
     }
 }
 
-impl Plugin for UniqueInParentIndex {
+impl Plugin for UniqueInParentPlugin {
     fn on_before_add_entry(
         &mut self,
         model: Rc<crate::Model>,

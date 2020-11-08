@@ -6,23 +6,23 @@ use crate::{
 };
 use crate::{HitError, ValidationError};
 
-use super::unique_in_parent_plugin::UniqueInParentIndex;
+use super::unique_in_parent_plugin::UniqueInParentPlugin;
 static UNIQUE_IN_PARENT: &str = "UNIQUE_IN_PARENT";
 
 pub struct UniqueInParentValidator {
     property_name: String,
-    index: Rc<RefCell<UniqueInParentIndex>>,
+    index: Rc<RefCell<UniqueInParentPlugin>>,
 }
 
 impl UniqueInParentValidator {
-    fn get_parent_property_value(&self, context: &ValidatorContext) -> Option<Vec<Reference>> {
-        let index = context.index.clone();
-        let parent = index.get_parent(context.id)?;
-        let val = index.get_value(&parent.id, context.property)?;
-        match val {
-            crate::ObjectValue::VecSubObjects(val) => Some(val),
-            _ => None,
-        }
+    pub fn new(
+        property_name: String,
+        index: Rc<RefCell<UniqueInParentPlugin>>,
+    ) -> Rc<RefCell<UniqueInParentValidator>> {
+        Rc::new(RefCell::new(UniqueInParentValidator {
+            property_name: property_name,
+            index: index,
+        }))
     }
 }
 
@@ -32,28 +32,26 @@ impl Validator<String> for UniqueInParentValidator {
         value: &String,
         context: &ValidatorContext,
     ) -> Result<Option<Vec<ValidationError>>, HitError> {
-        // TODO : remove unwrap
-        let parent_sub_items = self.get_parent_property_value(context).unwrap();
-        for sub_item in parent_sub_items.iter() {
-            if sub_item.id == context.id {
-                continue;
-            }
-            // TODO : remove unwrap
-            let index = context.index.clone();
-            match index
-                .get_value(&sub_item.id, &self.property_name)
-                .unwrap_or(ObjectValue::Null)
-            {
-                ObjectValue::String(val) => {
-                    if &val == value {
+        let index = self.index.borrow();
+        let parent = context
+            .index
+            .get_parent(context.id)
+            .ok_or(HitError::NoParent())?;
+        let items = index
+            .index
+            .get(context.property, &parent.id, &parent.property);
+        match items {
+            Some(items) => {
+                for item in items.iter() {
+                    if item.id != context.id && item.value == Some(value.to_string()) {
                         return Ok(Some(vec![ValidationError::warning(
                             UNIQUE_IN_PARENT.into(),
                             None,
                         )]));
                     }
                 }
-                _ => {}
             }
+            None => {}
         }
         Ok(None)
     }
