@@ -1,5 +1,6 @@
 use linked_hash_map::LinkedHashMap;
 
+use crate::index::IndexImporter;
 use crate::object_data::ObjectValues;
 use crate::HitError;
 use crate::{events::Listeners, index::IndexEntryProperty};
@@ -8,7 +9,6 @@ use crate::{
     hit_mod::{Hit, HitKernel, HitPlugins},
     ObjectValue,
 };
-use crate::{index::IndexImporter, validators::ValidatorContext};
 use std::cell::RefCell;
 
 use std::rc::Rc;

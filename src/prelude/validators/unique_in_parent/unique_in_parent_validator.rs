@@ -6,7 +6,7 @@ use crate::{
 };
 use crate::{HitError, ValidationError};
 
-use super::unique_in_parent_plugin::UniqueInParentPlugin;
+use super::unique_in_parent_plugin::{UniqueInParentPlugin, UniqueInParentValueIndexValue};
 static UNIQUE_IN_PARENT: &str = "UNIQUE_IN_PARENT";
 
 pub struct UniqueInParentValidator {
@@ -24,14 +24,11 @@ impl UniqueInParentValidator {
             index: index,
         }))
     }
-}
 
-impl Validator<String> for UniqueInParentValidator {
-    fn validate(
+    fn get_items(
         &self,
-        value: &String,
         context: &ValidatorContext,
-    ) -> Result<Option<Vec<ValidationError>>, HitError> {
+    ) -> Result<Option<Vec<UniqueInParentValueIndexValue>>, HitError> {
         let index = self.index.borrow();
         let parent = context
             .index
@@ -40,6 +37,20 @@ impl Validator<String> for UniqueInParentValidator {
         let items = index
             .index
             .get(context.property, &parent.id, &parent.property);
+        match items {
+            Some(items) => Ok(Some(items.clone())),
+            None => Ok(None),
+        }
+    }
+}
+
+impl Validator<String> for UniqueInParentValidator {
+    fn validate(
+        &self,
+        value: &String,
+        context: &ValidatorContext,
+    ) -> Result<Option<Vec<ValidationError>>, HitError> {
+        let items = self.get_items(context)?;
         match items {
             Some(items) => {
                 for item in items.iter() {
