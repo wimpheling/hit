@@ -37,8 +37,6 @@ impl UniqueInParentPlugin {
                     match data.get(field_name) {
                         Some(data) => match data {
                             ObjectValue::String(value) => {
-                                println!("TEST DEBUG 21 ${:#?}", value);
-                                println!("TEST DEBUG 2 ${:#?}", self.index);
                                 self.index.borrow_mut().set(
                                     field_name,
                                     &parent.id,
@@ -46,7 +44,6 @@ impl UniqueInParentPlugin {
                                     id,
                                     Some(value.to_string()),
                                 );
-                                println!("TEST DEBUG 3 ${:#?}", self.index);
                             }
                             _ => {}
                         },

@@ -60,6 +60,6 @@ fn it_should_create_errors_when_names_are_not_unique() {
 
     assert_eq!(
         hit.get_validation_errors("id3", "name").unwrap(),
-        &vec![ValidationError::warning("A".into(), None)]
+        &vec![ValidationError::warning("UNIQUE_IN_PARENT".into(), None)]
     );
 }
