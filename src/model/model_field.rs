@@ -7,7 +7,7 @@ use mopa;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub trait ModelField: mopa::Any {
+pub trait ModelField {
     fn get_name(&self) -> String;
     fn validate(
         &self,
@@ -20,7 +20,7 @@ pub trait ModelField: mopa::Any {
     fn is_vec_subobject(&self) -> bool;
     fn on_kernel_init(&mut self, model_name: &str);
 }
-mopafy!(ModelField);
+// mopafy!(ModelField);
 
 pub type ModelFieldRef = Rc<RefCell<dyn ModelField>>;
 

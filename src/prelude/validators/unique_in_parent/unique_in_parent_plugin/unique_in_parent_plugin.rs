@@ -1,4 +1,4 @@
-use std::{collections::HashSet, rc::Rc};
+use std::{cell::RefCell, collections::HashSet, rc::Rc};
 
 use crate::{DeletePlugin, Hit, IndexEntryProperty, Model, ObjectValue, ObjectValues, Plugin};
 use crate::{HitError, InitEntryPlugin};
@@ -8,15 +8,16 @@ use super::unique_in_parent_value_index::UniqueInParentValueIndex;
 pub struct UniqueInParentPlugin {
     pub(in crate::prelude::validators::unique_in_parent) property_names: HashSet<String>,
     pub(in crate::prelude::validators::unique_in_parent) model_names: HashSet<String>,
-    pub(in crate::prelude::validators::unique_in_parent) index: UniqueInParentValueIndex,
+    pub(in crate::prelude::validators::unique_in_parent) index:
+        Rc<RefCell<UniqueInParentValueIndex>>,
 }
 
 impl UniqueInParentPlugin {
-    pub fn new() -> Self {
+    pub fn new(index: Rc<RefCell<UniqueInParentValueIndex>>) -> Self {
         UniqueInParentPlugin {
             property_names: HashSet::new(),
             model_names: HashSet::new(),
-            index: UniqueInParentValueIndex::new(),
+            index: index,
         }
     }
 
@@ -36,13 +37,16 @@ impl UniqueInParentPlugin {
                     match data.get(field_name) {
                         Some(data) => match data {
                             ObjectValue::String(value) => {
-                                self.index.set(
+                                println!("TEST DEBUG 21 ${:#?}", value);
+                                println!("TEST DEBUG 2 ${:#?}", self.index);
+                                self.index.borrow_mut().set(
                                     field_name,
                                     &parent.id,
                                     &parent.property,
                                     id,
                                     Some(value.to_string()),
                                 );
+                                println!("TEST DEBUG 3 ${:#?}", self.index);
                             }
                             _ => {}
                         },
@@ -62,6 +66,7 @@ impl UniqueInParentPlugin {
     ) -> Result<(), HitError> {
         match self
             .index
+            .borrow()
             .get(property_name, parent_id, parent_property_name)
         {
             Some(index) => {
@@ -110,8 +115,12 @@ impl DeletePlugin for UniqueInParentPlugin {
         for (name, _field) in model.get_fields().iter() {
             if self.property_names.contains(name) {
                 // Delete from index
-                self.index
-                    .remove_value(name, &parent.id, &parent.property, &entry.get_id());
+                self.index.borrow_mut().remove_value(
+                    name,
+                    &parent.id,
+                    &parent.property,
+                    &entry.get_id(),
+                );
             }
         }
         Ok(())
@@ -169,7 +178,7 @@ impl Plugin for UniqueInParentPlugin {
             let parent = instance.get_parent(&property.id).clone().unwrap();
             match value {
                 ObjectValue::String(value) => {
-                    self.index.set(
+                    self.index.borrow_mut().set(
                         &property.property,
                         &parent.id,
                         &parent.property,
@@ -208,7 +217,7 @@ impl Plugin for UniqueInParentPlugin {
             for (field_name, _field) in model.get_fields().iter() {
                 if self.property_names.contains(field_name) {
                     // Remove from origin index
-                    self.index.remove_value(
+                    self.index.borrow_mut().remove_value(
                         field_name,
                         &original_parent.id,
                         &original_parent.property,
@@ -231,8 +240,13 @@ impl Plugin for UniqueInParentPlugin {
                             None => None,
                         }
                     };
-                    self.index
-                        .set(field_name, &target.id, &target.property, id, value);
+                    self.index.borrow_mut().set(
+                        field_name,
+                        &target.id,
+                        &target.property,
+                        id,
+                        value,
+                    );
 
                     self.validate_index(instance, field_name, &target.id, &target.property)?;
                 }

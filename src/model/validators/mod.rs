@@ -1,9 +1,8 @@
 use crate::{errors::ValidationError, Hit};
 use crate::{errors::ValidationErrorLevel, HitError};
-use std::cell::RefCell;
 use std::rc::Rc;
 
-pub type Validators<T> = Vec<Rc<RefCell<dyn Validator<T>>>>;
+pub type Validators<T> = Vec<Box<dyn Validator<T>>>;
 
 pub trait Validator<T> {
     fn validate(

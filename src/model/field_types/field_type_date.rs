@@ -18,8 +18,7 @@ pub struct FieldTypeDate {
 
 impl ModelField for FieldTypeDate {
     fn on_kernel_init(&mut self, model_name: &str) {
-        for validator in self.validators.clone() {
-            let mut validator = validator.borrow_mut();
+        for validator in self.validators.iter_mut() {
             validator.on_kernel_init(&self.name, model_name);
         }
     }

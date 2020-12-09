@@ -84,15 +84,15 @@ fn create_test_events_model() -> Rc<Model> {
         },
         "references": FieldTypeReferenceArray {
             authorized_models: vec!["test/test".to_string()],
-            validators: vec![Rc::new(RefCell::new(IsNotId2Validator {}))],
+            validators: vec![Box::new(IsNotId2Validator {})],
         },
         "reference": FieldTypeReference {
             authorized_models: vec!["test/test".to_string()],
-            validators: vec![Rc::new(RefCell::new(IsNotId2Validator {}))],
+            validators: vec![Box::new(IsNotId2Validator {})],
         },
         "reference2": FieldTypeReference {
             authorized_models: vec!["test/test".to_string()],
-            validators: vec![Rc::new(RefCell::new(OnlyIdInReferenceValidator {}))],
+            validators: vec![Box::new(OnlyIdInReferenceValidator {})],
         }
     )
 }

@@ -3,6 +3,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 use crate::{
     field_types::{FieldTypeString, FieldTypeSubobjectArray},
     modele,
+    prelude::validators::unique_in_parent::unique_in_parent_plugin::UniqueInParentValueIndex,
     prelude::UniqueInParentPlugin,
     prelude::UniqueInParentValidator,
     utils::kernel_init,
@@ -51,12 +52,14 @@ impl Kernel for TestUniqueKernel {
 }
 
 pub fn create_test_unique_in_parent_kernel() -> TestUniqueKernel {
-    let unique_in_parent_plugin = Rc::new(RefCell::new(UniqueInParentPlugin::new()));
+    let value_index = Rc::new(RefCell::new(UniqueInParentValueIndex::new()));
+    let unique_in_parent_plugin =
+        Rc::new(RefCell::new(UniqueInParentPlugin::new(value_index.clone())));
     let mut models = HashMap::new();
     models.insert(String::from("testunique/project"), modele!("testunique/project", "Project" =>
         "name": FieldTypeString {
             required: true,
-            validators: vec![UniqueInParentValidator::new("name".to_string(), unique_in_parent_plugin.clone())]
+            validators: vec![UniqueInParentValidator::new("name".to_string(), unique_in_parent_plugin.clone(), value_index.clone())]
         },
         "folders": FieldTypeSubobjectArray {
             authorized_models: vec![String::from("testunique/project"), String::from("testunique/folder")]
@@ -66,7 +69,7 @@ pub fn create_test_unique_in_parent_kernel() -> TestUniqueKernel {
     models.insert(String::from("testunique/folder"), modele!("testunique/folder", "Folder" =>
         "name": FieldTypeString {
             required: true,
-            validators: vec![UniqueInParentValidator::new("name".to_string(), unique_in_parent_plugin.clone())]
+            validators: vec![UniqueInParentValidator::new("name".to_string(), unique_in_parent_plugin.clone(), value_index.clone())]
         },
         "folders": FieldTypeSubobjectArray {
             authorized_models: vec![String::from("testunique/project"), String::from("testunique/folder")]
