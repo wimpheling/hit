@@ -16,7 +16,7 @@ impl DeletePlugin for TestDeletePlugin {
     fn on_before_delete_entry(
         &mut self,
         _entry: &HitEntry,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) -> Result<(), HitError> {
         self.before_delete_count = self.before_delete_count + 1;
         Ok(())
@@ -25,7 +25,7 @@ impl DeletePlugin for TestDeletePlugin {
     fn on_after_delete_entry(
         &mut self,
         _entry: &HitEntry,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) -> Result<(), HitError> {
         self.after_delete_count = self.after_delete_count + 1;
         Ok(())

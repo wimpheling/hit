@@ -29,8 +29,16 @@ pub trait InitEntryAfterIndexPlugin {
 }
 
 pub trait DeletePlugin {
-    fn on_before_delete_entry(&mut self, entry: &HitEntry, instance: &Hit) -> Result<(), HitError>;
-    fn on_after_delete_entry(&mut self, entry: &HitEntry, instance: &Hit) -> Result<(), HitError>;
+    fn on_before_delete_entry(
+        &mut self,
+        entry: &HitEntry,
+        instance: &mut Hit,
+    ) -> Result<(), HitError>;
+    fn on_after_delete_entry(
+        &mut self,
+        entry: &HitEntry,
+        instance: &mut Hit,
+    ) -> Result<(), HitError>;
 }
 
 pub trait Plugin {

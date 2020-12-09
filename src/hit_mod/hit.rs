@@ -69,7 +69,7 @@ impl Hit {
         };
         for (key, value) in values.iter() {
             hit.set(id, key, value.clone())?;
-        }   
+        }
         hit.validate_all();
         Ok(hit)
     }
@@ -140,13 +140,13 @@ impl Hit {
             .ok_or(HitError::IDNotFound(id.to_string()))?;
 
         // before plugins call
-        for plugin in self.plugins.delete_plugins.iter() {
+        for plugin in self.plugins.delete_plugins.clone().iter() {
             plugin.borrow_mut().on_before_delete_entry(
                 &HitEntry {
                     entry: entry.clone(),
                     model: model.clone(),
                 },
-                &self,
+                self,
             )?;
         }
 
@@ -159,13 +159,13 @@ impl Hit {
         }
 
         // after plugins call
-        for plugin in self.plugins.delete_plugins.iter() {
+        for plugin in self.plugins.delete_plugins.clone().iter() {
             plugin.borrow_mut().on_after_delete_entry(
                 &HitEntry {
                     entry: entry.clone(),
                     model: model.clone(),
                 },
-                &self,
+                self,
             )?;
         }
         Ok(id_list)
