@@ -53,7 +53,6 @@ impl Validator<String> for UniqueInParentValidator {
         let items = self.get_items(context)?;
         match items {
             Some(items) => {
-                println!("TEST DEBUG {:#?}", items);
                 for item in items.iter() {
                     if item.id != context.id && item.value == Some(value.to_string()) {
                         return Ok(Some(vec![ValidationError::warning(
