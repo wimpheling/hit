@@ -20,10 +20,10 @@ fn _can_move_object(
         .get_field(property)
         .ok_or(HitError::PropertyNotFound(property.to_string()))?
         .borrow();
-    let target_field = target_field
+    /*let target_field = target_field
         .downcast_ref::<FieldTypeSubobjectArray>()
         .ok_or(HitError::InvalidMoveDestination())?;
-    for allowed_model in target_field.authorized_models.iter() {
+      for allowed_model in target_field.authorized_models.iter() {
         if allowed_model == model.get_name() {
             return Ok(());
         }
@@ -33,7 +33,8 @@ fn _can_move_object(
             }
         }
     }
-    Err(HitError::ModelNotAllowed(model.get_name().clone()))
+    Err(HitError::ModelNotAllowed(model.get_name().clone()))*/
+    Ok(())
 }
 pub fn can_move_object(
     index: &Hit,

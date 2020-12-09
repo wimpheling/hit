@@ -1,42 +1,42 @@
 use std::{cell::RefCell, clone::Clone, rc::Rc};
 
-use crate::{
-    model::validators::{Validator, ValidatorContext},
-    ObjectValue, Reference,
-};
+use crate::model::validators::{Validator, ValidatorContext};
 use crate::{HitError, ValidationError};
 
-use super::unique_in_parent_plugin::{UniqueInParentPlugin, UniqueInParentValueIndexValue};
+use super::unique_in_parent_plugin::{
+    UniqueInParentPlugin, UniqueInParentValueIndex, UniqueInParentValueIndexValue,
+};
 static UNIQUE_IN_PARENT: &str = "UNIQUE_IN_PARENT";
 
 pub struct UniqueInParentValidator {
     property_name: String,
     index: Rc<RefCell<UniqueInParentPlugin>>,
+    value_index: Rc<RefCell<UniqueInParentValueIndex>>,
 }
 
 impl UniqueInParentValidator {
     pub fn new(
         property_name: String,
         index: Rc<RefCell<UniqueInParentPlugin>>,
-    ) -> Rc<RefCell<UniqueInParentValidator>> {
-        Rc::new(RefCell::new(UniqueInParentValidator {
+        value_index: Rc<RefCell<UniqueInParentValueIndex>>,
+    ) -> Box<UniqueInParentValidator> {
+        Box::new(UniqueInParentValidator {
             property_name: property_name,
             index: index,
-        }))
+            value_index: value_index,
+        })
     }
 
     fn get_items(
         &self,
         context: &ValidatorContext,
     ) -> Result<Option<Vec<UniqueInParentValueIndexValue>>, HitError> {
-        let index = self.index.borrow();
+        let value_index = self.value_index.borrow();
         let parent = context
             .index
             .get_parent(context.id)
             .ok_or(HitError::NoParent())?;
-        let items = index
-            .index
-            .get(context.property, &parent.id, &parent.property);
+        let items = value_index.get(context.property, &parent.id, &parent.property);
         match items {
             Some(items) => Ok(Some(items.clone())),
             None => Ok(None),
@@ -53,6 +53,7 @@ impl Validator<String> for UniqueInParentValidator {
         let items = self.get_items(context)?;
         match items {
             Some(items) => {
+                println!("TEST DEBUG {:#?}", items);
                 for item in items.iter() {
                     if item.id != context.id && item.value == Some(value.to_string()) {
                         return Ok(Some(vec![ValidationError::warning(

@@ -75,7 +75,7 @@ pub fn run_validators<T>(
     context: &ValidatorContext,
 ) -> Result<(), HitError> {
     for validator in validators.iter() {
-        let errors = validator.borrow().validate(value, context)?;
+        let errors = validator.validate(value, context)?;
         match errors {
             Some(errors) => all_errors.extend(errors),
             None => {}
