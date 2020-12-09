@@ -49,12 +49,16 @@ impl DeletePlugin for ModelTypeIndexer {
     fn on_before_delete_entry(
         &mut self,
         _entry: &HitEntry,
-        _instance: &Hit,
+        _instance: &mut Hit,
     ) -> Result<(), HitError> {
         Ok(())
     }
 
-    fn on_after_delete_entry(&mut self, entry: &HitEntry, _instance: &Hit) -> Result<(), HitError> {
+    fn on_after_delete_entry(
+        &mut self,
+        entry: &HitEntry,
+        _instance: &mut Hit,
+    ) -> Result<(), HitError> {
         let model = entry.get_model();
         let model_type = model.get_name();
         let id = entry.get_id();

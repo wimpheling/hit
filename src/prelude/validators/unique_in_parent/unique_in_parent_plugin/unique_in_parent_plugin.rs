@@ -97,7 +97,7 @@ impl DeletePlugin for UniqueInParentPlugin {
     fn on_before_delete_entry(
         &mut self,
         entry: &crate::HitEntry,
-        instance: &crate::Hit,
+        instance: &mut crate::Hit,
     ) -> Result<(), HitError> {
         Ok(())
     }
@@ -105,7 +105,7 @@ impl DeletePlugin for UniqueInParentPlugin {
     fn on_after_delete_entry(
         &mut self,
         entry: &crate::HitEntry,
-        _instance: &crate::Hit,
+        _instance: &mut crate::Hit,
     ) -> Result<(), HitError> {
         let model = entry.get_model();
         let parent = entry.get_parent().ok_or(HitError::NoParent())?;
@@ -118,6 +118,7 @@ impl DeletePlugin for UniqueInParentPlugin {
                     &parent.property,
                     &entry.get_id(),
                 );
+                self.validate_index(_instance, name, &parent.id, &parent.property)?;
             }
         }
         Ok(())
