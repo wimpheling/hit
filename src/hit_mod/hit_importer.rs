@@ -78,7 +78,7 @@ impl IndexModelImporter {
             errors: errors,
             errors_subscriptions: Listeners::new(),
         };
-        hit.validate_all();
+        hit.validate_all()?;
 
         Ok(hit)
     }
