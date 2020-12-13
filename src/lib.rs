@@ -1,6 +1,5 @@
 #![feature(hash_set_entry)]
 #[macro_use]
-extern crate mopa;
 
 mod errors;
 pub mod events;
