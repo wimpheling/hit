@@ -1,8 +1,8 @@
 use linked_hash_map::LinkedHashMap;
 
 use crate::{
-    field_types::*, modele, validators::Validator, Hit, IndexEntryProperty, ObjectValue, Reference,
-    ValidationError, ValidationErrorLevel,
+    export, field_types::*, import, modele, validators::Validator, Hit, IndexEntryProperty,
+    ObjectValue, Reference, ValidationError, ValidationErrorLevel,
 };
 use std::{cell::RefCell, rc::Rc};
 
@@ -159,6 +159,32 @@ fn it_should_return_an_error_on_reference_arrays_when_validator_detects_it() {
 }
 
 #[test]
+fn it_should_validate_when_importing() {
+    let mut hit = get_test_hit();
+    hit.set(
+        "id",
+        "reference",
+        ObjectValue::Reference(Reference { id: "id2".into() }),
+    )
+    .expect("Error");
+    let exported = export(&hit).expect("Error");
+    println!("Exported {:#?}", exported.to_string());
+    let kernel = Rc::new(create_test_events_kernel());
+
+    println!("BBBB");
+    let hit2 = import(&exported, kernel).expect("Error");
+    println!("FFF {:#?}", hit2.get_value("id", "reference"));
+    assert_eq!(
+        hit2.get_validation_errors("id", "reference").unwrap(),
+        &vec![ValidationError {
+            key: "TEST_ERROR".into(),
+            level: ValidationErrorLevel::Error,
+            arguments: Some(vec![("id".into(), "id2".into())].into_iter().collect()),
+        }]
+    );
+}
+
+#[test]
 fn it_should_return_an_error_on_set_when_validator_detects_it() {
     let mut hit = get_test_hit();
     hit.set(
@@ -168,7 +194,7 @@ fn it_should_return_an_error_on_set_when_validator_detects_it() {
     )
     .expect("Error");
     assert_eq!(
-        hit.errors.get("id", "reference").unwrap(),
+        hit.get_validation_errors("id", "reference").unwrap(),
         &vec![ValidationError {
             key: "TEST_ERROR".into(),
             level: ValidationErrorLevel::Error,

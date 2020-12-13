@@ -38,6 +38,7 @@ impl ModelField for FieldTypeReferenceArray {
     }
     fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnHitError {
         match value {
+            ObjectValue::Null => Ok(None),
             ObjectValue::Reference(value) => {
                 let mut errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
