@@ -16,5 +16,6 @@ readme = "README.md"
 chrono = "0.4"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
+mopa = "0.2.2"
 thiserror = "1.0"
 linked-hash-map = "0.5.3"
