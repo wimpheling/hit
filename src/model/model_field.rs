@@ -3,10 +3,11 @@ use crate::object_data::ObjectValue;
 use crate::HitError;
 use crate::{errors::ValidationError, model::validators::ValidatorContext};
 use linked_hash_map::LinkedHashMap;
+use mopa;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub trait ModelField {
+pub trait ModelField: mopa::Any {
     fn get_name(&self) -> String;
     fn validate(
         &self,
@@ -19,6 +20,7 @@ pub trait ModelField {
     fn is_vec_subobject(&self) -> bool;
     fn on_kernel_init(&mut self, model_name: &str);
 }
+mopafy!(ModelField);
 
 pub type ModelFieldRef = Rc<RefCell<dyn ModelField>>;
 
