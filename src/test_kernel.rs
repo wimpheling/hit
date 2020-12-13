@@ -1,11 +1,11 @@
 use crate::kernel::Kernel;
-use crate::model::field_types::FieldTypeReference;
 use crate::model::field_types::FieldTypeReferenceArray;
 use crate::model::field_types::FieldTypeString;
 use crate::model::field_types::FieldTypeSubobjectArray;
 use crate::model::Model;
 use crate::plugins::Plugins;
 use crate::HitError;
+use crate::{field_types::FieldTypeFloat, model::field_types::FieldTypeReference};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -54,11 +54,10 @@ pub fn create_test_kernel() -> TestKernel {
     );
     model.fields.insert(
         String::from("age"),
-        Rc::new(RefCell::new(FieldTypeString {
+        Rc::new(RefCell::new(FieldTypeFloat {
             name: String::from("age"),
             required: true,
             validators: vec![],
-            _enum: None,
         })),
     );
     model.fields.insert(
