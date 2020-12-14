@@ -32,13 +32,14 @@ impl UniqueInParentValidator {
         context: &ValidatorContext,
     ) -> Result<Option<Vec<UniqueInParentValueIndexValue>>, HitError> {
         let value_index = self.value_index.borrow();
-        let parent = context
-            .index
-            .get_parent(context.id)
-            .ok_or(HitError::NoParent())?;
-        let items = value_index.get(context.property, &parent.id, &parent.property);
-        match items {
-            Some(items) => Ok(Some(items.clone())),
+        match context.index.get_parent(context.id) {
+            Some(parent) => {
+                let items = value_index.get(context.property, &parent.id, &parent.property);
+                match items {
+                    Some(items) => Ok(Some(items.clone())),
+                    None => Ok(None),
+                }
+            }
             None => Ok(None),
         }
     }
