@@ -458,22 +458,6 @@ impl Hit {
         }
     }
 
-    pub fn iter(&self) -> Option<HitEntry> {
-        // Let's loop until we find something that should not be filtered.
-        loop {
-            match self.model_index.borrow().map.iter().next() {
-                Some((id, model)) => {
-                    let entry = self.index.get(&id)?;
-                    return Some(HitEntry {
-                        entry: entry.clone(),
-                        model: model.clone(),
-                    });
-                }
-                None => return None,
-            }
-        }
-    }
-
     pub fn get_parent(&self, id: &str) -> Option<IndexEntryProperty> {
         self.get(id)?.get_parent()
     }
@@ -573,32 +557,18 @@ impl Hit {
     }
 
     pub(in crate) fn validate_all(&mut self) -> Result<(), HitError> {
-        for entry in self.iter() {
-            let id = entry.get_id();
-            // TODO : remove unwrap
-            let model = self.get_model(&id).unwrap();
-            println!("ID {:#?}", id);
+        let model_index = self.model_index.borrow().map.clone();
+
+        for (id, model) in model_index.iter() {
             for (field_name, _field) in model.get_fields().iter() {
-                println!("LLL {:#?}", field_name);
-                let model_field = entry
-                    .model
+                let model_field = model
                     .get_field(field_name)
                     .ok_or(HitError::PropertyNotFound(field_name.to_string()))?;
                 let value = self
                     .get_value(&id, field_name)
                     .or(Some(ObjectValue::Null))
                     .unwrap();
-                println!("LLL VALUE {:#?}", value);
                 self._validate_field(model_field, &id, field_name, value)?;
-                /*
-                field.validate(
-                    &value,
-                    &ValidatorContext {
-                        id: &id,
-                        property: field_name,
-                        index: Rc::new(&self),
-                    },
-                )?; */
             }
         }
         Ok(())
