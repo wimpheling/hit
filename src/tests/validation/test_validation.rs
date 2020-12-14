@@ -168,12 +168,9 @@ fn it_should_validate_when_importing() {
     )
     .expect("Error");
     let exported = export(&hit).expect("Error");
-    println!("Exported {:#?}", exported.to_string());
     let kernel = Rc::new(create_test_events_kernel());
 
-    println!("BBBB");
     let hit2 = import(&exported, kernel).expect("Error");
-    println!("FFF {:#?}", hit2.get_value("id", "reference"));
     assert_eq!(
         hit2.get_validation_errors("id", "reference").unwrap(),
         &vec![ValidationError {
