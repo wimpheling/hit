@@ -39,14 +39,15 @@ impl ModelField for FieldTypeReferenceArray {
     fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnHitError {
         match value {
             ObjectValue::Null => Ok(None),
-            ObjectValue::Reference(value) => {
+            ObjectValue::VecReference(value) => {
                 let mut errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
-                let _entry = check_reference_exists(value, context)?;
+                // TODO
+                /*  let _entry = check_reference_exists(value, context)?;
                 run_validators(&self.validators, value, &mut errors, context)?;
                 if errors.len() > 0 {
                     return Ok(Some(errors));
-                }
+                } */
                 return Ok(None);
             }
             _ => Err(HitError::InvalidDataType()),

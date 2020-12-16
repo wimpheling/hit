@@ -35,6 +35,7 @@ pub fn get_value_as_string(value: &Value) -> Result<String, JSONImportError> {
         _ => Err(JSONImportError::InvalidTypeShouldBeAString()),
     }
 }
+/*
 pub fn get_value_as_u32(value: &Value) -> Result<u32, JSONImportError> {
     match value {
         Value::Number(value) => match value.as_u64() {
@@ -43,7 +44,7 @@ pub fn get_value_as_u32(value: &Value) -> Result<u32, JSONImportError> {
         },
         _ => Err(JSONImportError::InvalidTypeShouldBeAString()),
     }
-}
+} */
 
 pub fn get_object_property(
     object: &JSONObject,
