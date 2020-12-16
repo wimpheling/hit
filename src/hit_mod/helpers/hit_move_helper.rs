@@ -14,6 +14,7 @@ fn _can_move_object(
     _target_model: Rc<Model>,
     _property: &str,
 ) -> Result<(), HitError> {
+    // TODO : should this be implemented ?
     /* let model = index
          .get_model(id)
          .ok_or(HitError::NoModelForId(id.to_string()))?;
