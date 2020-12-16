@@ -19,7 +19,7 @@ impl Validator<String> for StringEnumValidator {
         return Ok(Some(vec![ValidationError::warning("A".into(), None)]));
     }
 
-    fn on_kernel_init(&mut self, field_name: &str, model_name: &str) -> Result<(), HitError> {
+    fn on_kernel_init(&mut self, _field_name: &str, _model_namee: &str) -> Result<(), HitError> {
         Ok(())
     }
 }

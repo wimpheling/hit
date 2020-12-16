@@ -4,7 +4,7 @@ use crate::{
     export, field_types::*, import, modele, validators::Validator, Hit, IndexEntryProperty,
     ObjectValue, Reference, ValidationError, ValidationErrorLevel,
 };
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 use crate::{HitError, Kernel, Model, Plugins};
 
@@ -47,7 +47,7 @@ impl Validator<Reference> for IsNotId2Validator {
         Ok(None)
     }
 
-    fn on_kernel_init(&mut self, field_name: &str, model_name: &str) -> Result<(), HitError> {
+    fn on_kernel_init(&mut self, _field_name: &str, _model_namee: &str) -> Result<(), HitError> {
         Ok(())
     }
 }
@@ -69,7 +69,7 @@ impl Validator<Reference> for OnlyIdInReferenceValidator {
         Ok(None)
     }
 
-    fn on_kernel_init(&mut self, field_name: &str, model_name: &str) -> Result<(), HitError> {
+    fn on_kernel_init(&mut self, _field_name: &str, _model_namee: &str) -> Result<(), HitError> {
         Ok(())
     }
 }

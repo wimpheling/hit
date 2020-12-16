@@ -38,6 +38,7 @@ impl UniqueInParentPlugin {
                         Some(data) => match data {
                             ObjectValue::String(value) => {
                                 self.index.borrow_mut().set(
+                                    // TODO : use the propertyname defined in the validator config
                                     field_name,
                                     &parent.id,
                                     &parent.property,
@@ -96,8 +97,8 @@ impl InitEntryPlugin for UniqueInParentPlugin {
 impl DeletePlugin for UniqueInParentPlugin {
     fn on_before_delete_entry(
         &mut self,
-        entry: &crate::HitEntry,
-        instance: &mut crate::Hit,
+        _entry: &crate::HitEntry,
+        _instance: &mut crate::Hit,
     ) -> Result<(), HitError> {
         Ok(())
     }
@@ -128,11 +129,11 @@ impl DeletePlugin for UniqueInParentPlugin {
 impl Plugin for UniqueInParentPlugin {
     fn on_before_add_entry(
         &mut self,
-        model: Rc<crate::Model>,
-        id: &str,
-        data: crate::ObjectValues,
-        parent: crate::IndexEntryProperty,
-        instance: &crate::Hit,
+        _model: Rc<crate::Model>,
+        _id: &str,
+        _data: crate::ObjectValues,
+        _parent: crate::IndexEntryProperty,
+        _instance: &crate::Hit,
     ) {
     }
 
@@ -157,10 +158,10 @@ impl Plugin for UniqueInParentPlugin {
 
     fn on_before_set_value(
         &mut self,
-        property: crate::IndexEntryProperty,
-        value: &ObjectValue,
-        old_value: &Option<ObjectValue>,
-        instance: &crate::Hit,
+        _property: crate::IndexEntryProperty,
+        _value: &ObjectValue,
+        _old_value: &Option<ObjectValue>,
+        _instance: &crate::Hit,
     ) {
     }
 
