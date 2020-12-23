@@ -134,7 +134,8 @@ impl Plugin for UniqueInParentPlugin {
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
         _instance: &crate::Hit,
-    ) {
+    ) -> Result<(), HitError> {
+        Ok(())
     }
 
     fn on_after_add_entry(
@@ -144,16 +145,17 @@ impl Plugin for UniqueInParentPlugin {
         data: crate::ObjectValues,
         parent: crate::IndexEntryProperty,
         instance: &mut crate::Hit,
-    ) {
+    ) -> Result<(), HitError> {
         self.handle_new_object(model.clone(), id, data, parent.clone());
         if self.model_names.contains(model.get_name()) {
             for (field_name, _field) in model.get_fields().iter() {
                 // only for matched field names
                 if self.property_names.contains(field_name) {
-                    self.validate_index(instance, field_name, &parent.id, &parent.property);
+                    self.validate_index(instance, field_name, &parent.id, &parent.property)?;
                 }
             }
         }
+        Ok(())
     }
 
     fn on_before_set_value(
@@ -162,7 +164,8 @@ impl Plugin for UniqueInParentPlugin {
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
         _instance: &crate::Hit,
-    ) {
+    ) -> Result<(), HitError> {
+        Ok(())
     }
 
     fn on_after_set_value(
@@ -171,7 +174,7 @@ impl Plugin for UniqueInParentPlugin {
         value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
         instance: &mut crate::Hit,
-    ) {
+    ) -> Result<(), HitError> {
         if self.property_names.contains(&property.property) {
             // TODO handle panic
             let parent = instance.get_parent(&property.id).clone().unwrap();
@@ -184,11 +187,17 @@ impl Plugin for UniqueInParentPlugin {
                         &property.id,
                         Some(value.to_string()),
                     );
-                    self.validate_index(instance, &property.property, &parent.id, &parent.property);
+                    self.validate_index(
+                        instance,
+                        &property.property,
+                        &parent.id,
+                        &parent.property,
+                    )?;
                 }
                 _ => {}
             }
         }
+        Ok(())
     }
 
     fn on_before_move_subobject(

@@ -18,7 +18,7 @@ pub trait ModelField: mopa::Any {
     fn accepts_model(&self, model: &Model) -> bool;
     fn is_vec_reference(&self) -> bool;
     fn is_vec_subobject(&self) -> bool;
-    fn on_kernel_init(&mut self, model_name: &str);
+    fn on_kernel_init(&mut self, model_name: &str) -> Result<(), HitError>;
 }
 mopafy!(ModelField);
 

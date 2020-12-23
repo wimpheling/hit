@@ -20,10 +20,11 @@ pub struct FieldTypeReference {
 }
 
 impl ModelField for FieldTypeReference {
-    fn on_kernel_init(&mut self, model_name: &str) {
+    fn on_kernel_init(&mut self, model_name: &str) -> Result<(), HitError> {
         for validator in self.validators.iter_mut() {
-            validator.on_kernel_init(&self.name, model_name);
+            validator.on_kernel_init(&self.name, model_name)?;
         }
+        Ok(())
     }
     fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {

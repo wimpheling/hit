@@ -51,7 +51,7 @@ impl Kernel for TestUniqueKernel {
     }
 }
 
-pub fn create_test_unique_in_parent_kernel() -> TestUniqueKernel {
+pub fn create_test_unique_in_parent_kernel() -> Result<TestUniqueKernel, HitError> {
     let value_index = Rc::new(RefCell::new(UniqueInParentValueIndex::new()));
     let unique_in_parent_plugin =
         Rc::new(RefCell::new(UniqueInParentPlugin::new(value_index.clone())));
@@ -80,6 +80,6 @@ pub fn create_test_unique_in_parent_kernel() -> TestUniqueKernel {
         models: models,
         unique_in_parent_plugin: unique_in_parent_plugin,
     };
-    kernel_init(kernel.models.clone());
-    kernel
+    kernel_init(kernel.models.clone())?;
+    Ok(kernel)
 }

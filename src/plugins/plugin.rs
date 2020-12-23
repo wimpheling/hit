@@ -49,7 +49,8 @@ pub trait Plugin {
         data: ObjectValues,
         parent: IndexEntryProperty,
         instance: &Hit,
-    );
+    ) -> Result<(), HitError>;
+
     fn on_after_add_entry(
         &mut self,
         model: Rc<Model>,
@@ -57,7 +58,7 @@ pub trait Plugin {
         data: ObjectValues,
         parent: IndexEntryProperty,
         instance: &mut Hit,
-    );
+    ) -> Result<(), HitError>;
 
     fn on_before_set_value(
         &mut self,
@@ -65,14 +66,16 @@ pub trait Plugin {
         value: &ObjectValue,
         old_value: &Option<ObjectValue>,
         instance: &Hit,
-    );
+    ) -> Result<(), HitError>;
+
     fn on_after_set_value(
         &mut self,
         property: IndexEntryProperty,
         value: &ObjectValue,
         old_value: &Option<ObjectValue>,
         instance: &mut Hit,
-    );
+    ) -> Result<(), HitError>;
+
     fn on_before_move_subobject(
         &mut self,
         id: &str,
@@ -80,6 +83,7 @@ pub trait Plugin {
         before_id: Option<String>,
         instance: &Hit,
     ) -> Result<(), HitError>;
+
     fn on_after_move_subobject(
         &mut self,
         id: &str,

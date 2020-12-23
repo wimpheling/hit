@@ -16,10 +16,11 @@ pub struct FieldTypeBool {
 }
 
 impl ModelField for FieldTypeBool {
-    fn on_kernel_init(&mut self, model_name: &str) {
+    fn on_kernel_init(&mut self, model_name: &str) -> Result<(), HitError> {
         for validator in self.validators.iter_mut() {
-            validator.on_kernel_init(&self.name, model_name);
+            validator.on_kernel_init(&self.name, model_name)?;
         }
+        Ok(())
     }
     fn get_name(&self) -> String {
         return String::from(&self.name);

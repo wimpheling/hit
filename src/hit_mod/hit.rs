@@ -276,7 +276,7 @@ impl Hit {
                 &value,
                 &old_value,
                 &self,
-            );
+            )?;
         }
 
         //does the field accept the object value
@@ -302,7 +302,7 @@ impl Hit {
                 &value,
                 &old_value,
                 self,
-            );
+            )?;
         }
 
         self._validate_field(model_field, id, property, value)?;
@@ -369,7 +369,7 @@ impl Hit {
                 values.clone(),
                 parent.clone(),
                 &self,
-            );
+            )?;
         }
 
         let target_model = self.get_model_or_error(&parent.id)?;
@@ -404,7 +404,7 @@ impl Hit {
                 values.clone(),
                 parent.clone(),
                 self,
-            );
+            )?;
         }
         Ok(())
     }

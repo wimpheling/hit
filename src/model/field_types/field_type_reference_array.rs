@@ -1,8 +1,4 @@
-use crate::{
-    errors::ValidationError,
-    model::field_types::{check_reference_exists, run_validators, ReturnHitError},
-    HitError,
-};
+use crate::{errors::ValidationError, model::field_types::ReturnHitError, HitError};
 
 use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
@@ -17,10 +13,11 @@ pub struct FieldTypeReferenceArray {
 }
 
 impl ModelField for FieldTypeReferenceArray {
-    fn on_kernel_init(&mut self, model_name: &str) {
+    fn on_kernel_init(&mut self, model_name: &str) -> Result<(), HitError> {
         for validator in self.validators.iter_mut() {
-            validator.on_kernel_init(&self.name, model_name);
+            validator.on_kernel_init(&self.name, model_name)?;
         }
+        Ok(())
     }
     fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
@@ -36,11 +33,11 @@ impl ModelField for FieldTypeReferenceArray {
     fn get_name(&self) -> String {
         return String::from(&self.name);
     }
-    fn validate(&self, value: &ObjectValue, context: &ValidatorContext) -> ReturnHitError {
+    fn validate(&self, value: &ObjectValue, _context: &ValidatorContext) -> ReturnHitError {
         match value {
             ObjectValue::Null => Ok(None),
-            ObjectValue::VecReference(value) => {
-                let mut errors: Vec<ValidationError> = vec![];
+            ObjectValue::VecReference(_value) => {
+                let mut _errors: Vec<ValidationError> = vec![];
                 //verify validity of reference
                 // TODO
                 /*  let _entry = check_reference_exists(value, context)?;
