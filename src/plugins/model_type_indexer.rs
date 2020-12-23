@@ -78,7 +78,8 @@ impl Plugin for ModelTypeIndexer {
         _data: ObjectValues,
         _parent: IndexEntryProperty,
         _instance: &Hit,
-    ) {
+    ) -> Result<(), HitError> {
+        Ok(())
     }
     fn on_after_add_entry(
         &mut self,
@@ -87,8 +88,9 @@ impl Plugin for ModelTypeIndexer {
         _data: ObjectValues,
         _parent: IndexEntryProperty,
         _instance: &mut Hit,
-    ) {
+    ) -> Result<(), HitError> {
         self.add_to_index(model, id);
+        Ok(())
     }
     fn on_after_set_value(
         &mut self,
@@ -96,7 +98,8 @@ impl Plugin for ModelTypeIndexer {
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
         _instance: &mut Hit,
-    ) {
+    ) -> Result<(), HitError> {
+        Ok(())
     }
     fn on_before_set_value(
         &mut self,
@@ -104,8 +107,10 @@ impl Plugin for ModelTypeIndexer {
         _value: &ObjectValue,
         _old_value: &Option<ObjectValue>,
         _instance: &Hit,
-    ) {
+    ) -> Result<(), HitError> {
+        Ok(())
     }
+
     fn on_before_move_subobject(
         &mut self,
         _id: &str,
@@ -115,6 +120,7 @@ impl Plugin for ModelTypeIndexer {
     ) -> Result<(), HitError> {
         Ok(())
     }
+
     fn on_after_move_subobject(
         &mut self,
         _id: &str,

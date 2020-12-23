@@ -10,7 +10,7 @@ mod unique_in_parent_kernel;
 
 #[test]
 fn it_should_initialize_the_model_index() {
-    let kernel = create_test_unique_in_parent_kernel();
+    let kernel = create_test_unique_in_parent_kernel().expect("Error");
     let mut values = HashSet::new();
     values.insert("testunique/project".into());
     values.insert("testunique/folder".into());
@@ -18,7 +18,7 @@ fn it_should_initialize_the_model_index() {
 }
 #[test]
 fn it_should_initialize_the_property_index() {
-    let kernel = create_test_unique_in_parent_kernel();
+    let kernel = create_test_unique_in_parent_kernel().expect("Error");
     let mut values = HashSet::new();
     values.insert("name".into());
     assert_eq!(
@@ -29,7 +29,7 @@ fn it_should_initialize_the_property_index() {
 
 #[test]
 fn it_should_detect_not_unique_values_on_insert() {
-    let kernel = Rc::new(create_test_unique_in_parent_kernel());
+    let kernel = Rc::new(create_test_unique_in_parent_kernel().expect("Error"));
     let mut hit = Hit::new("id", "testunique/project", kernel.clone()).expect("Error");
     let mut name = LinkedHashMap::new();
     name.insert("name".into(), ObjectValue::String("identical".into()));
@@ -70,7 +70,7 @@ fn it_should_detect_not_unique_values_on_insert() {
 
 #[test]
 fn it_should_detect_not_unique_values_when_setting_it() {
-    let kernel = Rc::new(create_test_unique_in_parent_kernel());
+    let kernel = Rc::new(create_test_unique_in_parent_kernel().expect("Error"));
     let mut hit = Hit::new("id", "testunique/project", kernel.clone()).expect("Error");
     let mut name = LinkedHashMap::new();
     name.insert("name".into(), ObjectValue::String("identical".into()));
@@ -117,7 +117,7 @@ fn it_should_detect_not_unique_values_when_setting_it() {
 
 #[test]
 fn it_should_remove_unique_errors_when_setting_to_correct_values() {
-    let kernel = Rc::new(create_test_unique_in_parent_kernel());
+    let kernel = Rc::new(create_test_unique_in_parent_kernel().expect("Error"));
     let mut hit = Hit::new("id", "testunique/project", kernel.clone()).expect("Error");
     let mut name = LinkedHashMap::new();
     name.insert("name".into(), ObjectValue::String("identical".into()));
@@ -155,7 +155,7 @@ fn it_should_remove_unique_errors_when_setting_to_correct_values() {
 
 #[test]
 fn it_should_remove_unique_errors_when_deleting_an_entry() {
-    let kernel = Rc::new(create_test_unique_in_parent_kernel());
+    let kernel = Rc::new(create_test_unique_in_parent_kernel().expect("Error"));
     let mut hit = Hit::new("id", "testunique/project", kernel.clone()).expect("Error");
     let mut name = LinkedHashMap::new();
     name.insert("name".into(), ObjectValue::String("identical".into()));
@@ -191,7 +191,7 @@ fn it_should_remove_unique_errors_when_deleting_an_entry() {
 
 #[test]
 fn it_should_remove_unique_errors_when_moving_an_entry() {
-    let kernel = Rc::new(create_test_unique_in_parent_kernel());
+    let kernel = Rc::new(create_test_unique_in_parent_kernel().expect("Error"));
     let mut hit = Hit::new("id", "testunique/project", kernel.clone()).expect("Error");
     let mut name = LinkedHashMap::new();
     name.insert("name".into(), ObjectValue::String("identical".into()));
