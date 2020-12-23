@@ -15,7 +15,7 @@ pub trait InitEntryPlugin {
 }
 
 pub trait AfterImportPlugin {
-    fn after_import(&mut self, hit: &Hit);
+    fn after_import(&mut self, hit: &Hit) -> Result<(), HitError>;
 }
 
 pub trait InitEntryAfterIndexPlugin {

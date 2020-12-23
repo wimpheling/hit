@@ -132,7 +132,10 @@ pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, JSONImpor
         .map_err(|err| JSONImportError::HitError(err))?;
 
     for plugin in kernel.get_plugins().after_import_plugins.iter() {
-        plugin.borrow_mut().after_import(&new_index);
+        plugin
+            .borrow_mut()
+            .after_import(&new_index)
+            .map_err(|err| JSONImportError::HitError(err))?;
     }
     Ok(new_index)
 }
