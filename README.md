@@ -269,9 +269,7 @@ TODO : create the macro ^^
 # TODO : After stabilization
 
 - clarify API
-- do we need insert quietly ?
 - enums for string type
-- unique in parent/parent.parent
   dependencies =>
 - provide methods so you don't need to use LinkedHashMap to use hit
 
@@ -281,7 +279,7 @@ TODO : create the macro ^^
 - refactor move function with allows_model
 - implement ACID transactions ?
 - integrate model_type index in Hit
-- use strongly typed, yet extensible errors for validation ? How to do that ?
+- use strongly typed, yet extendable errors for validation ? How to do that ?
 
 ```
 
