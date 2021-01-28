@@ -98,7 +98,6 @@ impl Hit {
         id: &str,
         target: IndexEntryProperty,
     ) -> Result<(), HitError> {
-        //TODO : validate that the model field accepts reference arrays
         let is_valid = self.field_is_reference_array(&target)?;
 
         if is_valid {

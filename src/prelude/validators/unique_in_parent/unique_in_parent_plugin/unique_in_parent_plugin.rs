@@ -176,25 +176,28 @@ impl Plugin for UniqueInParentPlugin {
         instance: &mut crate::Hit,
     ) -> Result<(), HitError> {
         if self.property_names.contains(&property.property) {
-            // TODO handle panic
-            let parent = instance.get_parent(&property.id).clone().unwrap();
-            match value {
-                ObjectValue::String(value) => {
-                    self.index.borrow_mut().set(
-                        &property.property,
-                        &parent.id,
-                        &parent.property,
-                        &property.id,
-                        Some(value.to_string()),
-                    );
-                    self.validate_index(
-                        instance,
-                        &property.property,
-                        &parent.id,
-                        &parent.property,
-                    )?;
+            match instance.get_parent(&property.id).clone() {
+                Some(parent) => {
+                    match value {
+                        ObjectValue::String(value) => {
+                            self.index.borrow_mut().set(
+                                &property.property,
+                                &parent.id,
+                                &parent.property,
+                                &property.id,
+                                Some(value.to_string()),
+                            );
+                            self.validate_index(
+                                instance,
+                                &property.property,
+                                &parent.id,
+                                &parent.property,
+                            )?;
+                        }
+                        _ => {}
+                    }
                 }
-                _ => {}
+                None => {}
             }
         }
         Ok(())
