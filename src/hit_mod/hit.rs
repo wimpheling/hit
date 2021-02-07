@@ -129,6 +129,10 @@ impl Hit {
         self.index.get_references(id)
     }
 
+    pub fn find_references_recursive(&self, id: &str) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
+        self.index.find_references_recursive(id)
+    }
+
     pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
         let entry = self
             .index

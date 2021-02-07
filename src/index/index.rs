@@ -14,7 +14,7 @@ use crate::object_data::ObjectValue;
 use crate::object_data::ObjectValues;
 use crate::object_data::Reference;
 use crate::HitError;
-use std::collections::btree_map::Iter;
+use std::collections::{HashMap, btree_map::Iter};
 use std::collections::BTreeMap;
 
 use super::find_references_before_deletion::find_references_recursive;
@@ -217,6 +217,10 @@ impl Index {
 
     pub(in crate) fn get_references(&self, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
         get_references(&self, id)
+    }
+
+    pub fn find_references_recursive(&self, id: &str) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
+        find_references_recursive(self, id)
     }
 
     pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
