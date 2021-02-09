@@ -54,6 +54,10 @@ impl IndexEntry {
         let id = &self.parent.as_ref()?.id;
         return Some(String::from(id));
     }
+    pub fn get_parent_property(&self) -> Option<String> {
+        let property = &self.parent.as_ref()?.property;
+        return Some(String::from(property));
+    }
 
     pub fn get_id(&self) -> &Id {
         &self.id

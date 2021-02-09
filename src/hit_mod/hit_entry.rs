@@ -29,6 +29,12 @@ impl HitEntry {
         let entry = self.entry.borrow();
         return entry.get_parent_id();
     }
+
+    pub fn get_parent_property(&self) -> Option<String> {
+        let entry = self.entry.borrow();
+        return entry.get_parent_property();
+    }
+
     pub fn get_parent(&self) -> Option<IndexEntryProperty> {
         let entry = self.entry.borrow();
         return entry.get_parent();
