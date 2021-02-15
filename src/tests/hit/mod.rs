@@ -1,3 +1,4 @@
+mod test_copy_object;
 mod test_create;
 mod test_get_references;
 mod test_insert_reference;
