@@ -1,7 +1,6 @@
 #![feature(hash_set_entry)]
 #[macro_use]
 extern crate mopa;
-#[macro_use]
 extern crate nanoid;
 
 mod errors;
