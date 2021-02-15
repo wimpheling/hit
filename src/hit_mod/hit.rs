@@ -1,6 +1,5 @@
 use linked_hash_map::LinkedHashMap;
 
-use crate::index::Index;
 use crate::index::IndexEntryProperty;
 use crate::model::validators::ValidatorContext;
 use crate::model::Model;
@@ -12,6 +11,7 @@ use crate::HitError;
 use crate::Kernel;
 use crate::{errors::ValidationError, events::FieldListenerRef};
 use crate::{events::Listeners, hit_mod::hit_entry::HitEntry};
+use crate::{helpers::copy_object, index::Index};
 use crate::{hit_mod::helpers::can_move_object, ModelField};
 
 use std::cell::RefCell;
@@ -129,7 +129,10 @@ impl Hit {
         self.index.get_references(id)
     }
 
-    pub fn find_references_recursive(&self, id: &str) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
+    pub fn find_references_recursive(
+        &self,
+        id: &str,
+    ) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
         self.index.find_references_recursive(id)
     }
 
@@ -222,6 +225,22 @@ impl Hit {
             )?;
         }
         Ok(())
+    }
+
+    pub fn copy_object(
+        &mut self,
+        id: Id,
+        target: IndexEntryProperty,
+        before_id: Option<String>,
+    ) -> Result<Id, HitError> {
+        let target_model = self.get_model_or_error(&target.id)?;
+        if !self.model_index.borrow().map.contains_key(&id) {
+            return Err(HitError::IDNotFound(id.into()));
+        }
+        self.can_move_object(&id, &target.id, target_model.get_name(), &target.property)?;
+
+        let id = copy_object(self, &id, target, before_id)?;
+        return Ok(id);
     }
 
     pub fn get_model(&self, id: &str) -> Option<Rc<Model>> {
