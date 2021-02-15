@@ -122,3 +122,52 @@ fn it_should_copy_an_object() {
         ObjectValue::F32(1.5)
     );
 }
+
+#[test]
+fn it_should_copy_an_object_and_its_subobjects() {
+    let mut hit = create_hit_with_subobjects();
+    let id_of_id3_clone = hit
+        .copy_object(
+            "id3".to_string(),
+            IndexEntryProperty {
+                id: "id2".into(),
+                property: "sub_items".into(),
+            },
+            None,
+        )
+        .expect("Error");
+    let sub_items = hit.get_value("id2", "sub_items").expect("Error");
+    let sub_items_array_obj = match sub_items {
+        ObjectValue::VecSubObjects(sub_items) => Ok(sub_items),
+        _ => Err(()),
+    }
+    .expect("Error");
+    assert_eq!(sub_items_array_obj.len(), 2);
+    assert_eq!(
+        sub_items_array_obj.get(1).expect("Error").clone(),
+        Reference {
+            id: id_of_id3_clone.clone()
+        }
+    );
+
+    // the clone of id3 shoudl have two sub_items
+    let sub_items_of_id3_clone = hit.get_value(&id_of_id3_clone, "sub_items").expect("Error");
+    let sub_items_of_id3_clone = match sub_items_of_id3_clone {
+        ObjectValue::VecSubObjects(sub_items_of_id3_clone) => Ok(sub_items_of_id3_clone),
+        _ => Err(()),
+    }
+    .expect("Error");
+    assert_eq!(sub_items_of_id3_clone.len(), 2);
+    assert_ne!(sub_items_of_id3_clone.get(0).expect("Error").id, "id4");
+    let id_of_id5_clone = sub_items_of_id3_clone.get(1).expect("Error").id.clone();
+    assert_ne!(id_of_id5_clone.clone(), "id5");
+
+    assert_eq!(
+        hit.get_value(&id_of_id5_clone, "name").expect("Error"),
+        ObjectValue::String("hello".into())
+    );
+    assert_eq!(
+        hit.get_value(&id_of_id5_clone, "age").expect("Error"),
+        ObjectValue::F32(1.5)
+    );
+}
