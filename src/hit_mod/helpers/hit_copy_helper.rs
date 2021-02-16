@@ -1,10 +1,14 @@
-use crate::{Hit, HitError, Id, IndexEntryProperty, ObjectValues};
+use std::collections::HashMap;
 
-pub fn copy_object(
+use crate::{Hit, HitError, Id, IndexEntryProperty, ObjectValue, ObjectValues, Reference};
+
+fn _copy_object(
     hit: &mut Hit,
     id: &Id,
     target: IndexEntryProperty,
     before_id: Option<String>,
+    references_to_update: &mut Vec<ReferenceToUpdate>,
+    updated_ids: &mut HashMap<Id, Id>,
 ) -> Result<Id, HitError> {
     let new_id = nanoid::simple();
     let entry = hit.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
@@ -17,8 +21,28 @@ pub fn copy_object(
     for (field_name, _field) in model.get_fields().iter() {
         let value = entry.get(field_name);
         match value {
-            crate::ObjectValue::Reference(_) => {}
-            crate::ObjectValue::VecReference(_) => {}
+            crate::ObjectValue::Reference(r) => {
+                references_to_update.push(ReferenceToUpdate {
+                    target: IndexEntryProperty {
+                        id: new_id.clone(),
+                        property: field_name.clone(),
+                    },
+                    reference: r.id,
+                    vec: false,
+                });
+            }
+            crate::ObjectValue::VecReference(refs) => {
+                for r in refs.iter() {
+                    references_to_update.push(ReferenceToUpdate {
+                        target: IndexEntryProperty {
+                            id: new_id.clone(),
+                            property: field_name.clone(),
+                        },
+                        reference: r.id.clone(),
+                        vec: true,
+                    });
+                }
+            }
             crate::ObjectValue::SubObject(_) => {}
             crate::ObjectValue::VecSubObjects(_) => {}
             _ => {
@@ -35,6 +59,8 @@ pub fn copy_object(
         before_id,
     )?;
 
+    updated_ids.insert(id.clone(), new_id.clone());
+
     // copy subobjects
     for (field_name, _field) in model.get_fields().iter() {
         let value = entry.get(field_name);
@@ -42,7 +68,7 @@ pub fn copy_object(
             crate::ObjectValue::Reference(_) => {}
             crate::ObjectValue::VecReference(_) => {}
             crate::ObjectValue::SubObject(subobject) => {
-                copy_object(
+                _copy_object(
                     hit,
                     &subobject.id,
                     IndexEntryProperty {
@@ -50,11 +76,13 @@ pub fn copy_object(
                         property: field_name.clone(),
                     },
                     None,
+                    references_to_update,
+                    updated_ids,
                 )?;
             }
             crate::ObjectValue::VecSubObjects(subobjects) => {
                 for subobject in subobjects.iter() {
-                    copy_object(
+                    _copy_object(
                         hit,
                         &subobject.id,
                         IndexEntryProperty {
@@ -62,11 +90,62 @@ pub fn copy_object(
                             property: field_name.clone(),
                         },
                         None,
+                        references_to_update,
+                        updated_ids,
                     )?;
                 }
             }
             _ => {}
         }
     }
+    Ok(new_id)
+}
+
+struct ReferenceToUpdate {
+    target: IndexEntryProperty,
+    reference: Id,
+    vec: bool,
+}
+
+fn get_updated_id(id: Id, updated_ids: &HashMap<Id, Id>) -> Id {
+    match updated_ids.get(&id.clone()) {
+        Some(updated_id) => updated_id.clone(),
+        None => id,
+    }
+}
+
+pub fn copy_object(
+    hit: &mut Hit,
+    id: &Id,
+    target: IndexEntryProperty,
+    before_id: Option<String>,
+) -> Result<Id, HitError> {
+    let mut references_to_update: Vec<ReferenceToUpdate> = vec![];
+    let mut updated_ids: HashMap<Id, Id> = HashMap::new();
+    let new_id = {
+        _copy_object(
+            hit,
+            id,
+            target,
+            before_id,
+            &mut references_to_update,
+            &mut updated_ids,
+        )?
+    };
+
+    // reproduce inner references, leave the others
+    for reference in references_to_update.iter() {
+        let updated_id = get_updated_id(reference.reference.clone(), &updated_ids);
+        if reference.vec {
+            hit.insert_reference(&updated_id, reference.target.clone());
+        } else {
+            hit.set(
+                &reference.target.id,
+                &reference.target.property,
+                ObjectValue::Reference(Reference { id: updated_id }),
+            )?;
+        }
+    }
+
     Ok(new_id)
 }
