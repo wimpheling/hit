@@ -2,6 +2,12 @@ use std::collections::HashMap;
 
 use crate::{Hit, HitError, Id, IndexEntryProperty, ObjectValue, ObjectValues, Reference};
 
+fn uuid() -> String {
+    (0..10)
+        .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
+        .collect()
+}
+
 fn _copy_object(
     hit: &mut Hit,
     id: &Id,
@@ -10,7 +16,7 @@ fn _copy_object(
     references_to_update: &mut Vec<ReferenceToUpdate>,
     updated_ids: &mut HashMap<Id, Id>,
 ) -> Result<Id, HitError> {
-    let new_id = nanoid::simple();
+    let new_id = uuid();
     let entry = hit.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
     let model = hit
         .get_model(id)
