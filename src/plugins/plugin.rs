@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{index::IndexEntryProperty, HitEntry, ObjectValue};
 use crate::{object_data::ObjectValues, Hit};
-use crate::{HitError, Model};
+use crate::{HitError, Id, Model};
 
 pub trait InitEntryPlugin {
     fn on_init_add_entry(
@@ -38,6 +38,32 @@ pub trait DeletePlugin {
         &mut self,
         entry: &HitEntry,
         instance: &mut Hit,
+    ) -> Result<(), HitError>;
+}
+pub trait ReferencePlugin {
+    fn on_before_add_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &Id,
+        target: &IndexEntryProperty,
+    ) -> Result<(), HitError>;
+    fn on_after_add_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &Id,
+        target: &IndexEntryProperty,
+    ) -> Result<(), HitError>;
+    fn on_before_remove_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &Id,
+        target: &IndexEntryProperty,
+    ) -> Result<(), HitError>;
+    fn on_after_remove_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &Id,
+        target: &IndexEntryProperty,
     ) -> Result<(), HitError>;
 }
 

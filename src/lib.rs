@@ -42,6 +42,7 @@ pub use json::import::import_from_string;
 
 pub use plugins::{
     AfterImportPlugin, DeletePlugin, InitEntryPlugin, ModelTypeIndexer, Plugin, Plugins,
+    ReferencePlugin,
 };
 
 pub use errors::HitError;

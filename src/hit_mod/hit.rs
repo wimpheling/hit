@@ -98,10 +98,23 @@ impl Hit {
         id: &str,
         target: IndexEntryProperty,
     ) -> Result<(), HitError> {
+        // before plugins call
+        for plugin in self.plugins.reference_plugins.clone().iter() {
+            plugin
+                .borrow_mut()
+                .on_before_add_reference(self, &id.to_string(), &target)?;
+        }
+
         let is_valid = self.field_is_reference_array(&target)?;
 
         if is_valid {
-            self.index.insert_reference(id, target)
+            self.index.insert_reference(id, target.clone())?;
+            for plugin in self.plugins.reference_plugins.clone().iter() {
+                plugin
+                    .borrow_mut()
+                    .on_after_add_reference(self, &id.to_string(), &target)?;
+            }
+            Ok(())
         } else {
             Err(HitError::InvalidReference(id.to_string()))
         }
@@ -112,6 +125,13 @@ impl Hit {
         id: &str,
         parent: IndexEntryProperty,
     ) -> Result<(), HitError> {
+        // before plugins call
+        for plugin in self.plugins.reference_plugins.clone().iter() {
+            plugin
+                .borrow_mut()
+                .on_before_remove_reference(self, &id.to_string(), &parent)?;
+        }
+
         // check in model that this property exists and is of a valid type
         let target_model = self.get_model_or_error(&parent.id)?;
         let target_property = target_model
@@ -119,7 +139,14 @@ impl Hit {
             .ok_or(HitError::PropertyNotFound((&parent.property).into()))?;
         let target_property = target_property.borrow();
         if target_property.is_vec_reference() {
-            self.index.remove_reference(id, parent)
+            self.index.remove_reference(id, parent.clone())?;
+
+            for plugin in self.plugins.reference_plugins.clone().iter() {
+                plugin
+                    .borrow_mut()
+                    .on_after_remove_reference(self, &id.to_string(), &parent)?;
+            }
+            Ok(())
         } else {
             Err(HitError::InvalidDataType())
         }
