@@ -1,2 +1,3 @@
 mod test_delete_plugin;
-mod test_insert_entry_plugin;
+mod test_plugin;
+mod test_reference_plugin;
