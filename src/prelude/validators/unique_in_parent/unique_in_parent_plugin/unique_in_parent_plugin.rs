@@ -1,6 +1,6 @@
 use std::{cell::RefCell, collections::HashSet, rc::Rc};
 
-use crate::{DeletePlugin, Hit, IndexEntryProperty, Model, ObjectValue, ObjectValues, Plugin};
+use crate::{DeletePlugin, Hit, Id, IndexEntryProperty, Model, ObjectValue, ObjectValues, Plugin};
 use crate::{HitError, InitEntryPlugin};
 
 use super::unique_in_parent_value_index::UniqueInParentValueIndex;
@@ -133,6 +133,7 @@ impl Plugin for UniqueInParentPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
+        _before_id: &Option<Id>,
         _instance: &crate::Hit,
     ) -> Result<(), HitError> {
         Ok(())
@@ -144,6 +145,7 @@ impl Plugin for UniqueInParentPlugin {
         id: &str,
         data: crate::ObjectValues,
         parent: crate::IndexEntryProperty,
+        _before_id: &Option<Id>,
         instance: &mut crate::Hit,
     ) -> Result<(), HitError> {
         self.handle_new_object(model.clone(), id, data, parent.clone());
@@ -177,26 +179,24 @@ impl Plugin for UniqueInParentPlugin {
     ) -> Result<(), HitError> {
         if self.property_names.contains(&property.property) {
             match instance.get_parent(&property.id).clone() {
-                Some(parent) => {
-                    match value {
-                        ObjectValue::String(value) => {
-                            self.index.borrow_mut().set(
-                                &property.property,
-                                &parent.id,
-                                &parent.property,
-                                &property.id,
-                                Some(value.to_string()),
-                            );
-                            self.validate_index(
-                                instance,
-                                &property.property,
-                                &parent.id,
-                                &parent.property,
-                            )?;
-                        }
-                        _ => {}
+                Some(parent) => match value {
+                    ObjectValue::String(value) => {
+                        self.index.borrow_mut().set(
+                            &property.property,
+                            &parent.id,
+                            &parent.property,
+                            &property.id,
+                            Some(value.to_string()),
+                        );
+                        self.validate_index(
+                            instance,
+                            &property.property,
+                            &parent.id,
+                            &parent.property,
+                        )?;
                     }
-                }
+                    _ => {}
+                },
                 None => {}
             }
         }

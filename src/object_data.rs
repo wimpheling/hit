@@ -13,12 +13,12 @@ pub struct Reference {
     pub id: Id,
 }
 
-#[derive(Clone, Serialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct DateTimeUtc {
     datetime: i64,
 }
 
-#[derive(Clone, Serialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub enum ObjectValue {
     Bool(bool),
     String(String),

@@ -74,6 +74,7 @@ pub trait Plugin {
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,
+        before_id: &Option<Id>,
         instance: &Hit,
     ) -> Result<(), HitError>;
 
@@ -83,6 +84,7 @@ pub trait Plugin {
         id: &str,
         data: ObjectValues,
         parent: IndexEntryProperty,
+        before_id: &Option<Id>,
         instance: &mut Hit,
     ) -> Result<(), HitError>;
 
