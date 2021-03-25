@@ -44,7 +44,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "hit"
+name = "hit-data"
 version = "0.0.1"
 dependencies = [
  "chrono",
