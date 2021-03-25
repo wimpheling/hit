@@ -1,6 +1,6 @@
 [package]
 name = "hit_data"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Lucas Trostaniecki <wimpheling@gmail.com>"]
 edition = "2018"
 license = "MIT"
