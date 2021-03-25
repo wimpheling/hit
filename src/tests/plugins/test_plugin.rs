@@ -1,6 +1,6 @@
 use linked_hash_map::LinkedHashMap;
 
-use crate::{field_types::*, modele, Hit, IndexEntryProperty, ObjectValue};
+use crate::{field_types::*, modele, Hit, Id, IndexEntryProperty, ObjectValue};
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{HitError, Kernel, Model, Plugin, Plugins};
@@ -22,6 +22,7 @@ impl Plugin for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
+        _before_id: &Option<Id>,
         _instance: &Hit,
     ) -> Result<(), HitError> {
         self.before_insert_count += 1;
@@ -34,6 +35,7 @@ impl Plugin for TestPlugin {
         _id: &str,
         _data: crate::ObjectValues,
         _parent: crate::IndexEntryProperty,
+        _before_id: &Option<Id>,
         _instance: &mut Hit,
     ) -> Result<(), HitError> {
         self.after_insert_count += 1;

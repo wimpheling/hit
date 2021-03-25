@@ -4,6 +4,7 @@ use crate::plugins::DeletePlugin;
 use crate::plugins::InitEntryPlugin;
 use crate::plugins::Plugin;
 use crate::HitError;
+use crate::Id;
 use crate::{hit_mod::HitEntry, ObjectValue};
 use crate::{index::IndexEntryProperty, Hit};
 use std::collections::HashMap;
@@ -77,6 +78,7 @@ impl Plugin for ModelTypeIndexer {
         _id: &str,
         _data: ObjectValues,
         _parent: IndexEntryProperty,
+        _before_id: &Option<Id>,
         _instance: &Hit,
     ) -> Result<(), HitError> {
         Ok(())
@@ -87,6 +89,7 @@ impl Plugin for ModelTypeIndexer {
         id: &str,
         _data: ObjectValues,
         _parent: IndexEntryProperty,
+        _before_id: &Option<Id>,
         _instance: &mut Hit,
     ) -> Result<(), HitError> {
         self.add_to_index(model, id);

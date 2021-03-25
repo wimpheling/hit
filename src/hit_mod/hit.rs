@@ -417,6 +417,7 @@ impl Hit {
                 &id,
                 values.clone(),
                 parent.clone(),
+                &before_id,
                 &self,
             )?;
         }
@@ -439,7 +440,7 @@ impl Hit {
         let values = self.validate_inserted_values(&new_object_model, id, &values)?;
         // update the data
         self.index
-            .insert(id, values.clone(), parent.clone(), before_id)?;
+            .insert(id, values.clone(), parent.clone(), before_id.clone())?;
         self.model_index
             .borrow_mut()
             .map
@@ -452,6 +453,7 @@ impl Hit {
                 &id,
                 values.clone(),
                 parent.clone(),
+                &before_id,
                 self,
             )?;
         }
