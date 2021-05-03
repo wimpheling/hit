@@ -135,6 +135,7 @@ fn it_should_return_an_error_on_reference_arrays_when_validator_detects_it() {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
 
@@ -146,6 +147,7 @@ fn it_should_return_an_error_on_reference_arrays_when_validator_detects_it() {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     assert_eq!(

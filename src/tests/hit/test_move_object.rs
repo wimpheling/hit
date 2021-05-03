@@ -62,6 +62,7 @@ fn create_hit_with_subobjects() -> Hit {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     return hit;

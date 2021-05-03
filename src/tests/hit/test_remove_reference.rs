@@ -29,6 +29,7 @@ fn create_hit_with_reference() -> Hit {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     hit.insert_reference(
@@ -37,6 +38,7 @@ fn create_hit_with_reference() -> Hit {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     return hit;

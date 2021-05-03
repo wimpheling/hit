@@ -50,6 +50,7 @@ fn create_hit_with_references() -> Hit {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     hit.insert_reference(
@@ -58,6 +59,7 @@ fn create_hit_with_references() -> Hit {
             id: "id4".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     hit.set(

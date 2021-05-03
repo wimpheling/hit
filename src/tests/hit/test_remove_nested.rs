@@ -65,6 +65,7 @@ fn it_should_return_an_error_when_a_nested_object_has_references() {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
 
@@ -93,6 +94,7 @@ fn it_should_not_return_an_error_when_a_nested_object_has_nested_references() {
             id: "id2".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
 

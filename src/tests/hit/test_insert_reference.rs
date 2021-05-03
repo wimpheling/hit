@@ -30,6 +30,7 @@ fn it_should_insert_a_reference() {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     hit.insert_reference(
@@ -38,6 +39,7 @@ fn it_should_insert_a_reference() {
             id: "id".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     assert_eq!(
@@ -60,6 +62,7 @@ fn it_should_refuse_incorrect_references() {
                 id: "id".into(),
                 property: "references".into(),
             },
+            None,
         )
         .expect_err("Error");
     assert_eq!(error, HitError::InvalidReference("id2".into()));
@@ -76,6 +79,7 @@ fn it_should_refuse_to_insert_references_in_other_fields() {
                 id: "id".into(),
                 property: "reference".into(),
             },
+            None,
         )
         .expect_err("Error");
     assert_eq!(error, HitError::InvalidDataType());
@@ -86,6 +90,7 @@ fn it_should_refuse_to_insert_references_in_other_fields() {
                 id: "id".into(),
                 property: "sub_items".into(),
             },
+            None,
         )
         .expect_err("Error");
     assert_eq!(error, HitError::InvalidDataType());
@@ -96,7 +101,49 @@ fn it_should_refuse_to_insert_references_in_other_fields() {
                 id: "id".into(),
                 property: "field_not_found".into(),
             },
+            None,
         )
         .expect_err("Error");
     assert_eq!(error, HitError::PropertyNotFound("field_not_found".into()));
+}
+#[test]
+fn it_should_insert_a_reference_before_another() {
+    let kernel = Rc::new(create_test_kernel());
+    let mut hit = Hit::new("id", "test/test", kernel).unwrap();
+    hit.insert(
+        "test/test",
+        "id2",
+        LinkedHashMap::new(),
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "sub_items".into(),
+        },
+        None,
+    )
+    .expect("Error");
+    hit.insert_reference(
+        "id2",
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "references".into(),
+        },
+        None,
+    )
+    .expect("Error");
+    hit.insert_reference(
+        "id",
+        IndexEntryProperty {
+            id: "id".into(),
+            property: "references".into(),
+        },
+        Some("id2".into()),
+    )
+    .expect("Error");
+    assert_eq!(
+        hit.get_value("id", "references").unwrap(),
+        ObjectValue::VecReference(vec![
+            Reference { id: "id".into() },
+            Reference { id: "id2".into() },
+        ])
+    )
 }
