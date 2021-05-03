@@ -115,6 +115,7 @@ fn it_should_call_the_before_delete_callback_only_before_an_error() {
                 id: "id".into(),
                 property: "references".into(),
             },
+            None,
         )
         .expect("Error 3");
 

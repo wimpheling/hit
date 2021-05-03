@@ -72,6 +72,7 @@ fn create_hit_with_subobjects() -> Hit {
             id: "id4".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     // A reference of an object that is a sub item of id3
@@ -87,6 +88,7 @@ fn create_hit_with_subobjects() -> Hit {
             id: "id5".into(),
             property: "references".into(),
         },
+        None,
     )
     .expect("Error");
     return hit;

@@ -97,6 +97,7 @@ impl Hit {
         &mut self,
         id: &str,
         target: IndexEntryProperty,
+        before_id: Option<String>,
     ) -> Result<(), HitError> {
         // before plugins call
         for plugin in self.plugins.reference_plugins.clone().iter() {
@@ -108,7 +109,7 @@ impl Hit {
         let is_valid = self.field_is_reference_array(&target)?;
 
         if is_valid {
-            self.index.insert_reference(id, target.clone())?;
+            self.index.insert_reference(id, target.clone(), before_id)?;
             for plugin in self.plugins.reference_plugins.clone().iter() {
                 plugin
                     .borrow_mut()

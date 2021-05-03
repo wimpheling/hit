@@ -143,7 +143,7 @@ pub fn copy_object(
     for reference in references_to_update.iter() {
         let updated_id = get_updated_id(reference.reference.clone(), &updated_ids);
         if reference.vec {
-            hit.insert_reference(&updated_id, reference.target.clone())?;
+            hit.insert_reference(&updated_id, reference.target.clone(), None)?;
         } else {
             hit.set(
                 &reference.target.id,

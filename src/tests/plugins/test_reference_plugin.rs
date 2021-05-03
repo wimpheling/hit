@@ -144,6 +144,7 @@ fn it_should_call_both_callbacks_when_adding_and_removing_reference() {
                 id: "id".into(),
                 property: "references".into(),
             },
+            None,
         )
         .expect("Error");
 

@@ -16,7 +16,10 @@ impl Validator<String> for StringEnumValidator {
                 return Ok(None);
             }
         }
-        return Ok(Some(vec![ValidationError::warning("A".into(), None)]));
+        return Ok(Some(vec![ValidationError::warning(
+            "VALUE_NOT_IN_ENUM".into(),
+            None,
+        )]));
     }
 
     fn on_kernel_init(&mut self, _field_name: &str, _model_namee: &str) -> Result<(), HitError> {

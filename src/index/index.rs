@@ -14,8 +14,8 @@ use crate::object_data::ObjectValue;
 use crate::object_data::ObjectValues;
 use crate::object_data::Reference;
 use crate::HitError;
-use std::collections::{HashMap, btree_map::Iter};
 use std::collections::BTreeMap;
+use std::collections::{btree_map::Iter, HashMap};
 
 use super::find_references_before_deletion::find_references_recursive;
 
@@ -170,6 +170,7 @@ impl Index {
         &mut self,
         id: &str,
         target: IndexEntryProperty,
+        before_id: Option<Id>,
     ) -> Result<(), HitError> {
         //update reference index
         index_reference(
@@ -185,7 +186,7 @@ impl Index {
                 .ok_or(HitError::IDNotFound(target.id.to_string()))?
         };
         let data = get_parent_property_value(&target_entry, &target);
-        let data = mutate_insert_in_reference_array(data, id, None)?;
+        let data = mutate_insert_in_reference_array(data, id, before_id)?;
         let value = ObjectValue::VecReference(data);
 
         //update the value in the index entry
@@ -219,7 +220,10 @@ impl Index {
         get_references(&self, id)
     }
 
-    pub fn find_references_recursive(&self, id: &str) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
+    pub fn find_references_recursive(
+        &self,
+        id: &str,
+    ) -> Result<(HashMap<String, Vec<IndexEntryProperty>>, Vec<String>), HitError> {
         find_references_recursive(self, id)
     }
 
