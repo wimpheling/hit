@@ -17,7 +17,10 @@ use crate::HitError;
 use std::collections::BTreeMap;
 use std::collections::{btree_map::Iter, HashMap};
 
-use super::find_references_before_deletion::find_references_recursive;
+use super::{
+    find_references_before_deletion::find_references_recursive,
+    reference_helpers::mutate_remove_from_reference_array,
+};
 
 pub struct Index {
     pub(in crate::index) index: BTreeMap<Id, IndexEntryRef>,
@@ -166,12 +169,91 @@ impl Index {
         Ok(())
     }
 
+    pub fn move_reference(
+        &mut self,
+        id: &str,
+        target: IndexEntryProperty,
+        before_id: Option<Id>,
+    ) -> Result<(), HitError> {
+        let target_entry = {
+            self.get_mut(&target.id)
+                .ok_or(HitError::IDNotFound(target.id.to_string()))?
+        };
+        let data = get_parent_property_value(&target_entry, &target);
+
+        // throw error if reference not found
+        match &data {
+            ObjectValue::VecReference(data) => {
+                if !data.iter().any(|r| r.id == id) {
+                    return Err(HitError::ReferenceNotFound());
+                }
+                match &before_id {
+                    Some(before_id) => {
+                        if !data.iter().any(|r| r.id == id) {
+                            return Err(HitError::InvalidBeforeId(before_id.clone()));
+                        }
+                    }
+                    None => {}
+                }
+            }
+            ObjectValue::Null => {
+                return Err(HitError::ReferenceNotFound());
+            }
+            _ => return Err(HitError::CannotInsertReferenceInThisDataType()),
+        }
+
+        let data = mutate_remove_from_reference_array(data, id)?.unwrap_or(vec![]);
+        let data =
+            mutate_insert_in_reference_array(ObjectValue::VecReference(data), id, before_id)?;
+        //update the value in the index entry
+        target_entry.borrow_mut().data.insert(
+            target.clone().property,
+            ObjectValue::VecReference(data.clone()),
+        );
+
+        Index::dispatch_value(
+            target_entry.clone(),
+            &target.property,
+            ObjectValue::VecReference(data),
+        );
+        Ok(())
+    }
+
     pub fn insert_reference(
         &mut self,
         id: &str,
         target: IndexEntryProperty,
         before_id: Option<Id>,
     ) -> Result<(), HitError> {
+        {
+            let target_entry = {
+                self.get_mut(&target.id)
+                    .ok_or(HitError::IDNotFound(target.id.to_string()))?
+            };
+            let data = get_parent_property_value(&target_entry, &target);
+
+            match &data {
+                ObjectValue::VecReference(data) => {
+                    // TODO ? throw error if reference already exists
+                    // if data.iter().any(|r| r.id == id) {
+                    //  return Err(HitError::CannotInsertReferenceTwice());
+                    // }
+                }
+                ObjectValue::Null => {}
+                _ => return Err(HitError::CannotInsertReferenceInThisDataType()),
+            }
+
+            //generate mutated vector
+            let data = mutate_insert_in_reference_array(data, id, before_id)?;
+            let value = ObjectValue::VecReference(data);
+
+            //update the value in the index entry
+            target_entry
+                .borrow_mut()
+                .data
+                .insert(target.clone().property, value.clone());
+        }
+
         //update reference index
         index_reference(
             self,
@@ -179,27 +261,19 @@ impl Index {
             &target.property,
             &target.id,
         )?;
-
-        //generate mutated vector
-        let target_entry = {
-            self.get_mut(&target.id)
-                .ok_or(HitError::IDNotFound(target.id.to_string()))?
-        };
-        let data = get_parent_property_value(&target_entry, &target);
-        let data = mutate_insert_in_reference_array(data, id, before_id)?;
-        let value = ObjectValue::VecReference(data);
-
-        //update the value in the index entry
-        target_entry
-            .borrow_mut()
-            .data
-            .insert(target.clone().property, value.clone());
-
         //send the value as an event
-        Index::dispatch_value(target_entry.clone(), &target.property, value);
+        {
+            let target_entry = {
+                self.get_mut(&target.id)
+                    .ok_or(HitError::IDNotFound(target.id.to_string()))?
+            };
+            let data = get_parent_property_value(&target_entry, &target);
+            Index::dispatch_value(target_entry.clone(), &target.property, data);
+        }
 
         Ok(())
     }
+
     pub fn remove_reference(
         &mut self,
         id: &str,

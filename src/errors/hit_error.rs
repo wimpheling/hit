@@ -56,6 +56,10 @@ pub enum HitError {
     CannotInsertObjectInThisDataType(),
     #[error("A reference cannot be inserted into a property that is not a reference array")]
     CannotInsertReferenceInThisDataType(),
+    #[error("This reference is already set in this property")]
+    CannotInsertReferenceTwice(),
+    #[error("This reference is not present in this property")]
+    ReferenceNotFound(),
     #[error("A reference cannot be deleted from a property that is not a reference array")]
     CannotRemoveReferenceFromThisDataType(),
     #[error("An object cannot be delete from a property that is not an object array")]
