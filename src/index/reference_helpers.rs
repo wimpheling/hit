@@ -32,7 +32,7 @@ pub fn remove_reference_from_parent_array_from_property(
     }
 }
 
-fn mutate_remove_from_reference_array(
+pub fn mutate_remove_from_reference_array(
     data: ObjectValue,
     id: &str,
 ) -> Result<Option<Vec<Reference>>, HitError> {
