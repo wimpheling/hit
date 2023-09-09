@@ -16,6 +16,7 @@ impl IndexImporter {
         }
     }
 
+
     pub fn add_item(
         &mut self,
         id: &str,
@@ -54,7 +55,6 @@ impl IndexImporter {
                     });
                 }
                 ObjectValue::VecReference(references) => {
-                    //
                     for reference in references.iter() {
                         let vector = self
                             .collected_refs

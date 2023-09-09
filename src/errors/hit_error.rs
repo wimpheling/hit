@@ -1,9 +1,10 @@
 use std::{clone::Clone, collections::HashMap};
+use serde::Serialize;
 use thiserror::*;
 
 use crate::IndexEntryProperty;
 
-#[derive(Error, Clone, Debug, PartialEq)]
+#[derive(Error, Clone, Debug, PartialEq, Serialize)]
 pub enum HitError {
     #[error("There is no model entry for id `{0}`")]
     NoModelForId(String),

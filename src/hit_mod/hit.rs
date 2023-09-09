@@ -34,7 +34,7 @@ impl ModelIndex {
 }
 
 pub struct Hit {
-    pub(in crate) index: Index,
+    pub index: Index,
     pub(in crate) model_index: Rc<RefCell<ModelIndex>>,
     pub(in crate) plugins: HitPlugins,
     pub kernel: Rc<HitKernel>,

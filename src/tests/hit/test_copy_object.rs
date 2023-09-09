@@ -8,7 +8,7 @@ use crate::Reference;
 
 use std::rc::Rc;
 
-fn create_hit_with_subobjects() -> Hit {
+pub(super) fn create_hit_with_subobjects() -> Hit {
     let kernel = Rc::new(create_test_kernel());
     let mut hit = Hit::new("id", "test/test", kernel).unwrap();
     hit.insert(

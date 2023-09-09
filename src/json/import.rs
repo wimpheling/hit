@@ -9,6 +9,8 @@ use serde_json::Value;
 
 use std::rc::Rc;
 
+use crate::import::generic_import::{finish_import, import_data_object_values};
+
 fn json_to_object_value(value: &Value) -> Result<ObjectValue, JSONImportError> {
     match value {
         Value::Null => Ok(ObjectValue::Null),
@@ -49,6 +51,7 @@ fn json_to_object_value(value: &Value) -> Result<ObjectValue, JSONImportError> {
         Value::Array(_value) => Err(JSONImportError::ShouldNotBeAnArray()),
     }
 }
+
 fn get_parent(value: &JSONObject) -> Result<Option<IndexEntryProperty>, JSONImportError> {
     let parent = get_object_property(value, String::from("parent"))?;
     match parent {
@@ -78,28 +81,13 @@ fn import_data<'index>(
     let sub_data = get_object_property(data, String::from("data"))?;
     let sub_data = get_value_as_object(sub_data)?;
     let mut new_data: ObjectValues = LinkedHashMap::new();
-
-    for (key, value) in sub_data {
-        //checks that the model field exists
-        get_model_field(model.clone(), String::from(key))?;
-        let object_value = json_to_object_value(value)?;
-        match object_value {
-            ObjectValue::Null => {}
-            _ => {
-                new_data.insert(String::from(key), object_value);
-            }
-        }
+    for d in sub_data.iter() {
+        new_data.insert(String::from(d.0), json_to_object_value(d.1)?);
     }
 
-    new_index
-        .add_item(model.get_name(), &id, new_data.clone(), parent.clone())
-        .map_err(|err| JSONImportError::HitError(err))?;
+    import_data_object_values(model, id, parent, new_index, new_data)
+        .map_err(JSONImportError::HitError)?;
 
-    for plugin in new_index.get_plugins().init_plugins.iter() {
-        plugin
-            .borrow_mut()
-            .on_init_add_entry(model.clone(), &id, new_data.clone(), parent.clone());
-    }
     return Ok(());
 }
 
@@ -116,6 +104,7 @@ pub fn import_from_string<'a>(
     let value = get_json_value(value)?;
     import(&value, kernel)
 }
+
 pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, JSONImportError> {
     let value = get_value_as_object(&value)?;
     let id = get_object_property_as_string(value, String::from("id"))?;
@@ -127,15 +116,6 @@ pub fn import<'a>(value: &Value, kernel: Rc<HitKernel>) -> Result<Hit, JSONImpor
         let entry = get_value_as_object(entry)?;
         import_data(entry, clone, &mut new_index)?;
     }
-    let new_index = new_index
-        .finish_import()
-        .map_err(|err| JSONImportError::HitError(err))?;
-
-    for plugin in kernel.get_plugins().after_import_plugins.iter() {
-        plugin
-            .borrow_mut()
-            .after_import(&new_index)
-            .map_err(|err| JSONImportError::HitError(err))?;
-    }
+    let new_index = finish_import(new_index, kernel).map_err(JSONImportError::HitError)?;
     Ok(new_index)
 }

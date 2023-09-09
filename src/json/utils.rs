@@ -1,7 +1,6 @@
 use crate::hit_mod::HitKernel;
 use crate::json::JSONImportError;
 use crate::model::Model;
-use crate::model::ModelFieldRef;
 use crate::object_data::Reference;
 use crate::HitError;
 use serde_json::{Map, Value};
@@ -71,16 +70,6 @@ pub fn get_model(kernel: Rc<HitKernel>, data: &JSONObject) -> Result<Rc<Model>, 
     match model {
         Ok(model) => return Ok(model),
         Err(error) => return Err(JSONImportError::HitError(error)),
-    }
-}
-
-pub fn get_model_field(model: Rc<Model>, key: String) -> Result<ModelFieldRef, JSONImportError> {
-    let field = model.get_field(&key);
-    match field {
-        Some(field) => Ok(field.clone()),
-        None => Err(JSONImportError::HitError(HitError::PropertyNotFound(
-            key.to_string(),
-        ))),
     }
 }
 

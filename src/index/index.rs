@@ -23,7 +23,7 @@ use super::{
 };
 
 pub struct Index {
-    pub(in crate::index) index: BTreeMap<Id, IndexEntryRef>,
+    pub(in crate) index: BTreeMap<Id, IndexEntryRef>,
     id: Id,
 }
 
@@ -111,8 +111,12 @@ impl Index {
         Ok(())
     }
 
-    pub(in crate) fn iter(&self) -> Iter<Id, IndexEntryRef> {
+    pub fn iter(&self) -> Iter<Id, IndexEntryRef> {
         return self.index.iter();
+    }
+
+    pub fn contains(&self, id: &str) -> bool {
+        return self.index.contains_key(id);
     }
 
     pub fn insert(

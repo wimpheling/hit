@@ -8,3 +8,5 @@ mod test_move_reference;
 mod test_remove_nested;
 mod test_remove_object;
 mod test_remove_reference;
+
+mod test_clone_hit;
