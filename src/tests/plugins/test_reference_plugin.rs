@@ -3,8 +3,8 @@ use linked_hash_map::LinkedHashMap;
 use crate::{field_types::*, modele, IndexEntryProperty};
 use std::{cell::RefCell, rc::Rc};
 
+use crate::Model;
 use crate::{Hit, HitError, Kernel, Plugins, ReferencePlugin};
-use crate::{HitEntry, Model};
 
 #[derive(Debug)]
 struct TestReferencePlugin {
@@ -12,6 +12,8 @@ struct TestReferencePlugin {
     after_add_reference_count: i32,
     before_remove_reference_count: i32,
     after_remove_reference_count: i32,
+    before_move_reference_count: i32,
+    after_move_reference_count: i32,
 }
 
 impl ReferencePlugin for TestReferencePlugin {
@@ -20,6 +22,7 @@ impl ReferencePlugin for TestReferencePlugin {
         instance: &mut Hit,
         reference_id: &crate::Id,
         target: &IndexEntryProperty,
+        before_id: &Option<String>,
     ) -> Result<(), HitError> {
         self.before_add_reference_count = self.before_add_reference_count + 1;
         Ok(())
@@ -30,8 +33,30 @@ impl ReferencePlugin for TestReferencePlugin {
         instance: &mut Hit,
         reference_id: &crate::Id,
         target: &IndexEntryProperty,
+        before_id: &Option<String>,
     ) -> Result<(), HitError> {
         self.after_add_reference_count = self.after_add_reference_count + 1;
+        Ok(())
+    }
+    fn on_before_move_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &crate::Id,
+        target: &IndexEntryProperty,
+        before_id: &Option<String>,
+    ) -> Result<(), HitError> {
+        self.before_move_reference_count = self.before_move_reference_count + 1;
+        Ok(())
+    }
+
+    fn on_after_move_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &crate::Id,
+        target: &IndexEntryProperty,
+        before_id: &Option<String>,
+    ) -> Result<(), HitError> {
+        self.after_move_reference_count = self.after_move_reference_count + 1;
         Ok(())
     }
 
@@ -103,6 +128,8 @@ fn create_test_delete_plugin() -> Rc<RefCell<TestReferencePlugin>> {
         after_add_reference_count: 0,
         before_remove_reference_count: 0,
         after_remove_reference_count: 0,
+        before_move_reference_count: 0,
+        after_move_reference_count: 0,
     }))
 }
 

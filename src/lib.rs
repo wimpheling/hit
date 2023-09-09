@@ -12,6 +12,7 @@ mod macros;
 mod model;
 mod object_data;
 mod plugins;
+mod import;
 #[cfg(test)]
 mod test_kernel;
 #[cfg(test)]
@@ -49,3 +50,5 @@ pub use errors::HitError;
 pub use errors::ValidationError;
 pub use errors::ValidationErrorLevel;
 pub use model::helpers;
+pub use linked_hash_map::LinkedHashMap;
+pub use import::*;

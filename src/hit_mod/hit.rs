@@ -34,7 +34,7 @@ impl ModelIndex {
 }
 
 pub struct Hit {
-    pub(in crate) index: Index,
+    pub index: Index,
     pub(in crate) model_index: Rc<RefCell<ModelIndex>>,
     pub(in crate) plugins: HitPlugins,
     pub kernel: Rc<HitKernel>,
@@ -101,19 +101,26 @@ impl Hit {
     ) -> Result<(), HitError> {
         // before plugins call
         for plugin in self.plugins.reference_plugins.clone().iter() {
-            plugin
-                .borrow_mut()
-                .on_before_add_reference(self, &id.to_string(), &target)?;
+            plugin.borrow_mut().on_before_add_reference(
+                self,
+                &id.to_string(),
+                &target,
+                &before_id,
+            )?;
         }
 
         let is_valid = self.field_is_reference_array(&target)?;
 
         if is_valid {
-            self.index.insert_reference(id, target.clone(), before_id)?;
+            self.index
+                .insert_reference(id, target.clone(), before_id.clone())?;
             for plugin in self.plugins.reference_plugins.clone().iter() {
-                plugin
-                    .borrow_mut()
-                    .on_after_add_reference(self, &id.to_string(), &target)?;
+                plugin.borrow_mut().on_after_add_reference(
+                    self,
+                    &id.to_string(),
+                    &target,
+                    &before_id,
+                )?;
             }
             Ok(())
         } else {
@@ -146,6 +153,40 @@ impl Hit {
                 plugin
                     .borrow_mut()
                     .on_after_remove_reference(self, &id.to_string(), &parent)?;
+            }
+            Ok(())
+        } else {
+            Err(HitError::InvalidDataType())
+        }
+    }
+
+    pub fn move_reference(
+        &mut self,
+        id: &str,
+        target: IndexEntryProperty,
+        before_id: Option<Id>,
+    ) -> Result<(), HitError> {
+        // before plugins call
+        for plugin in self.plugins.reference_plugins.clone().iter() {
+            plugin
+                .borrow_mut()
+                .on_before_remove_reference(self, &id.to_string(), &target)?;
+        }
+
+        // check in model that this property exists and is of a valid type
+        let target_model = self.get_model_or_error(&target.id)?;
+        let target_property = target_model
+            .get_field(&target.property)
+            .ok_or(HitError::PropertyNotFound((&target.property).into()))?;
+        let target_property = target_property.borrow();
+        if target_property.is_vec_reference() {
+            self.index
+                .move_reference(id, target.clone(), before_id.clone())?;
+
+            for plugin in self.plugins.reference_plugins.clone().iter() {
+                plugin
+                    .borrow_mut()
+                    .on_after_remove_reference(self, &id.to_string(), &target)?;
             }
             Ok(())
         } else {

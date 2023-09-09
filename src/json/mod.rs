@@ -1,6 +1,7 @@
 pub mod export;
 pub mod import;
 mod utils;
+
 use crate::HitError;
 
 #[derive(Debug)]
@@ -16,7 +17,6 @@ pub enum JSONImportError {
     InvalidJSON(),
     InvalidDateFormat(),
 }
-
 #[cfg(test)]
 mod tests {
     use crate::json::import::import;

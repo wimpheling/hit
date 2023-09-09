@@ -18,6 +18,5 @@ serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 mopa = "0.2.2"
 thiserror = "1.0"
-linked-hash-map = "0.5.3"
+linked-hash-map ={ version= "0.5.3", features = ["serde_impl"] }
 rand = { version="0.7.2", features = ["wasm-bindgen"] }
-

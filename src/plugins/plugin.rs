@@ -46,12 +46,28 @@ pub trait ReferencePlugin {
         instance: &mut Hit,
         reference_id: &Id,
         target: &IndexEntryProperty,
+        before_id: &Option<String>,
     ) -> Result<(), HitError>;
     fn on_after_add_reference(
         &mut self,
         instance: &mut Hit,
         reference_id: &Id,
         target: &IndexEntryProperty,
+        before_id: &Option<String>,
+    ) -> Result<(), HitError>;
+    fn on_before_move_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &Id,
+        target: &IndexEntryProperty,
+        before_id: &Option<String>,
+    ) -> Result<(), HitError>;
+    fn on_after_move_reference(
+        &mut self,
+        instance: &mut Hit,
+        reference_id: &Id,
+        target: &IndexEntryProperty,
+        before_id: &Option<String>,
     ) -> Result<(), HitError>;
     fn on_before_remove_reference(
         &mut self,
