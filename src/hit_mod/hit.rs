@@ -1,6 +1,6 @@
 use linked_hash_map::LinkedHashMap;
 
-use crate::index::{IndexEntryProperty, IndexEntry};
+use crate::index::{IndexEntry, IndexEntryProperty};
 use crate::model::validators::ValidatorContext;
 use crate::model::Model;
 use crate::object_data::Id;
@@ -21,7 +21,7 @@ use std::rc::Rc;
 pub type HitPlugins = Plugins;
 pub type HitKernel = dyn Kernel;
 
-pub(in crate) struct ModelIndex {
+pub(crate) struct ModelIndex {
     pub map: HashMap<String, Rc<Model>>,
 }
 
@@ -36,11 +36,11 @@ impl ModelIndex {
 #[derive(Clone)]
 pub struct Hit {
     pub index: Index,
-    pub(in crate) model_index: Rc<RefCell<ModelIndex>>,
-    pub(in crate) plugins: HitPlugins,
+    pub(crate) model_index: Rc<RefCell<ModelIndex>>,
+    pub(crate) plugins: HitPlugins,
     pub kernel: Rc<HitKernel>,
-    pub(in crate) errors: ModelPropertyVectors<ValidationError>,
-    pub(in crate) errors_subscriptions: Listeners<Vec<ValidationError>>,
+    pub(crate) errors: ModelPropertyVectors<ValidationError>,
+    pub(crate) errors_subscriptions: Listeners<Vec<ValidationError>>,
 }
 
 impl Hit {
@@ -64,8 +64,13 @@ impl Hit {
                 continue;
             }
             let value = value.borrow();
-            
-            let new_entry = IndexEntry::new_raw(id.clone(), value.data.clone(), get_parent(&value), value.references.clone());
+
+            let new_entry = IndexEntry::new_raw(
+                id.clone(),
+                value.data.clone(),
+                get_parent(&value),
+                value.references.clone(),
+            );
             let model = hit.get_model_or_error(&id)?;
             self.model_index.borrow_mut().map.insert(id.clone(), model);
             self.index.index.insert(id.clone(), new_entry);
@@ -74,7 +79,7 @@ impl Hit {
         // insert main
         let main = hit.get(&main_id).unwrap();
         let model = hit.get_model_or_error(main_id)?;
-        
+
         self.insert(&model.get_name(), main_id, main.get_data(), parent, None)?;
         Ok(())
     }
@@ -239,13 +244,14 @@ impl Hit {
     }
 
     pub fn remove_object(&mut self, id: &str) -> Result<Vec<String>, HitError> {
-        let entry = self
-            .index
-            .get(id)
-            .ok_or(HitError::IDNotFound(id.to_string(), "remove_object entry".to_string()))?;
-        let model = self
-            .get_model(id)
-            .ok_or(HitError::IDNotFound(id.to_string(), "remove_object model".to_string()))?;
+        let entry = self.index.get(id).ok_or(HitError::IDNotFound(
+            id.to_string(),
+            "remove_object entry".to_string(),
+        ))?;
+        let model = self.get_model(id).ok_or(HitError::IDNotFound(
+            id.to_string(),
+            "remove_object model".to_string(),
+        ))?;
 
         // before plugins call
         for plugin in self.plugins.delete_plugins.clone().iter() {
@@ -259,7 +265,6 @@ impl Hit {
         }
 
         let id_list = self.index.remove_object(id)?;
-
 
         // after plugins call
         for plugin in self.plugins.delete_plugins.clone().iter() {
@@ -354,7 +359,8 @@ impl Hit {
     }
 
     fn get_model_or_error(&self, id: &str) -> Result<Rc<Model>, HitError> {
-        self.get_model(id).ok_or(HitError::IDNotFound(id.into(), "get_model".into()))
+        self.get_model(id)
+            .ok_or(HitError::IDNotFound(id.into(), "get_model".into()))
     }
     /*
     fn get_model_field_or_error(
@@ -384,7 +390,9 @@ impl Hit {
     }
 
     pub fn set(&mut self, id: &str, property: &str, value: ObjectValue) -> Result<(), HitError> {
-        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string(), "set".into()))?;
+        let entry = self
+            .get(id)
+            .ok_or(HitError::IDNotFound(id.to_string(), "set".into()))?;
         let model_field = entry
             .model
             .get_field(property)
@@ -522,6 +530,18 @@ impl Hit {
             .map
             .insert(id.to_string(), new_object_model.clone());
 
+        // after_add_entry hook
+        for plugin in { self.get_plugins().plugins.clone() }.iter() {
+            plugin.borrow_mut().on_after_add_entry(
+                new_object_model.clone(),
+                &id,
+                values.clone(),
+                parent.clone(),
+                &before_id,
+                self,
+            )?;
+        }
+
         Ok(())
     }
 
@@ -555,7 +575,10 @@ impl Hit {
                 };
                 Ok(listener_id)
             }
-            None => Err(HitError::IDNotFound(id.to_string(), "subscribe_field".into())),
+            None => Err(HitError::IDNotFound(
+                id.to_string(),
+                "subscribe_field".into(),
+            )),
         }
     }
 
@@ -570,7 +593,10 @@ impl Hit {
                 entry.borrow_mut().remove_listener(field, listener_id)?;
                 Ok(())
             }
-            None => Err(HitError::IDNotFound(id.to_string(), "unsubscribe_field".into())),
+            None => Err(HitError::IDNotFound(
+                id.to_string(),
+                "unsubscribe_field".into(),
+            )),
         }
     }
 
@@ -672,7 +698,7 @@ impl Hit {
         )
     }
 
-    pub(in crate) fn validate_all(&mut self) -> Result<(), HitError> {
+    pub(crate) fn validate_all(&mut self) -> Result<(), HitError> {
         let model_index = self.model_index.borrow().map.clone();
 
         for (id, model) in model_index.iter() {
