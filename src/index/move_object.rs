@@ -12,7 +12,7 @@ fn set_object_parent(
 ) -> Result<(), HitError> {
     index
         .get_mut(id)
-        .ok_or(HitError::IDNotFound(id.to_string()))?
+        .ok_or(HitError::IDNotFound(id.to_string(), "set_object_parent".to_string()))?
         .borrow_mut()
         .set_parent(Some(new_parent));
     Ok(())
@@ -21,7 +21,7 @@ fn set_object_parent(
 fn check_target_is_not_a_child(index: &Index, id: &str, target_id: &str) -> Result<bool, HitError> {
     let parent = index
         .get(target_id)
-        .ok_or(HitError::IDNotFound(target_id.to_string()))?;
+        .ok_or(HitError::IDNotFound(target_id.to_string(), "check_target_is_not_a_child".to_string()))?;
     let parent_parent = parent.borrow().get_parent();
     match parent_parent {
         None => Ok(true),
@@ -48,7 +48,7 @@ fn _can_move_object(
 
     match index
         .get(id)
-        .ok_or(HitError::IDNotFound(id.to_string()))?
+        .ok_or(HitError::IDNotFound(id.to_string(), "_can_move_object".to_string()))?
         .borrow()
         .get_parent()
     {
@@ -86,7 +86,7 @@ pub fn move_object(
 
     let original_parent = index
         .get(id)
-        .ok_or(HitError::IDNotFound(id.to_string()))?
+        .ok_or(HitError::IDNotFound(id.to_string(), "move_object".to_string()))?
         .borrow()
         .get_parent()
         .ok_or(HitError::CannotMoveRootObject())?;

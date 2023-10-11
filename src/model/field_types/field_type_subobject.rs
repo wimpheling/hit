@@ -11,6 +11,7 @@ use crate::model::validators::{ValidatorContext, Validators};
 use crate::model::{Model, ModelField};
 use crate::object_data::{ObjectValue, Reference};
 
+#[derive(Default)]
 pub struct FieldTypeSubobject {
     pub required: bool,
     pub name: String,

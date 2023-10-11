@@ -47,7 +47,7 @@ pub fn import_from_patches_and_entries<'a>(
     return Ok(hit);
 }
 
-pub fn apply_patches(hit: &Hit, patch: Vec<Patch>) -> Result<Hit, HitError> {
+pub fn apply_patches(hit: &Hit, patches: Vec<Patch>) -> Result<Hit, HitError> {
     let mut entries = LinkedHashMap::new();
     for entry in hit.index.iter() {
         let model = hit.get_model(&entry.0).unwrap();
@@ -58,7 +58,7 @@ pub fn apply_patches(hit: &Hit, patch: Vec<Patch>) -> Result<Hit, HitError> {
             model: model.get_name().to_string(),
         });
     }
-    import_from_patches_and_entries(patch, hit.get_main_object_id(), hit.kernel.clone(), &mut entries)
+    import_from_patches_and_entries(patches, hit.get_main_object_id(), hit.kernel.clone(), &mut entries)
 }
 
 pub fn duplicate_hit(hit: &Hit) -> Result<Hit, HitError> {

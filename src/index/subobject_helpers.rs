@@ -45,22 +45,22 @@ fn mutate_remove_from_subobject_array(
 
 fn remove_from_subobject_array(index: &Index, id: &str) -> Result<(), HitError> {
     let (array_of_refs, parent) = {
-        let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+        let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string(), "remove_from_subobject_array entry".into()))?;
         let entry = entry.borrow();
         let parent = entry
             .get_parent()
-            .ok_or(HitError::IDNotFound(id.to_string()))?;
+            .ok_or(HitError::IDNotFound(id.to_string(), "remove_from_subobject_array parent".into()))?;
         (
             index.get_value(&parent.id, &parent.property),
             parent.clone(),
         )
     };
-    let array_of_refs = array_of_refs.ok_or(HitError::IDNotFound(id.to_string()))?;
+    let array_of_refs = array_of_refs.ok_or(HitError::IDNotFound(id.to_string(), "remove_from_subobject_array array".into()))?;
     // let refs_as_vec = get_object_value_as_vec_reference(array_of_refs.clone())?;
     let new_value = mutate_remove_from_subobject_array(array_of_refs, id)?;
     let parent_index_entry = index
         .get(&parent.id)
-        .ok_or(HitError::IDNotFound(id.to_string()))?;
+        .ok_or(HitError::IDNotFound(id.to_string(), "remove_from_subobject_array parent_index".into()))?;
     match new_value {
         Some(new_data) => {
             parent_index_entry

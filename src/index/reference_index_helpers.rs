@@ -46,7 +46,7 @@ pub fn unindex_reference(
     parent: IndexEntryProperty,
     id: &str,
 ) -> Result<(), HitError> {
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string(), "unindex_reference".to_string()))?;
     entry.borrow_mut().references.retain(|x| x != &parent);
     Ok(())
 }

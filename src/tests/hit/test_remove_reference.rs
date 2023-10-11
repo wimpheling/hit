@@ -73,7 +73,7 @@ fn it_should_throw_error_for_invalid_references() {
         )
         .err()
         .unwrap(),
-        HitError::IDNotFound("id24".into())
+        HitError::IDNotFound("id24".into(), "unindex_reference".into())
     );
 }
 #[test]

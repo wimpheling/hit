@@ -41,7 +41,7 @@ impl ModelField for FieldTypeSubobjectArray {
     }
     fn accepts_for_set(&self, value: &ObjectValue, _context: &ValidatorContext) -> bool {
         match value {
-            // ObjectValue::VecSubObjects(_) => true,
+            ObjectValue::VecSubObjects(_) => true,
             _ => false,
         }
     }

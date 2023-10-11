@@ -12,7 +12,7 @@ pub fn get_parent_index_entry(
     let entry = index
         .index
         .get(id)
-        .ok_or(HitError::IDNotFound(id.to_string()))?
+        .ok_or(HitError::IDNotFound(id.to_string(), "get_parent_index_entry".to_string()))?
         .borrow();
     let parent = entry.get_parent();
     match parent {
@@ -32,7 +32,7 @@ pub fn get_parent_index_entry_from_parent(
 }
 
 pub fn dispatch_event(index: &Index, id: &str, property: &str) -> Result<(), HitError> {
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string(), "dispatch_event".to_string()))?;
     let value = entry.borrow().get(&property).clone();
     entry.borrow_mut().dispatch_value(&property, value);
     Ok(())

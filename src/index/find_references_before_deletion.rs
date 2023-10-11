@@ -17,7 +17,7 @@ fn add_references_to_output(
     }
     id_list.push(id.to_string());
 
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string(), "add_references_to_output".to_string()))?;
     for (_, value) in entry.borrow().data.iter() {
         match value {
             ObjectValue::VecSubObjects(value) => {

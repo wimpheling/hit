@@ -6,6 +6,7 @@ type PropertyMap<T> = HashMap<String, Vec<T>>;
 
 type EntryMap<T> = HashMap<String, PropertyMap<T>>;
 
+#[derive(Clone)]
 pub struct ModelPropertyVectors<T: PartialEq> {
     entry_map: EntryMap<T>,
 }

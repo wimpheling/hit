@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+#[derive(Clone)]
 pub struct Listeners<T>(HashMap<String, Vec<FieldListenerRef<T>>>);
 
 impl<T> Listeners<T> {

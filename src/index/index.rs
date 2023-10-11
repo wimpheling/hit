@@ -22,6 +22,7 @@ use super::{
     reference_helpers::mutate_remove_from_reference_array,
 };
 
+#[derive(Clone)]
 pub struct Index {
     pub(in crate) index: BTreeMap<Id, IndexEntryRef>,
     id: Id,
@@ -106,7 +107,7 @@ impl Index {
             _ => return Err(HitError::CanOnlySetScalarValues()),
         }
 
-        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+        let entry = self.get(id).ok_or(HitError::IDNotFound(id.to_string(), "set_value".into()))?;
         entry.borrow_mut().set(property, value)?;
         Ok(())
     }
@@ -181,7 +182,7 @@ impl Index {
     ) -> Result<(), HitError> {
         let target_entry = {
             self.get_mut(&target.id)
-                .ok_or(HitError::IDNotFound(target.id.to_string()))?
+                .ok_or(HitError::IDNotFound(target.id.to_string(), "move_reference".into()))?
         };
         let data = get_parent_property_value(&target_entry, &target);
 
@@ -232,7 +233,7 @@ impl Index {
         {
             let target_entry = {
                 self.get_mut(&target.id)
-                    .ok_or(HitError::IDNotFound(target.id.to_string()))?
+                    .ok_or(HitError::IDNotFound(target.id.to_string(), "insert_reference".into()))?
             };
             let data = get_parent_property_value(&target_entry, &target);
 
@@ -269,7 +270,7 @@ impl Index {
         {
             let target_entry = {
                 self.get_mut(&target.id)
-                    .ok_or(HitError::IDNotFound(target.id.to_string()))?
+                    .ok_or(HitError::IDNotFound(target.id.to_string(), "insert_reference".into()))?
             };
             let data = get_parent_property_value(&target_entry, &target);
             Index::dispatch_value(target_entry.clone(), &target.property, data);
@@ -289,7 +290,7 @@ impl Index {
         //dispatch event
         let entry = self
             .get(&parent.clone().id)
-            .ok_or(HitError::IDNotFound(parent.clone().id.to_string()))?;
+            .ok_or(HitError::IDNotFound(parent.clone().id.to_string(), "remove_reference".into()))?;
         Index::dispatch_value(entry, &parent.property, value);
         Ok(())
     }

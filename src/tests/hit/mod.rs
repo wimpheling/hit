@@ -10,3 +10,5 @@ mod test_remove_object;
 mod test_remove_reference;
 
 mod test_clone_hit;
+
+mod test_import_hit;

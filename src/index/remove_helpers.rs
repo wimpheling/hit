@@ -5,7 +5,7 @@ use crate::object_data::ObjectValue;
 use crate::HitError;
 
 pub fn get_references(index: &Index, id: &str) -> Result<Vec<IndexEntryProperty>, HitError> {
-    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+    let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string(), "get_references".to_string()))?;
     let entry = entry.borrow();
     Ok(entry.references.clone())
 }
@@ -23,7 +23,7 @@ pub fn remove_object_helper(index: &mut Index, id: &str) -> Result<(), HitError>
 
 fn remove_object_children(index: &mut Index, id: &str) -> Result<(), HitError> {
     let data = {
-        let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+        let entry = index.get(id).ok_or(HitError::IDNotFound(id.to_string(), "remove_object_children".to_string()))?;
         let entry = entry.borrow();
         entry.data.clone()
     };
