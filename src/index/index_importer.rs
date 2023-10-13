@@ -33,7 +33,7 @@ impl IndexImporter {
             let entry = self
                 .index
                 .get(id)
-                .ok_or(HitError::IDNotFound(id.to_string()))?;
+                .ok_or(HitError::IDNotFound(id.to_string(), "finish_import".to_string()))?;
             for parent in vector.iter() {
                 entry.borrow_mut().references.push(parent.clone());
             }

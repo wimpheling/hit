@@ -20,7 +20,7 @@ pub struct IndexEntry {
     id: Id,
     pub(in crate) data: ObjectValues,
     parent: Option<IndexEntryProperty>,
-    pub(in crate::index) references: Vec<IndexEntryProperty>,
+    pub(in crate) references: Vec<IndexEntryProperty>,
     property_change_listeners: Listeners<ObjectValue>,
 }
 
@@ -31,6 +31,16 @@ impl IndexEntry {
             data: data,
             parent: parent,
             references: vec![],
+            property_change_listeners: Listeners::new(),
+        }));
+    }
+
+    pub(crate) fn new_raw(id: Id, data: ObjectValues, parent: Option<IndexEntryProperty>, references: Vec<IndexEntryProperty>) -> IndexEntryRef {
+        return Rc::new(RefCell::new(IndexEntry {
+            id: String::from(id),
+            data: data,
+            parent,
+            references,
             property_change_listeners: Listeners::new(),
         }));
     }

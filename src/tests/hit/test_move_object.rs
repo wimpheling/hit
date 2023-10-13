@@ -142,7 +142,7 @@ fn it_should_return_an_error_when_id_is_invalid() {
         )
         .err()
         .unwrap(),
-        HitError::IDNotFound("id421".into())
+        HitError::IDNotFound("id421".into(), "move_object".into())
     );
 }
 #[test]
@@ -159,7 +159,7 @@ fn it_should_return_an_error_when_target_id_is_invalid() {
         )
         .err()
         .unwrap(),
-        HitError::IDNotFound("id222".into())
+        HitError::IDNotFound("id222".into(), "get_model".into())
     );
 }
 

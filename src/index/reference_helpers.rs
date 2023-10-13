@@ -11,7 +11,7 @@ pub fn remove_reference_from_parent_array_from_property(
 ) -> Result<ObjectValue, HitError> {
     let entry = index
         .get(&parent.id)
-        .ok_or(HitError::IDNotFound(parent.id.to_string()))?;
+        .ok_or(HitError::IDNotFound(parent.id.to_string(), "remove_reference_from_parent".into()))?;
     let data = get_parent_property_value(&entry, &parent);
     let new_data = mutate_remove_from_reference_array(data, id)?;
     match new_data {

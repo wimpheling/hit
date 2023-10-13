@@ -1,3 +1,4 @@
+use std::backtrace::Backtrace;
 use std::{clone::Clone, collections::HashMap};
 use serde::Serialize;
 use thiserror::*;
@@ -31,8 +32,8 @@ pub enum HitError {
     Required(),
     #[error("Model `{0}` is not allowed here")]
     ModelNotAllowed(String),
-    #[error("ID not found: `{0}`")]
-    IDNotFound(String),
+    #[error("ID not found: `{0}`, ref: `{1}`")]
+    IDNotFound(String, String),
     #[error("Listener Not Found: `{0}`")]
     ListenerNotFound(String),
     #[error("VALIDATION ERROR: TODO THIS SHOULD NOT BE A HITERROR")]

@@ -17,7 +17,7 @@ fn _copy_object(
     updated_ids: &mut HashMap<Id, Id>,
 ) -> Result<Id, HitError> {
     let new_id = uuid();
-    let entry = hit.get(id).ok_or(HitError::IDNotFound(id.to_string()))?;
+    let entry = hit.get(id).ok_or(HitError::IDNotFound(id.to_string(), "copy_object entry".to_string()))?;
     let model = hit
         .get_model(id)
         .ok_or(HitError::ModelDoesNotExist(id.into()))?;

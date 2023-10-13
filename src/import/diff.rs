@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::{Hit, ObjectValue, Id, ObjectValues, IndexEntryProperty};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PatchPropertyDifference {
     pub id: String,
     pub property: String,
@@ -18,14 +18,14 @@ pub struct AddedEntry {
     pub parent: Option<IndexEntryProperty>,
     pub model: String,
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Patch {
     pub differences: Vec<PatchPropertyDifference>,
     pub deleted: Vec<String>,
     pub added: Vec<AddedEntry>,
 }
 
-pub fn create_patch(old: Hit, new: Hit) -> Patch {
+pub fn create_patch(old: Hit, new: &Hit) -> Patch {
     let mut deleted = Vec::new();
     let mut added = Vec::new();
     let mut differences = Vec::new();
@@ -181,7 +181,7 @@ mod tests {
         )
         .unwrap();
 
-        let patch = create_patch(old, new);
+        let patch = create_patch(old, &new);
         assert_eq!(patch.added, vec![AddedEntry {
             id: "added_folder".to_string(),
             data: fields.clone(),
